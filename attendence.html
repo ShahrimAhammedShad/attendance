@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Coaching Center - Attendance Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- SheetJS (XLSX) CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- jsPDF and AutoTable CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginSection" class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-slate-100">
+            <h2 class="text-2xl font-extrabold text-indigo-600 text-center mb-2">Ideal Coaching Center</h2>
+            <p id="authFormTitle" class="text-slate-500 text-center mb-6 text-sm">Attendance Management System</p>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Email Address</label>
+                    <input type="email" id="loginEmail" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <button type="submit" id="btnAuthSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition">Log In</button>
+            </form>
+            <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardSection" class="hidden flex-grow flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col p-4 space-y-2">
+            <div class="py-4 px-2 border-b border-slate-800 mb-4">
+                <h3 class="text-lg font-bold tracking-wider text-indigo-400">Ideal Coaching Center</h3>
+                <p id="userRoleBadge" class="text-xs bg-slate-800 text-slate-300 inline-block px-2 py-0.5 rounded-full mt-1 font-semibold uppercase"></p>
+            </div>
+            
+            <nav class="space-y-1 flex-grow">
+                <button onclick="switchTab('markTab')" id="btn-markTab" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium">
+                    <i data-lucide="check-square" class="w-5 h-5"></i> <span>Mark Attendance</span>
+                </button>
+                <button onclick="switchTab('studentsTab')" id="btn-studentsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="users" class="w-5 h-5"></i> <span>Student Database</span>
+                </button>
+                <button onclick="switchTab('recordsTab')" id="btn-recordsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="calendar" class="w-5 h-5"></i> <span>Attendance History</span>
+                </button>
+                <button onclick="switchTab('statsTab')" id="btn-statsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> <span>Statistics & Reports</span>
+                </button>
+                <button onclick="switchTab('usersTab')" id="btn-usersTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i> <span>Add Inputter Account</span>
+                </button>
+            </nav>
+
+            <button onclick="logOut()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left text-red-400 hover:bg-slate-850 mt-auto transition font-medium">
+                <i data-lucide="log-out" class="w-5 h-5"></i> <span>Sign Out</span>
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow p-6 overflow-y-auto max-w-7xl mx-auto w-full">
+            
+            <!-- 1. MARK ATTENDANCE TAB -->
+            <section id="markTab" class="tab-content space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800">
+                        <i data-lucide="check-square" class="text-indigo-600"></i> Mark Attendance
+                    </h2>
+                    
+                    <!-- View Mode Toggle -->
+                    <div class="flex space-x-4 mb-6 border-b border-slate-100 pb-4">
+                        <button onclick="toggleEntryMode('individual')" id="btnModeInd" class="px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600">Individual Entry</button>
+                        <button onclick="toggleEntryMode('bulk')" id="btnModeBulk" class="px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent">Batch / Session Entry</button>
+                    </div>
+
+                    <!-- Individual Quick Entry -->
+                    <div id="individualEntryView" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Select Date</label>
+                                <input type="date" id="singleDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Roll Number (6 Digits)</label>
+                                <input type="text" id="singleRoll" maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Status</label>
+                                <select id="singleStatus" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="Present">Present</option>
+                                    <option value="Late">Late</option>
+                                    <option value="Absent" selected>Absent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-100 mb-4">
+                            <span class="text-sm text-slate-500 font-medium">Matched Student Name:</span>
+                            <span id="liveStudentName" class="font-bold text-indigo-600 text-lg">Type a valid 6-digit roll...</span>
+                        </div>
+                        <button onclick="saveIndividualAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">Save Record</button>
+                    </div>
+
+                    <!-- Batch Entry -->
+                    <div id="bulkEntryView" class="space-y-4 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Select Date</label>
+                                <input type="date" id="bulkDate" onchange="loadStudentsForBulkMarking()" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Select Session / Batch</label>
+                                <select id="bulkSessionFilter" onchange="loadStudentsForBulkMarking()" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">-- Choose Session --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto mt-4">
+                            <table class="min-w-full bg-white divide-y divide-slate-100">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Roll</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Name</th>
+                                        <th class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bulkMarkingTableBody" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="3" class="text-center py-6 text-slate-400">Please select both date and session to load students.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-end pt-4">
+                            <button onclick="saveBulkAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">Save Batch Attendance</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. STUDENT DATABASE TAB (ADMIN ONLY) -->
+            <section id="studentsTab" class="tab-content space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Manual Student Entry -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-indigo-600"></i> Add Student</h3>
+                        <form id="studentForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Name</label>
+                                <input type="text" id="studentName" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Roll Number (6 Digits)</label>
+                                <input type="text" id="studentRoll" required maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Session / Batch</label>
+                                <input type="text" id="studentSession" required placeholder="e.g., 2023-24" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Register Student</button>
+                        </form>
+                    </div>
+
+                    <!-- Excel Upload -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="file-spreadsheet" class="text-green-600"></i> Bulk Excel Upload</h3>
+                            <p class="text-slate-500 text-xs mb-4">Upload an Excel file (.xlsx) with columns explicitly named: <strong class="text-indigo-600">Roll, Name, Session</strong>. Make sure Roll is 6 digits.</p>
+                            <input type="file" id="excelFile" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer mb-4">
+                        </div>
+                        <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">Upload Excel Data</button>
+                    </div>
+
+                    <!-- Export Tool -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="download" class="text-indigo-600"></i> Export Tools</h3>
+                            <p class="text-slate-500 text-xs mb-4">Download your entire student database directly into Excel sheet formats or clean backups.</p>
+                        </div>
+                        <button onclick="exportStudentsToExcel()" class="w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+                            <i data-lucide="external-link" class="w-4 h-4"></i> Export Students to Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Student Directory Table -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <h3 class="text-lg font-bold text-slate-800">Student Directory</h3>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="text" id="studentSearch" oninput="renderStudentList()" placeholder="Search Name or Roll..." class="border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-64">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Roll</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Session</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody" class="divide-y divide-slate-100">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. ATTENDANCE HISTORY TAB -->
+            <section id="recordsTab" class="tab-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i data-lucide="history" class="text-indigo-600"></i> Attendance History</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Start Date</label>
+                            <input type="date" id="historyStartDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">End Date</label>
+                            <input type="date" id="historyEndDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Filter by Session</label>
+                            <select id="historySessionFilter" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">All Sessions</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="queryAttendanceRecords()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium">Apply Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 justify-end mb-4">
+                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
+                        </button>
+                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Roll</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Session</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="text-center py-6 text-slate-400">Click "Apply Filters" to load attendance history records.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- INDIVIDUAL STUDENT HISTORY SEARCH PANEL -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mt-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i data-lucide="user-search" class="text-indigo-600"></i> Individual Student Search</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Roll Number (6 Digits)</label>
+                            <input type="text" id="indivRollSearch" maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
+                        </div>
+                        <div class="md:col-span-2 flex items-end">
+                            <button onclick="queryIndividualHistory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm w-full md:w-auto font-medium">Search Student History</button>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-100 mb-4">
+                        <span class="text-sm text-slate-500 font-medium">Matched Student:</span>
+                        <span id="indivStudentMatchedName" class="font-bold text-indigo-600 text-lg">Type a valid 6-digit roll...</span>
+                    </div>
+                    
+                    <!-- Individual Result List -->
+                    <div id="indivHistoryResultSection" class="hidden">
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                            <h4 class="text-md font-bold text-slate-700">Attendance Log for <span id="indivResultName" class="text-indigo-600"></span></h4>
+                            <button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> Export Student PDF
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="indivHistoryTableBody" class="divide-y divide-slate-100">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. STATISTICS & REPORTS TAB (ADMIN ONLY) -->
+            <section id="statsTab" class="tab-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i data-lucide="bar-chart-3" class="text-indigo-600"></i> Analytics Dashboard</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Cycle Start Date</label>
+                            <input type="date" id="statsStartDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Cycle End Date</label>
+                            <input type="date" id="statsEndDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Select Batch / Session</label>
+                            <select id="statsSession" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="generateStatistics()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium font-medium">Analyze Cycle</button>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Cards (4-Column Layout) -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="p-5 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl shadow-sm">
+                            <h4 class="text-indigo-100 text-sm font-medium mb-1 uppercase tracking-wider">Total Class Days Run</h4>
+                            <p id="statTotalDays" class="text-3xl font-extrabold">0</p>
+                            <span class="text-indigo-200 text-xs">Based on cycle date range</span>
+                        </div>
+                        <div class="p-5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl shadow-sm">
+                            <h4 class="text-emerald-100 text-sm font-medium mb-1 uppercase tracking-wider">Class Average Rate</h4>
+                            <p id="statBatchAvg" class="text-3xl font-extrabold">0%</p>
+                            <span class="text-emerald-200 text-xs">Entire selected batch rate</span>
+                        </div>
+                        <div class="p-5 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-xl shadow-sm">
+                            <h4 class="text-rose-100 text-sm font-medium mb-1 uppercase tracking-wider">Students At Risk</h4>
+                            <p id="statAtRisk" class="text-3xl font-extrabold">0</p>
+                            <span class="text-rose-200 text-xs">Attendance rate < 60%</span>
+                        </div>
+                        <div class="p-5 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl shadow-sm">
+                            <h4 class="text-amber-100 text-sm font-medium mb-1 uppercase tracking-wider">Perfect Attenders</h4>
+                            <p id="statPerfect" class="text-3xl font-extrabold">0</p>
+                            <span class="text-amber-200 text-xs">Students with 100% rate</span>
+                        </div>
+                    </div>
+
+                    <!-- Insight Rankings Panel -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-2 mb-2 text-indigo-600">
+                                <i data-lucide="award" class="w-5 h-5"></i>
+                                <h4 class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Top Attender(s)</h4>
+                            </div>
+                            <p id="statTopAttender" class="text-lg font-bold text-slate-800">N/A</p>
+                            <span id="statTopAttenderPresents" class="text-xs text-slate-500 block mt-1">Presents count: 0</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-2 mb-2 text-rose-500">
+                                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                                <h4 class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Least Attender(s)</h4>
+                            </div>
+                            <p id="statLeastAttender" class="text-lg font-bold text-slate-800">N/A</p>
+                            <span id="statLeastAttenderPresents" class="text-xs text-slate-500 block mt-1">Presents count: 0</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="flex items-center gap-2 mb-2 text-amber-500">
+                                <i data-lucide="clock" class="w-5 h-5"></i>
+                                <h4 class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Most Late</h4>
+                            </div>
+                            <p id="statMostLate" class="text-lg font-bold text-slate-800">N/A</p>
+                            <span id="statMostLateCount" class="text-xs text-slate-500 block mt-1">Lates count: 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Search and Dynamic Filter Bar -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                            <input type="text" id="statsSearch" oninput="filterStatsTable()" placeholder="Search Name or Roll in results..." class="border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-64">
+                            <select id="statsCriteriaFilter" onchange="filterStatsTable()" class="border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full md:w-48">
+                                <option value="all">All Students</option>
+                                <option value="low">Low Attendance (&lt; 60%)</option>
+                                <option value="high">High Attendance (&ge; 90%)</option>
+                                <option value="lates">Has Lates</option>
+                            </select>
+                        </div>
+                        <!-- Export Stats -->
+                        <div class="flex gap-2">
+                            <button onclick="exportStatsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
+                            </button>
+                            <button onclick="exportStatsPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analytics Table -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Roll</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Present Days</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Late Days</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Absent Days</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Attendance Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statsTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="text-center py-6 text-slate-400">Generate analysis to populate statistical records.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. USER MANAGEMENT TAB (ADMIN ONLY) -->
+            <section id="usersTab" class="tab-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md mx-auto">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-indigo-600"></i> Register Inputter</h2>
+                    <p class="text-slate-500 text-xs mb-4">Inputters are auxiliary accounts that can only record attendance. They are restricted from modifying databases, checking stats, or exporting files.</p>
+                    <form id="createInputterForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Email</label>
+                            <input type="email" id="inputterEmail" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Password</label>
+                            <input type="password" id="inputterPassword" required minlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Assign to Batch / Session</label>
+                            <select id="inputterSessionAssign" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Select Batch --</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Create Account</button>
+                    </form>
+                    <p id="inputterFormMessage" class="text-center text-sm font-semibold mt-4 hidden"></p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Edit Record Modal -->
+    <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md border border-slate-100 space-y-4">
+            <h3 class="text-lg font-bold">Edit Attendance Record</h3>
+            <div>
+                <label class="block text-sm font-medium mb-1">Student Name</label>
+                <input type="text" id="editModalName" readonly class="w-full border px-3 py-2 rounded-lg bg-slate-50 text-slate-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Roll</label>
+                <input type="text" id="editModalRoll" readonly class="w-full border px-3 py-2 rounded-lg bg-slate-50 text-slate-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Status</label>
+                <select id="editModalStatus" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="Present">Present</option>
+                    <option value="Late">Late</option>
+                    <option value="Absent">Absent</option>
+                </select>
+            </div>
+            <input type="hidden" id="editModalDocId">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-600 transition font-semibold">Cancel</button>
+                <button onclick="saveEditModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition font-semibold">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER DEVELOPMENT ATTRIBUTION -->
+    <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
+        <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4">Shahrim Ahammed Shad</a></p>
+    </footer>
+
+    <!-- MAIN APP SCRIPT -->
+    <script>
+        // ==========================================
+        // CONFIGURATION: INTEGRATED WITH YOUR CONFIG
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYKiRqkuyKyk6vELYSAuxMviT-owg_DiY",
+            authDomain: "attendance-64352.firebaseapp.com",
+            projectId: "attendance-64352",
+            storageBucket: "attendance-64352.firebasestorage.app",
+            messagingSenderId: "625341651770",
+            appId: "1:625341651770:web:6e644bad3641532c33ce03"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // App States
+        let currentUser = null;
+        let currentUserRole = null;
+        let currentUserAssignedSession = null;
+        
+        let studentsCache = [];
+        let sessionsCache = [];
+        let currentlyMarkingSessionStudents = [];
+        let queriedRecords = [];
+        let queriedStats = [];
+        let statsCycleDetails = { totalDays: 0, session: '', start: '', end: '' };
+        
+        let indivQueriedRecords = [];
+        let indivSelectedStudent = null;
+
+        // DOM Elements
+        const loginSection = document.getElementById('loginSection');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const loginForm = document.getElementById('loginForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const userRoleBadge = document.getElementById('userRoleBadge');
+
+        // Initial Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initIcons();
+            setDefaultDates();
+            
+            // Check auth state
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    const role = await getUserRole(user.uid);
+                    currentUserRole = role;
+                    setupDashboardForRole(role);
+                    await syncCache();
+                } else {
+                    showLoginScreen();
+                }
+            });
+        });
+
+        function initIcons() {
+            lucide.createIcons();
+        }
+
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('singleDate').value = today;
+            document.getElementById('bulkDate').value = today;
+            document.getElementById('historyStartDate').value = today;
+            document.getElementById('historyEndDate').value = today;
+            document.getElementById('statsStartDate').value = today;
+            document.getElementById('statsEndDate').value = today;
+        }
+
+        // ==========================================
+        // USER AUTHENTICATION & ROLE MANAGEMENT
+        // ==========================================
+        async function getUserRole(uid) {
+            try {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    currentUserRole = data.role;
+                    currentUserAssignedSession = data.assignedSession || null;
+                    return data.role;
+                } else {
+                    // AUTO-ADMIN PROVISIONING:
+                    let assignedRole = 'inputter';
+                    if (currentUser && currentUser.email && currentUser.email.toLowerCase().includes('admin')) {
+                        assignedRole = 'admin';
+                    } else {
+                        const usersSnap = await db.collection('users').limit(1).get();
+                        if (usersSnap.empty) {
+                            assignedRole = 'admin';
+                        }
+                    }
+                    
+                    // Auto-write profile to Database
+                    await db.collection('users').doc(uid).set({
+                        email: currentUser.email,
+                        role: assignedRole
+                    });
+                    currentUserRole = assignedRole;
+                    currentUserAssignedSession = null;
+                    return assignedRole;
+                }
+            } catch (error) {
+                console.error("Error mapping user roles: ", error);
+                return 'admin'; 
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.classList.add('hidden');
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                loginError.textContent = error.message;
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        function logOut() {
+            auth.signOut().then(() => {
+                showLoginScreen();
+            });
+        }
+
+        function showLoginScreen() {
+            loginSection.classList.remove('hidden');
+            dashboardSection.classList.add('hidden');
+            currentUser = null;
+            currentUserRole = null;
+            currentUserAssignedSession = null;
+        }
+
+        function setupDashboardForRole(role) {
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            userRoleBadge.textContent = role;
+
+            if (role === 'admin') {
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+                switchTab('markTab');
+            } else {
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+                switchTab('markTab');
+            }
+        }
+
+        // ==========================================
+        // GENERAL CORE UTILS & TAB NAVIGATION
+        // ==========================================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'bg-slate-800');
+            });
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-800');
+            }
+        }
+
+        // Cache-syncer loads all students globally to memory for offline-speed roll matched searches
+        async function syncCache() {
+            db.collection('students').onSnapshot(snapshot => {
+                studentsCache = [];
+                sessionsCache = new Set();
+                
+                snapshot.forEach(doc => {
+                    const student = doc.data();
+                    studentsCache.push(student);
+                    if (student.session) sessionsCache.add(student.session);
+                });
+
+                updateDropdowns();
+                renderStudentList();
+            });
+        }
+
+        function updateDropdowns() {
+            const sortedSessions = Array.from(sessionsCache).sort();
+            
+            // Populate normal dropdown filters
+            const dropdowns = [
+                'historySessionFilter',
+                'statsSession',
+                'inputterSessionAssign'
+            ];
+
+            dropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                
+                el.innerHTML = id.includes('history') ? '<option value="">All Sessions</option>' : '<option value="">-- Select Batch --</option>';
+                sortedSessions.forEach(session => {
+                    const opt = document.createElement('option');
+                    opt.value = session;
+                    opt.textContent = session;
+                    el.appendChild(opt);
+                });
+            });
+
+            // Populate the Bulk Session filter. 
+            // If the user is an inputter with a batch lock, restrict dropdown and disable it.
+            const bulkFilter = document.getElementById('bulkSessionFilter');
+            bulkFilter.innerHTML = '<option value="">-- Choose Session --</option>';
+            
+            if (currentUserRole === 'inputter' && currentUserAssignedSession) {
+                const opt = document.createElement('option');
+                opt.value = currentUserAssignedSession;
+                opt.textContent = currentUserAssignedSession;
+                opt.selected = true;
+                bulkFilter.appendChild(opt);
+                bulkFilter.disabled = true;
+                loadStudentsForBulkMarking();
+            } else {
+                bulkFilter.disabled = false;
+                sortedSessions.forEach(session => {
+                    const opt = document.createElement('option');
+                    opt.value = session;
+                    opt.textContent = session;
+                    bulkFilter.appendChild(opt);
+                });
+            }
+        }
+
+        // ==========================================
+        // 1. ATTENDANCE ENTRY (INDIVIDUAL & BATCH)
+        // ==========================================
+        let entryMode = 'individual';
+        function toggleEntryMode(mode) {
+            entryMode = mode;
+            if (mode === 'individual') {
+                document.getElementById('individualEntryView').classList.remove('hidden');
+                document.getElementById('bulkEntryView').classList.add('hidden');
+                document.getElementById('btnModeInd').classList.add('border-indigo-600', 'text-indigo-600');
+                document.getElementById('btnModeBulk').classList.remove('border-indigo-600', 'text-indigo-600');
+                document.getElementById('btnModeBulk').classList.add('border-transparent', 'text-slate-500');
+            } else {
+                document.getElementById('individualEntryView').classList.add('hidden');
+                document.getElementById('bulkEntryView').classList.remove('hidden');
+                document.getElementById('btnModeBulk').classList.add('border-indigo-600', 'text-indigo-600');
+                document.getElementById('btnModeInd').classList.remove('border-indigo-600', 'text-indigo-600');
+                document.getElementById('btnModeInd').classList.add('border-transparent', 'text-slate-500');
+            }
+        }
+
+        // Live Name Lookup Listener for individual attendance
+        const singleRollInput = document.getElementById('singleRoll');
+        const liveStudentName = document.getElementById('liveStudentName');
+
+        singleRollInput.addEventListener('input', () => {
+            const roll = singleRollInput.value.trim();
+            if (roll.length === 6) {
+                const matched = studentsCache.find(s => s.roll === roll);
+                if (matched) {
+                    liveStudentName.textContent = `${matched.name} (Session: ${matched.session})`;
+                    liveStudentName.className = "font-bold text-green-600 text-lg";
+                } else {
+                    liveStudentName.textContent = "Roll not found in database!";
+                    liveStudentName.className = "font-bold text-red-500 text-lg";
+                }
+            } else {
+                liveStudentName.textContent = "Type a valid 6-digit roll...";
+                liveStudentName.className = "font-bold text-slate-500 text-lg";
+            }
+        });
+
+        async function saveIndividualAttendance() {
+            const date = document.getElementById('singleDate').value;
+            const roll = singleRollInput.value.trim();
+            const status = document.getElementById('singleStatus').value;
+
+            if (!date || roll.length !== 6) {
+                alert("Please provide a valid date and a 6-digit roll number.");
+                return;
+            }
+
+            const matchedStudent = studentsCache.find(s => s.roll === roll);
+            if (!matchedStudent) {
+                alert("This roll number does not match any existing student record.");
+                return;
+            }
+
+            // BATCH LOCK SECURITY:
+            if (currentUserRole === 'inputter' && currentUserAssignedSession) {
+                if (matchedStudent.session !== currentUserAssignedSession) {
+                    alert(`Authorized Access Blocked: You are only allowed to mark attendance for batch "${currentUserAssignedSession}".`);
+                    return;
+                }
+            }
+
+            // Write to Firestore with uniform record id structured as {date}_{roll}
+            const recordId = `${date}_${roll}`;
+            try {
+                await db.collection('attendance').doc(recordId).set({
+                    date: date,
+                    roll: roll,
+                    name: matchedStudent.name,
+                    session: matchedStudent.session,
+                    status: status,
+                    markedBy: currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Attendance record registered successfully!");
+                singleRollInput.value = "";
+                liveStudentName.textContent = "Type a valid 6-digit roll...";
+                liveStudentName.className = "font-bold text-slate-500 text-lg";
+            } catch (error) {
+                alert("Error recording attendance: " + error.message);
+            }
+        }
+
+        // Batch / Session Loading
+        async function loadStudentsForBulkMarking() {
+            const date = document.getElementById('bulkDate').value;
+            const session = document.getElementById('bulkSessionFilter').value;
+            const container = document.getElementById('bulkMarkingTableBody');
+            
+            if (!date || !session) {
+                container.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-400">Please select both date and session to load students.</td></tr>`;
+                currentlyMarkingSessionStudents = [];
+                return;
+            }
+
+            container.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-400">Loading student list & existing records...</td></tr>`;
+
+            currentlyMarkingSessionStudents = studentsCache.filter(s => s.session === session);
+            if (currentlyMarkingSessionStudents.length === 0) {
+                container.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-400">No registered students found in this session.</td></tr>`;
+                return;
+            }
+
+            // DYNAMIC ATTENDANCE RETRIEVAL & PRE-POPULATION:
+            let existingRecords = {};
+            try {
+                const snapshot = await db.collection('attendance')
+                    .where('date', '==', date)
+                    .where('session', '==', session)
+                    .get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    existingRecords[data.roll] = data.status;
+                });
+            } catch (err) {
+                console.error("Error pre-populating existing records:", err);
+            }
+
+            container.innerHTML = "";
+            currentlyMarkingSessionStudents.forEach(student => {
+                const existingStatus = existingRecords[student.roll] || "Absent";
+                
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-slate-700">${student.roll}</td>
+                    <td class="px-6 py-4 text-slate-800 font-medium">${student.name}</td>
+                    <td class="px-6 py-4 text-center">
+                        <select data-roll="${student.roll}" class="bulk-status-select border border-slate-300 rounded-lg px-3 py-1 bg-white outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                            <option value="Present" ${existingStatus === 'Present' ? 'selected' : ''}>Present</option>
+                            <option value="Late" ${existingStatus === 'Late' ? 'selected' : ''}>Late</option>
+                            <option value="Absent" ${existingStatus === 'Absent' ? 'selected' : ''}>Absent</option>
+                        </select>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        async function saveBulkAttendance() {
+            const date = document.getElementById('bulkDate').value;
+            const session = document.getElementById('bulkSessionFilter').value;
+
+            if (!date || !session) {
+                alert("Please select a valid date and a session.");
+                return;
+            }
+
+            const selectElements = document.querySelectorAll('.bulk-status-select');
+            if (selectElements.length === 0) {
+                alert("No student records available to submit.");
+                return;
+            }
+
+            const batch = db.batch();
+            selectElements.forEach(select => {
+                const roll = select.getAttribute('data-roll');
+                const status = select.value;
+                const student = currentlyMarkingSessionStudents.find(s => s.roll === roll);
+
+                if (student) {
+                    const docId = `${date}_${roll}`;
+                    const docRef = db.collection('attendance').doc(docId);
+                    batch.set(docRef, {
+                        date: date,
+                        roll: roll,
+                        name: student.name,
+                        session: student.session,
+                        status: status,
+                        markedBy: currentUser.uid,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+
+            try {
+                await batch.commit();
+                alert(`Attendance successfully logged for the session: ${session}`);
+                document.getElementById('bulkSessionFilter').value = "";
+                loadStudentsForBulkMarking();
+            } catch (error) {
+                alert("Error logging batch records: " + error.message);
+            }
+        }
+
+
+        // ==========================================
+        // 2. STUDENT REGISTRATION & DATA MANAGEMENT (ADMIN ONLY)
+        // ==========================================
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value.trim();
+            const roll = document.getElementById('studentRoll').value.trim();
+            const session = document.getElementById('studentSession').value.trim();
+
+            if (roll.length !== 6 || isNaN(roll)) {
+                alert("Roll number must be precisely 6 numerical digits.");
+                return;
+            }
+
+            try {
+                const checkDoc = await db.collection('students').doc(roll).get();
+                if (checkDoc.exists) {
+                    alert("This roll number already exists inside the database!");
+                    return;
+                }
+
+                await db.collection('students').doc(roll).set({
+                    roll: roll,
+                    name: name,
+                    session: session
+                });
+
+                alert("Student recorded successfully.");
+                document.getElementById('studentForm').reset();
+            } catch (err) {
+                alert("Error writing record: " + err.message);
+            }
+        });
+
+        // Parse & Import from Excel using SheetJS
+        function handleExcelUpload() {
+            const fileInput = document.getElementById('excelFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a valid Excel file (.xlsx) first.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+
+                if (json.length === 0) {
+                    alert("Excel document appears to contain no records.");
+                    return;
+                }
+
+                let addedCount = 0;
+                let failedCount = 0;
+                const batch = db.batch();
+
+                for (let i = 0; i < json.length; i++) {
+                    const row = json[i];
+                    const name = row.Name || row.name || row.NAME;
+                    let roll = row.Roll || row.roll || row.ROLL;
+                    const session = row.Session || row.session || row.SESSION;
+
+                    if (roll) roll = roll.toString().trim();
+
+                    if (name && roll && roll.length === 6 && session) {
+                        const docRef = db.collection('students').doc(roll);
+                        batch.set(docRef, {
+                            name: name.toString().trim(),
+                            roll: roll,
+                            session: session.toString().trim()
+                        });
+                        addedCount++;
+                    } else {
+                        failedCount++;
+                    }
+                }
+
+                try {
+                    await batch.commit();
+                    alert(`Upload successful! Registered: ${addedCount} students. Skipped: ${failedCount} malformed records.`);
+                    fileInput.value = "";
+                } catch (error) {
+                    alert("Batch database ingestion error: " + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderStudentList() {
+            const container = document.getElementById('studentTableBody');
+            const query = document.getElementById('studentSearch').value.toLowerCase().trim();
+            
+            container.innerHTML = "";
+            const filtered = studentsCache.filter(student => {
+                return student.name.toLowerCase().includes(query) || student.roll.includes(query);
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">No matching student records found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-slate-700">${student.roll}</td>
+                    <td class="px-6 py-4 text-slate-800 font-medium">${student.name}</td>
+                    <td class="px-6 py-4 text-slate-500 font-medium">${student.session}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteStudent('${student.roll}')" class="text-rose-600 hover:text-rose-800 font-semibold text-xs flex items-center justify-center gap-1 mx-auto transition">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+            initIcons();
+        }
+
+        async function deleteStudent(roll) {
+            if (confirm(`Warning! Are you sure you want to permanently delete student with roll: ${roll}? This will not automatically clear old history records.`)) {
+                try {
+                    await db.collection('students').doc(roll).delete();
+                    alert("Student successfully dropped from active directory.");
+                } catch (err) {
+                    alert("Error removing student document: " + err.message);
+                }
+            }
+        }
+
+        function exportStudentsToExcel() {
+            if (studentsCache.length === 0) {
+                alert("No student data available to extract.");
+                return;
+            }
+            const sheetData = studentsCache.map(s => ({
+                "Roll": s.roll,
+                "Name": s.name,
+                "Session": s.session
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(sheetData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+            XLSX.writeFile(workbook, "SAMS_Student_Database.xlsx");
+        }
+
+
+        // ==========================================
+        // 3. ATTENDANCE HISTORY & EDITS (ADMIN ONLY)
+        // ==========================================
+        async function queryAttendanceRecords() {
+            const start = document.getElementById('historyStartDate').value;
+            const end = document.getElementById('historyEndDate').value;
+            const session = document.getElementById('historySessionFilter').value;
+            const container = document.getElementById('historyTableBody');
+
+            if (!start || !end) {
+                alert("Please select both a starting and ending range date.");
+                return;
+            }
+
+            container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading history records...</td></tr>`;
+
+            try {
+                let queryRef = db.collection('attendance')
+                                .where('date', '>=', start)
+                                .where('date', '<=', end);
+
+                const snapshot = await queryRef.get();
+                queriedRecords = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    
+                    if (!session || data.session === session) {
+                        queriedRecords.push(data);
+                    }
+                });
+
+                queriedRecords.sort((a, b) => a.date.localeCompare(b.date) || a.roll.localeCompare(b.roll));
+                renderHistoryTable();
+            } catch (err) {
+                console.error(err);
+                alert("Query failed: " + err.message);
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">Failed to load data.</td></tr>`;
+            }
+        }
+
+        function renderHistoryTable() {
+            const container = document.getElementById('historyTableBody');
+            container.innerHTML = "";
+
+            if (queriedRecords.length === 0) {
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No attendance entries found for selected range parameters.</td></tr>`;
+                return;
+            }
+
+            queriedRecords.forEach((rec, index) => {
+                let badgeClass = "bg-green-100 text-green-800";
+                if (rec.status === "Late") badgeClass = "bg-amber-100 text-amber-800";
+                if (rec.status === "Absent") badgeClass = "bg-rose-100 text-rose-800";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-slate-600 font-medium">${rec.date}</td>
+                    <td class="px-6 py-4 font-semibold text-slate-800">${rec.roll}</td>
+                    <td class="px-6 py-4 text-slate-800 font-medium">${rec.name}</td>
+                    <td class="px-6 py-4 text-slate-500 font-medium">${rec.session}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badgeClass}">${rec.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center space-x-2">
+                        <button onclick="openEditModal('${rec.id}', '${rec.name}', '${rec.roll}', '${rec.status}')" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold inline-flex items-center gap-0.5">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit
+                        </button>
+                        <button onclick="deleteAttendanceRecord('${rec.id}', ${index})" class="text-rose-600 hover:text-rose-800 text-xs font-semibold inline-flex items-center gap-0.5">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Del
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+            initIcons();
+        }
+
+        // Edit/Delete handlers
+        function openEditModal(id, name, roll, status) {
+            document.getElementById('editModalDocId').value = id;
+            document.getElementById('editModalName').value = name;
+            document.getElementById('editModalRoll').value = roll;
+            document.getElementById('editModalStatus').value = status;
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        async function saveEditModal() {
+            const id = document.getElementById('editModalDocId').value;
+            const newStatus = document.getElementById('editModalStatus').value;
+
+            try {
+                await db.collection('attendance').doc(id).update({
+                    status: newStatus
+                });
+                alert("Attendance record updated successfully.");
+                const idx = queriedRecords.findIndex(r => r.id === id);
+                if (idx !== -1) {
+                    queriedRecords[idx].status = newStatus;
+                    renderHistoryTable();
+                }
+                closeEditModal();
+            } catch (err) {
+                alert("Update execution failed: " + err.message);
+            }
+        }
+
+        async function deleteAttendanceRecord(id, index) {
+            if (confirm("Are you sure you want to delete this specific attendance log?")) {
+                try {
+                    await db.collection('attendance').doc(id).delete();
+                    queriedRecords.splice(index, 1);
+                    renderHistoryTable();
+                    alert("Record deleted successfully.");
+                } catch (err) {
+                    alert("Failed to delete record: " + err.message);
+                }
+            }
+        }
+
+        // Excel Export
+        function exportHistoryExcel() {
+            if (queriedRecords.length === 0) {
+                alert("No records currently queried to build sheet file output.");
+                return;
+            }
+            const out = queriedRecords.map(r => ({
+                "Date": r.date,
+                "Roll": r.roll,
+                "Name": r.name,
+                "Session": r.session,
+                "Status": r.status
+            }));
+            const ws = XLSX.utils.json_to_sheet(out);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "History Log");
+            XLSX.writeFile(wb, "Attendance_History_Extraction.xlsx");
+        }
+
+        // PDF Export - General Logs with Ideal Coaching Center Branding
+        function exportHistoryPDF() {
+            if (queriedRecords.length === 0) {
+                alert("No records currently queried to build PDF report.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Ideal Coaching Center", 14, 20);
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Attendance Log History Report", 14, 28);
+            
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 34);
+
+            const tableRows = queriedRecords.map(r => [
+                r.date,
+                r.roll,
+                r.name,
+                r.session,
+                r.status
+            ]);
+
+            doc.autoTable({
+                startY: 40,
+                head: [['Date', 'Roll', 'Name', 'Session', 'Status']],
+                body: tableRows,
+                theme: 'striped',
+                didDrawPage: function(data) {
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            doc.save("Attendance_History_Report.pdf");
+        }
+
+
+        // ==========================================
+        // 4. STATISTICS & AUTO-ABSENT ALGORITHMS (ADMIN ONLY)
+        // ==========================================
+        async function generateStatistics() {
+            const start = document.getElementById('statsStartDate').value;
+            const end = document.getElementById('statsEndDate').value;
+            const session = document.getElementById('statsSession').value;
+
+            if (!start || !end || !session) {
+                alert("All query filters (start date, end date, session) are mandatory for analysis cycle computation.");
+                return;
+            }
+
+            const container = document.getElementById('statsTableBody');
+            container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Crunching cycle metrics...</td></tr>`;
+
+            try {
+                const sessionStudents = studentsCache.filter(s => s.session === session);
+                if (sessionStudents.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">No registered students found matching session: ${session}</td></tr>`;
+                    return;
+                }
+
+                const rawLogsSnapshot = await db.collection('attendance')
+                    .where('date', '>=', start)
+                    .where('date', '<=', end)
+                    .get();
+
+                const logs = [];
+                const loggedDates = new Set();
+                rawLogsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    if (data.session === session) {
+                        logs.push(data);
+                        loggedDates.add(data.date);
+                    }
+                });
+
+                const totalDaysCount = loggedDates.size;
+                statsCycleDetails = {
+                    totalDays: totalDaysCount,
+                    session: session,
+                    start: start,
+                    end: end
+                };
+                
+                document.getElementById('statTotalDays').textContent = totalDaysCount;
+
+                if (totalDaysCount === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No attendance data logged on any dates within this range.</td></tr>`;
+                    document.getElementById('statBatchAvg').textContent = "0%";
+                    document.getElementById('statAtRisk').textContent = "0";
+                    document.getElementById('statPerfect').textContent = "0";
+                    document.getElementById('statTopAttender').textContent = "N/A";
+                    document.getElementById('statTopAttenderPresents').textContent = "Presents count: 0";
+                    document.getElementById('statLeastAttender').textContent = "N/A";
+                    document.getElementById('statLeastAttenderPresents').textContent = "Presents count: 0";
+                    document.getElementById('statMostLate').textContent = "N/A";
+                    document.getElementById('statMostLateCount').textContent = "Lates count: 0";
+                    return;
+                }
+
+                let totalRateSum = 0;
+                let atRiskCount = 0;
+                let perfectCount = 0;
+
+                // Map stats calculations incorporating AUTO-ABSENT logic
+                queriedStats = sessionStudents.map(student => {
+                    const studentLogs = logs.filter(l => l.roll === student.roll);
+                    
+                    const explicitPresent = studentLogs.filter(l => l.status === "Present").length;
+                    const explicitLate = studentLogs.filter(l => l.status === "Late").length;
+                    const explicitAbsent = studentLogs.filter(l => l.status === "Absent").length;
+
+                    // AUTO-ABSENT LOGIC:
+                    const missingDays = totalDaysCount - studentLogs.length;
+                    const totalAbsent = explicitAbsent + missingDays;
+
+                    // Attendance rate:
+                    const presentRateNum = totalDaysCount > 0 
+                        ? ((explicitPresent + explicitLate) / totalDaysCount) * 100 
+                        : 0;
+
+                    totalRateSum += presentRateNum;
+                    if (presentRateNum < 60) atRiskCount++;
+                    if (presentRateNum === 100) perfectCount++;
+
+                    const presentRate = presentRateNum.toFixed(1) + "%";
+
+                    return {
+                        roll: student.roll,
+                        name: student.name,
+                        session: student.session,
+                        present: explicitPresent,
+                        late: explicitLate,
+                        absent: totalAbsent,
+                        rate: presentRate,
+                        rateNum: presentRateNum
+                    };
+                });
+
+                const batchAvgRate = sessionStudents.length > 0 ? (totalRateSum / sessionStudents.length).toFixed(1) : 0;
+
+                document.getElementById('statBatchAvg').textContent = batchAvgRate + "%";
+                document.getElementById('statAtRisk').textContent = atRiskCount;
+                document.getElementById('statPerfect').textContent = perfectCount;
+
+                // Render metrics elements using filtering layer (keeps search & dynamic queries active)
+                filterStatsTable();
+                calculateDashHighlights();
+
+            } catch (err) {
+                console.error(err);
+                alert("Stats assembly failed: " + err.message);
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">Failed to render statistical dashboard.</td></tr>`;
+            }
+        }
+
+        // Search and filter analytics results
+        function filterStatsTable() {
+            const query = document.getElementById('statsSearch').value.toLowerCase().trim();
+            const criteria = document.getElementById('statsCriteriaFilter').value;
+            const container = document.getElementById('statsTableBody');
+            
+            container.innerHTML = "";
+
+            if (queriedStats.length === 0) {
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Generate analysis to populate statistical records.</td></tr>`;
+                return;
+            }
+
+            const filtered = queriedStats.filter(stat => {
+                const matchesQuery = stat.name.toLowerCase().includes(query) || stat.roll.includes(query);
+                
+                let matchesCriteria = true;
+                if (criteria === 'low') {
+                    matchesCriteria = stat.rateNum < 60;
+                } else if (criteria === 'high') {
+                    matchesCriteria = stat.rateNum >= 90;
+                } else if (criteria === 'lates') {
+                    matchesCriteria = stat.late > 0;
+                }
+
+                return matchesQuery && matchesCriteria;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No matching analytics records found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(stat => {
+                const rateVal = stat.rateNum;
+                let barColor = "bg-green-500";
+                let textClass = "text-green-700 bg-green-50";
+                
+                if (rateVal < 60) {
+                    barColor = "bg-rose-500";
+                    textClass = "text-rose-700 bg-rose-50";
+                } else if (rateVal < 90) {
+                    barColor = "bg-amber-500";
+                    textClass = "text-amber-700 bg-amber-50";
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-slate-700">${stat.roll}</td>
+                    <td class="px-6 py-4 text-slate-800 font-medium">${stat.name}</td>
+                    <td class="px-6 py-4 text-center text-green-600 font-semibold">${stat.present}</td>
+                    <td class="px-6 py-4 text-center text-amber-600 font-semibold">${stat.late}</td>
+                    <td class="px-6 py-4 text-center text-rose-600 font-semibold">${stat.absent}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-24 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block">
+                                <div class="${barColor} h-full" style="width: ${rateVal}%"></div>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-bold rounded-lg ${textClass}">${stat.rate}</span>
+                        </div>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        function calculateDashHighlights() {
+            if (queriedStats.length === 0) return;
+
+            // Top Attenders (Max presents)
+            let maxPresent = -1;
+            let topAttenders = [];
+
+            // Least Attenders (Min presents)
+            let minPresent = Infinity;
+            let leastAttenders = [];
+
+            // Most Lates (Max lates)
+            let maxLate = -1;
+            let mostLates = [];
+
+            queriedStats.forEach(s => {
+                // Top Attender calculation
+                if (s.present > maxPresent) {
+                    maxPresent = s.present;
+                    topAttenders = [s.name];
+                } else if (s.present === maxPresent && maxPresent !== -1) {
+                    topAttenders.push(s.name);
+                }
+
+                // Least Attender calculation
+                if (s.present < minPresent) {
+                    minPresent = s.present;
+                    leastAttenders = [s.name];
+                } else if (s.present === minPresent && minPresent !== Infinity) {
+                    leastAttenders.push(s.name);
+                }
+
+                // Most Late calculation
+                if (s.late > maxLate) {
+                    maxLate = s.late;
+                    mostLates = [s.name];
+                } else if (s.late === maxLate && maxLate !== -1) {
+                    mostLates.push(s.name);
+                }
+            });
+
+            document.getElementById('statTopAttender').textContent = maxPresent > 0 ? topAttenders.join(", ") : "None";
+            document.getElementById('statTopAttenderPresents').textContent = `Presents count: ${maxPresent}`;
+
+            document.getElementById('statLeastAttender').textContent = minPresent !== Infinity ? leastAttenders.join(", ") : "None";
+            document.getElementById('statLeastAttenderPresents').textContent = `Presents count: ${minPresent !== Infinity ? minPresent : 0}`;
+
+            document.getElementById('statMostLate').textContent = maxLate > 0 ? mostLates.join(", ") : "None";
+            document.getElementById('statMostLateCount').textContent = `Lates count: ${maxLate}`;
+        }
+
+        // Export Stats Excel
+        function exportStatsExcel() {
+            if (queriedStats.length === 0) {
+                alert("Run dynamic statistics query before compiling extract sheets.");
+                return;
+            }
+            const data = queriedStats.map(s => ({
+                "Roll": s.roll,
+                "Name": s.name,
+                "Presents": s.present,
+                "Lates": s.late,
+                "Absents": s.absent,
+                "Attendance Rate": s.rate
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Cycle Statistics");
+            XLSX.writeFile(wb, `Stats_${statsCycleDetails.session}_Cycle.xlsx`);
+        }
+
+        // Export Stats PDF with Ideal Coaching Center Branding
+        function exportStatsPDF() {
+            if (queriedStats.length === 0) {
+                alert("Run dynamic statistics query before generating pdf.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Ideal Coaching Center", 14, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Attendance Cycle Analytics Report", 14, 28);
+            
+            doc.setFontSize(10);
+            doc.text(`Session: ${statsCycleDetails.session}`, 14, 35);
+            doc.text(`Date Cycle: ${statsCycleDetails.start} to ${statsCycleDetails.end}`, 14, 41);
+            doc.text(`Total Active Class Days Logged: ${statsCycleDetails.totalDays}`, 14, 47);
+
+            const tableRows = queriedStats.map(s => [
+                s.roll,
+                s.name,
+                s.present,
+                s.late,
+                s.absent,
+                s.rate
+            ]);
+
+            doc.autoTable({
+                startY: 53,
+                head: [['Roll', 'Name', 'Presents', 'Lates', 'Absents', 'Rate']],
+                body: tableRows,
+                theme: 'grid',
+                didDrawPage: function(data) {
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            doc.save(`SAMS_Stats_${statsCycleDetails.session}_Cycle.pdf`);
+        }
+
+
+        // ==========================================
+        // 5. USER MANAGEMENT & AUXILIARY SIGNUPS (ADMIN ONLY)
+        // ==========================================
+        document.getElementById('createInputterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('inputterFormMessage');
+            msgEl.className = "text-center text-sm font-semibold mt-4 text-indigo-600";
+            msgEl.textContent = "Creating authentication profiles...";
+            msgEl.classList.remove('hidden');
+
+            const email = document.getElementById('inputterEmail').value.trim();
+            const password = document.getElementById('inputterPassword').value;
+            const assignedSession = document.getElementById('inputterSessionAssign').value;
+
+            if (!assignedSession) {
+                alert("Please select a batch to assign to this inputter.");
+                return;
+            }
+
+            try {
+                const secondaryApp = firebase.initializeApp(firebaseConfig, "SecondaryApp");
+                const creds = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+                
+                await db.collection('users').doc(creds.user.uid).set({
+                    email: email,
+                    role: 'inputter',
+                    assignedSession: assignedSession // Save batch assignment lock
+                });
+
+                await secondaryApp.auth().signOut();
+                await secondaryApp.delete();
+
+                msgEl.className = "text-center text-sm font-semibold mt-4 text-green-600";
+                msgEl.textContent = "Auxiliary Inputter profile registered successfully.";
+                document.getElementById('createInputterForm').reset();
+            } catch (err) {
+                msgEl.className = "text-center text-sm font-semibold mt-4 text-red-500";
+                msgEl.textContent = "Registration failure: " + err.message;
+            }
+        });
+
+        // ==========================================
+        // 6. INDIVIDUAL STUDENT ATTENDANCE HISTORY SEARCH
+        // ==========================================
+        const indivRollInput = document.getElementById('indivRollSearch');
+        const indivStudentMatchedName = document.getElementById('indivStudentMatchedName');
+
+        indivRollInput.addEventListener('input', () => {
+            const roll = indivRollInput.value.trim();
+            if (roll.length === 6) {
+                const matched = studentsCache.find(s => s.roll === roll);
+                if (matched) {
+                    indivStudentMatchedName.textContent = `${matched.name} (Session: ${matched.session})`;
+                    indivStudentMatchedName.className = "font-bold text-green-600 text-lg";
+                    indivSelectedStudent = matched;
+                } else {
+                    indivStudentMatchedName.textContent = "Roll not found in database!";
+                    indivStudentMatchedName.className = "font-bold text-red-500 text-lg";
+                    indivSelectedStudent = null;
+                }
+            } else {
+                indivStudentMatchedName.textContent = "Type a valid 6-digit roll...";
+                indivStudentMatchedName.className = "font-bold text-slate-500 text-lg";
+                indivSelectedStudent = null;
+            }
+        });
+
+        async function queryIndividualHistory() {
+            const resultSection = document.getElementById('indivHistoryResultSection');
+            const tableBody = document.getElementById('indivHistoryTableBody');
+            
+            if (!indivSelectedStudent) {
+                alert("Please provide a valid 6-digit roll number matching an active student.");
+                return;
+            }
+            
+            tableBody.innerHTML = `<tr><td colspan="2" class="text-center py-6 text-slate-400">Fetching student logs...</td></tr>`;
+            resultSection.classList.remove('hidden');
+            document.getElementById('indivResultName').textContent = `${indivSelectedStudent.name} (${indivSelectedStudent.roll})`;
+            
+            try {
+                const snapshot = await db.collection('attendance')
+                    .where('roll', '==', indivSelectedStudent.roll)
+                    .get();
+                
+                indivQueriedRecords = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    indivQueriedRecords.push(data);
+                });
+                
+                indivQueriedRecords.sort((a, b) => b.date.localeCompare(a.date)); // Sort descending (newest first)
+                
+                tableBody.innerHTML = "";
+                if (indivQueriedRecords.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="2" class="text-center py-6 text-slate-400">No attendance logs found for this student.</td></tr>`;
+                    return;
+                }
+                
+                indivQueriedRecords.forEach(rec => {
+                    let badgeClass = "bg-green-100 text-green-800";
+                    if (rec.status === "Late") badgeClass = "bg-amber-100 text-amber-800";
+                    if (rec.status === "Absent") badgeClass = "bg-rose-100 text-rose-800";
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 text-slate-600 font-medium">${rec.date}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badgeClass}">${rec.status}</span>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Failed to retrieve student history: " + err.message);
+                tableBody.innerHTML = `<tr><td colspan="2" class="text-center py-6 text-red-500">Retrieval failed. Please try again.</td></tr>`;
+            }
+        }
+
+        // Export Individual Student Report PDF with Ideal Coaching Center Branding
+        async function exportIndivPDF() {
+            if (indivQueriedRecords.length === 0 || !indivSelectedStudent) {
+                alert("No records currently queried to build PDF report.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Ideal Coaching Center", 14, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Individual Student Attendance Report", 14, 28);
+            
+            doc.setFontSize(10);
+            doc.text(`Student Name: ${indivSelectedStudent.name}`, 14, 36);
+            doc.text(`Roll Number: ${indivSelectedStudent.roll}`, 14, 42);
+            doc.text(`Session / Batch: ${indivSelectedStudent.session}`, 14, 48);
+            doc.text(`Report Generated: ${new Date().toLocaleString()}`, 14, 54);
+
+            const tableRows = indivQueriedRecords.map(r => [
+                r.date,
+                r.status
+            ]);
+
+            doc.autoTable({
+                startY: 60,
+                head: [['Date', 'Status']],
+                body: tableRows,
+                theme: 'striped',
+                didDrawPage: function(data) {
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            doc.save(`Attendance_Report_${indivSelectedStudent.roll}.pdf`);
+        }
+    </script>
+</body>
+</html>
