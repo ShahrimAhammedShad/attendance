@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,7 +124,8 @@
                                 <label class="block text-sm font-medium mb-1">Select Date</label>
                                 <input type="date" id="bulkDate" onchange="loadStudentsForBulkMarking()" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <div>
+                            <!-- Selection is programmatically hidden for inputters -->
+                            <div id="bulkSessionFilterContainer">
                                 <label class="block text-sm font-medium mb-1">Select Session / Batch</label>
                                 <select id="bulkSessionFilter" onchange="loadStudentsForBulkMarking()" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                                     <option value="">-- Choose Session --</option>
@@ -148,7 +150,7 @@
                             </table>
                         </div>
                         <div class="flex justify-end pt-4">
-                            <button onclick="saveBulkAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">Save Batch Attendance</button>
+                            <button onclick="saveBulkAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm font-medium">Save Batch Attendance</button>
                         </div>
                     </div>
                 </div>
@@ -173,7 +175,7 @@
                                 <label class="block text-sm font-medium mb-1">Session / Batch</label>
                                 <input type="text" id="studentSession" required placeholder="e.g., 2023-24" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Register Student</button>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition font-medium">Register Student</button>
                         </form>
                     </div>
 
@@ -184,7 +186,7 @@
                             <p class="text-slate-500 text-xs mb-4">Upload an Excel file (.xlsx) with columns explicitly named: <strong class="text-indigo-600">Roll, Name, Session</strong>. Make sure Roll is 6 digits.</p>
                             <input type="file" id="excelFile" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer mb-4">
                         </div>
-                        <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">Upload Excel Data</button>
+                        <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition font-medium">Upload Excel Data</button>
                     </div>
 
                     <!-- Export Tool -->
@@ -193,7 +195,7 @@
                             <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="download" class="text-indigo-600"></i> Export Tools</h3>
                             <p class="text-slate-500 text-xs mb-4">Download your entire student database directly into Excel sheet formats or clean backups.</p>
                         </div>
-                        <button onclick="exportStudentsToExcel()" class="w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+                        <button onclick="exportStudentsToExcel()" class="w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 font-medium">
                             <i data-lucide="external-link" class="w-4 h-4"></i> Export Students to Excel
                         </button>
                     </div>
@@ -300,7 +302,7 @@
                     <div id="indivHistoryResultSection" class="hidden">
                         <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
                             <h4 class="text-md font-bold text-slate-700">Attendance Log for <span id="indivResultName" class="text-indigo-600"></span></h4>
-                            <button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                                 <i data-lucide="file-text" class="w-4 h-4"></i> Export Student PDF
                             </button>
                         </div>
@@ -342,7 +344,7 @@
                             </select>
                         </div>
                         <div class="flex items-end">
-                            <button onclick="generateStatistics()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium font-medium">Analyze Cycle</button>
+                            <button onclick="generateStatistics()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium">Analyze Cycle</button>
                         </div>
                     </div>
 
@@ -411,10 +413,10 @@
                         </div>
                         <!-- Export Stats -->
                         <div class="flex gap-2">
-                            <button onclick="exportStatsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <button onclick="exportStatsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
                             </button>
-                            <button onclick="exportStatsPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                            <button onclick="exportStatsPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                                 <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
                             </button>
                         </div>
@@ -445,28 +447,51 @@
 
             <!-- 5. USER MANAGEMENT TAB (ADMIN ONLY) -->
             <section id="usersTab" class="tab-content space-y-6 hidden">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 max-w-md mx-auto">
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-indigo-600"></i> Register Inputter</h2>
-                    <p class="text-slate-500 text-xs mb-4">Inputters are auxiliary accounts that can only record attendance. They are restricted from modifying databases, checking stats, or exporting files.</p>
-                    <form id="createInputterForm" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Email</label>
-                            <input type="email" id="inputterEmail" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left: Create Inputter -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-indigo-600"></i> Register Inputter</h2>
+                        <p class="text-slate-500 text-xs mb-4">Inputters are auxiliary accounts that can only record attendance. They are restricted from modifying databases, checking stats, or exporting files.</p>
+                        <form id="createInputterForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Email</label>
+                                <input type="email" id="inputterEmail" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Password</label>
+                                <input type="password" id="inputterPassword" required minlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Assign to Batch / Session</label>
+                                <select id="inputterSessionAssign" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">-- Select Batch --</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition font-medium">Create Account</button>
+                        </form>
+                        <p id="inputterFormMessage" class="text-center text-sm font-semibold mt-4 hidden"></p>
+                    </div>
+
+                    <!-- Right: Inputters Directory -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2"><i data-lucide="users" class="text-indigo-600"></i> Inputter Accounts</h2>
+                        <p class="text-slate-500 text-xs mb-4">Manage access controls and modify batch authorization rules for existing inputters.</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                                        <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Assigned Batch</th>
+                                        <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inputtersTableBody" class="divide-y divide-slate-100">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Password</label>
-                            <input type="password" id="inputterPassword" required minlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Assign to Batch / Session</label>
-                            <select id="inputterSessionAssign" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option value="">-- Select Batch --</option>
-                                <!-- Populated dynamically -->
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Create Account</button>
-                    </form>
-                    <p id="inputterFormMessage" class="text-center text-sm font-semibold mt-4 hidden"></p>
+                    </div>
                 </div>
             </section>
 
@@ -501,9 +526,35 @@
         </div>
     </div>
 
+    <!-- Edit Inputter Assignment Modal -->
+    <div id="editInputterModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md border border-slate-100 space-y-4">
+            <h3 class="text-lg font-bold">Edit Inputter Assignment</h3>
+            <div>
+                <label class="block text-sm font-medium mb-1">Email</label>
+                <input type="text" id="editInputterEmail" readonly class="w-full border px-3 py-2 rounded-lg bg-slate-50 text-slate-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Assigned Batch / Session</label>
+                <select id="editInputterSession" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <!-- Populated dynamically with sessionsCache -->
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">View / Edit Password</label>
+                <input type="text" id="editInputterPassword" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <input type="hidden" id="editInputterUid">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditInputterModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-600 transition font-semibold">Cancel</button>
+                <button onclick="saveEditInputter()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition font-semibold">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER DEVELOPMENT ATTRIBUTION -->
     <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
-        <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4">Shahrim Ahammed Shad</a></p>
+        <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4 font-medium font-medium">Shahrim Ahammed Shad</a></p>
     </footer>
 
     <!-- MAIN APP SCRIPT -->
@@ -540,6 +591,8 @@
         let indivQueriedRecords = [];
         let indivSelectedStudent = null;
 
+        let inputtersCache = [];
+
         // DOM Elements
         const loginSection = document.getElementById('loginSection');
         const dashboardSection = document.getElementById('dashboardSection');
@@ -562,6 +615,9 @@
                     currentUserRole = role;
                     setupDashboardForRole(role);
                     await syncCache();
+                    if (role === 'admin') {
+                        syncInputters();
+                    }
                 } else {
                     showLoginScreen();
                 }
@@ -719,11 +775,14 @@
             });
 
             // Populate the Bulk Session filter. 
-            // If the user is an inputter with a batch lock, restrict dropdown and disable it.
+            // If the user is an inputter with a batch lock, hide selector completely.
             const bulkFilter = document.getElementById('bulkSessionFilter');
+            const bulkFilterContainer = document.getElementById('bulkSessionFilterContainer');
             bulkFilter.innerHTML = '<option value="">-- Choose Session --</option>';
             
             if (currentUserRole === 'inputter' && currentUserAssignedSession) {
+                bulkFilterContainer.classList.add('hidden');
+                
                 const opt = document.createElement('option');
                 opt.value = currentUserAssignedSession;
                 opt.textContent = currentUserAssignedSession;
@@ -732,6 +791,7 @@
                 bulkFilter.disabled = true;
                 loadStudentsForBulkMarking();
             } else {
+                bulkFilterContainer.classList.remove('hidden');
                 bulkFilter.disabled = false;
                 sortedSessions.forEach(session => {
                     const opt = document.createElement('option');
@@ -1599,17 +1659,23 @@
             }
 
             try {
-                const secondaryApp = firebase.initializeApp(firebaseConfig, "SecondaryApp");
+                let secondaryApp;
+                try {
+                    secondaryApp = firebase.initializeApp(firebaseConfig, "SecondaryApp");
+                } catch (e) {
+                    secondaryApp = firebase.app("SecondaryApp");
+                }
+
                 const creds = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
                 
                 await db.collection('users').doc(creds.user.uid).set({
                     email: email,
                     role: 'inputter',
-                    assignedSession: assignedSession // Save batch assignment lock
+                    assignedSession: assignedSession, // Save batch assignment lock
+                    password: password // Plaintext fallback stored for Admin visibility
                 });
 
                 await secondaryApp.auth().signOut();
-                await secondaryApp.delete();
 
                 msgEl.className = "text-center text-sm font-semibold mt-4 text-green-600";
                 msgEl.textContent = "Auxiliary Inputter profile registered successfully.";
@@ -1619,6 +1685,133 @@
                 msgEl.textContent = "Registration failure: " + err.message;
             }
         });
+
+        // Syncs the list of auxiliary inputters in real-time
+        function syncInputters() {
+            if (currentUserRole !== 'admin') return;
+            
+            db.collection('users').where('role', '==', 'inputter').onSnapshot(snapshot => {
+                inputtersCache = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.uid = doc.id;
+                    inputtersCache.push(data);
+                });
+                renderInputtersList();
+            });
+        }
+
+        function renderInputtersList() {
+            const container = document.getElementById('inputtersTableBody');
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (inputtersCache.length === 0) {
+                container.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-400">No inputter accounts registered yet.</td></tr>`;
+                return;
+            }
+
+            inputtersCache.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-slate-800 font-medium">${user.email}</td>
+                    <td class="px-6 py-4 text-slate-500 font-semibold">${user.assignedSession || 'None'}</td>
+                    <td class="px-6 py-4 text-center space-x-2">
+                        <button onclick="openEditInputterModal('${user.uid}', '${user.email}', '${user.assignedSession}')" class="text-indigo-600 hover:text-indigo-800 text-xs font-semibold inline-flex items-center gap-0.5">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit
+                        </button>
+                        <button onclick="deleteInputter('${user.uid}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold inline-flex items-center gap-0.5">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+            initIcons();
+        }
+
+        function openEditInputterModal(uid, email, currentSession) {
+            document.getElementById('editInputterUid').value = uid;
+            document.getElementById('editInputterEmail').value = email;
+            
+            const select = document.getElementById('editInputterSession');
+            select.innerHTML = '<option value="">-- Select Batch --</option>';
+            Array.from(sessionsCache).sort().forEach(session => {
+                const opt = document.createElement('option');
+                opt.value = session;
+                opt.textContent = session;
+                if (session === currentSession) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            // Retrieves the stored plaintext password and populates the text field
+            const userCached = inputtersCache.find(u => u.uid === uid);
+            const currentPassword = userCached ? (userCached.password || '') : '';
+            document.getElementById('editInputterPassword').value = currentPassword;
+            
+            document.getElementById('editInputterModal').classList.remove('hidden');
+        }
+
+        function closeEditInputterModal() {
+            document.getElementById('editInputterModal').classList.add('hidden');
+        }
+
+        async function saveEditInputter() {
+            const uid = document.getElementById('editInputterUid').value;
+            const newSession = document.getElementById('editInputterSession').value;
+            const newPassword = document.getElementById('editInputterPassword').value.trim();
+
+            const userCached = inputtersCache.find(u => u.uid === uid);
+            const oldPassword = userCached ? (userCached.password || '') : '';
+            const email = userCached ? userCached.email : '';
+
+            if (!newSession) {
+                alert("Please select a valid batch/session.");
+                return;
+            }
+
+            try {
+                // If password has changed, update both live Authentication and Firestore profiles
+                if (newPassword && newPassword !== oldPassword) {
+                    let tempApp;
+                    try {
+                        tempApp = firebase.initializeApp(firebaseConfig, "TempEditApp");
+                    } catch (e) {
+                        tempApp = firebase.app("TempEditApp");
+                    }
+
+                    const creds = await tempApp.auth().signInWithEmailAndPassword(email, oldPassword);
+                    await creds.user.updatePassword(newPassword);
+                    await tempApp.auth().signOut();
+                }
+
+                // Update Firestore user profile configuration document
+                let updateData = {
+                    assignedSession: newSession
+                };
+                if (newPassword) {
+                    updateData.password = newPassword;
+                }
+
+                await db.collection('users').doc(uid).update(updateData);
+                alert("Inputter configuration successfully updated.");
+                closeEditInputterModal();
+            } catch (err) {
+                alert("Failed to update inputter: " + err.message);
+            }
+        }
+
+        async function deleteInputter(uid) {
+            if (confirm("Are you sure you want to delete this inputter's access? This will remove their role and login permissions within the app database.")) {
+                try {
+                    await db.collection('users').doc(uid).delete();
+                    alert("Inputter deleted successfully from active directory.");
+                } catch (err) {
+                    alert("Failed to delete inputter: " + err.message);
+                }
+            }
+        }
 
         // ==========================================
         // 6. INDIVIDUAL STUDENT ATTENDANCE HISTORY SEARCH
