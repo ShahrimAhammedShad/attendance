@@ -64,6 +64,9 @@
                 <button onclick="switchTab('statsTab')" id="btn-statsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i> <span>Statistics & Reports</span>
                 </button>
+                <button onclick="switchTab('logsTab')" id="btn-logsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i> <span>Activity Logs</span>
+                </button>
                 <button onclick="switchTab('usersTab')" id="btn-usersTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
                     <i data-lucide="user-plus" class="w-5 h-5"></i> <span>Add Inputter Account</span>
                 </button>
@@ -252,10 +255,10 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2 justify-end mb-4">
-                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
                         </button>
-                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5">
+                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                             <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
                         </button>
                     </div>
@@ -290,7 +293,7 @@
                             <input type="text" id="indivRollSearch" maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
                         </div>
                         <div class="md:col-span-2 flex items-end">
-                            <button onclick="queryIndividualHistory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm w-full md:w-auto font-medium">Search Student History</button>
+                            <button onclick="queryIndividualHistory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm w-full md:w-auto font-medium font-medium">Search Student History</button>
                         </div>
                     </div>
                     <div class="p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-100 mb-4">
@@ -445,7 +448,53 @@
                 </div>
             </section>
 
-            <!-- 5. USER MANAGEMENT TAB (ADMIN ONLY) -->
+            <!-- 5. ACTIVITY LOGS TAB (ADMIN ONLY) -->
+            <section id="logsTab" class="tab-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i data-lucide="clipboard-list" class="text-indigo-600"></i> Inputter Activity Logs</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Start Date</label>
+                            <input type="date" id="logStartDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">End Date</label>
+                            <input type="date" id="logEndDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Filter by Inputter</label>
+                            <select id="logInputterFilter" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">All Inputters</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="queryActivityLogs()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium">Apply Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Input Time</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Inputter Email</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Class Date</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Student Details</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Batch</th>
+                                    <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="6" class="text-center py-6 text-slate-400">Click "Apply Filters" to load activity logs.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. USER MANAGEMENT TAB (ADMIN ONLY) -->
             <section id="usersTab" class="tab-content space-y-6 hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Create Inputter -->
@@ -542,7 +591,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1">View / Edit Password</label>
-                <input type="text" id="editInputterPassword" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="text" id="editInputterPassword" placeholder="No password stored (Type to set a new password)" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <input type="hidden" id="editInputterUid">
             <div class="flex justify-end gap-2">
@@ -554,7 +603,7 @@
 
     <!-- FOOTER DEVELOPMENT ATTRIBUTION -->
     <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
-        <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4 font-medium font-medium">Shahrim Ahammed Shad</a></p>
+        <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4 font-medium">Shahrim Ahammed Shad</a></p>
     </footer>
 
     <!-- MAIN APP SCRIPT -->
@@ -636,6 +685,10 @@
             document.getElementById('historyEndDate').value = today;
             document.getElementById('statsStartDate').value = today;
             document.getElementById('statsEndDate').value = today;
+            
+            // Default dates for the Activity Logs Tab
+            document.getElementById('logStartDate').value = today;
+            document.getElementById('logEndDate').value = today;
         }
 
         // ==========================================
@@ -823,7 +876,7 @@
             }
         }
 
-        // Live Name Lookup Listener for individual attendance
+        // Live Name Lookup Listener for individual attendance (locked to specific batch for restricted inputters)
         const singleRollInput = document.getElementById('singleRoll');
         const liveStudentName = document.getElementById('liveStudentName');
 
@@ -832,8 +885,14 @@
             if (roll.length === 6) {
                 const matched = studentsCache.find(s => s.roll === roll);
                 if (matched) {
-                    liveStudentName.textContent = `${matched.name} (Session: ${matched.session})`;
-                    liveStudentName.className = "font-bold text-green-600 text-lg";
+                    // Check if restricted inputter is trying to view a student from another batch
+                    if (currentUserRole === 'inputter' && currentUserAssignedSession && matched.session !== currentUserAssignedSession) {
+                        liveStudentName.textContent = "Authorized Access Blocked: Student belongs to another batch.";
+                        liveStudentName.className = "font-bold text-red-500 text-lg";
+                    } else {
+                        liveStudentName.textContent = `${matched.name} (Session: ${matched.session})`;
+                        liveStudentName.className = "font-bold text-green-600 text-lg";
+                    }
                 } else {
                     liveStudentName.textContent = "Roll not found in database!";
                     liveStudentName.className = "font-bold text-red-500 text-lg";
@@ -878,6 +937,7 @@
                     session: matchedStudent.session,
                     status: status,
                     markedBy: currentUser.uid,
+                    markedByEmail: currentUser.email, // Log profile email identity
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 alert("Attendance record registered successfully!");
@@ -976,6 +1036,7 @@
                         session: student.session,
                         status: status,
                         markedBy: currentUser.uid,
+                        markedByEmail: currentUser.email, // Log profile email identity
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -1512,7 +1573,7 @@
                             <div class="w-24 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block">
                                 <div class="${barColor} h-full" style="width: ${rateVal}%"></div>
                             </div>
-                            <span class="px-2 py-1 text-xs font-bold rounded-lg ${textClass}">${stat.rate}</span>
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${textClass}">${stat.rate}</span>
                         </div>
                     </td>
                 `;
@@ -1728,6 +1789,19 @@
                 `;
                 container.appendChild(tr);
             });
+
+            // Dynamically populate the Inputter filter dropdown in Activity Logs
+            const logFilter = document.getElementById('logInputterFilter');
+            if (logFilter) {
+                logFilter.innerHTML = '<option value="">All Inputters</option>';
+                inputtersCache.forEach(user => {
+                    const opt = document.createElement('option');
+                    opt.value = user.email;
+                    opt.textContent = user.email;
+                    logFilter.appendChild(opt);
+                });
+            }
+
             initIcons();
         }
 
@@ -1774,6 +1848,10 @@
             try {
                 // If password has changed, update both live Authentication and Firestore profiles
                 if (newPassword && newPassword !== oldPassword) {
+                    if (!oldPassword) {
+                        alert("Error: This legacy account does not have a password backup. To update its password, please delete this inputter account and recreate it.");
+                        return;
+                    }
                     let tempApp;
                     try {
                         tempApp = firebase.initializeApp(firebaseConfig, "TempEditApp");
@@ -1935,6 +2013,79 @@
             });
 
             doc.save(`Attendance_Report_${indivSelectedStudent.roll}.pdf`);
+        }
+
+        // ==========================================
+        // 7. INPUTTER ACTIVITY LOGS PANEL
+        // ==========================================
+        async function queryActivityLogs() {
+            const start = document.getElementById('logStartDate').value;
+            const end = document.getElementById('logEndDate').value;
+            const selectedEmail = document.getElementById('logInputterFilter').value;
+            const container = document.getElementById('logsTableBody');
+
+            if (!start || !end) {
+                alert("Please select both a start and end date.");
+                return;
+            }
+
+            container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading activity logs...</td></tr>`;
+
+            try {
+                // Perform a simple indexed date query to bypass Firestore composite indexing constraints
+                const snapshot = await db.collection('attendance')
+                    .where('date', '>=', start)
+                    .where('date', '<=', end)
+                    .get();
+
+                let logs = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    // Filter in memory (client-side) to bypass composite index constraints
+                    if (!selectedEmail || data.markedByEmail === selectedEmail) {
+                        logs.push(data);
+                    }
+                });
+
+                // Sort logs descending (newest real-world entries first)
+                logs.sort((a, b) => {
+                    const timeA = a.timestamp ? a.timestamp.toDate() : new Date(a.date);
+                    const timeB = b.timestamp ? b.timestamp.toDate() : new Date(b.date);
+                    return timeB - timeA;
+                });
+
+                container.innerHTML = "";
+                if (logs.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No logs found matching your criteria.</td></tr>`;
+                    return;
+                }
+
+                logs.forEach(log => {
+                    const inputTime = log.timestamp ? log.timestamp.toDate().toLocaleString() : 'Legacy Data';
+                    let badgeClass = "bg-green-100 text-green-800";
+                    if (log.status === "Late") badgeClass = "bg-amber-100 text-amber-800";
+                    if (log.status === "Absent") badgeClass = "bg-rose-100 text-rose-800";
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 text-slate-500 font-medium">${inputTime}</td>
+                        <td class="px-6 py-4 text-slate-800 font-semibold">${log.markedByEmail || 'Admin/Legacy'}</td>
+                        <td class="px-6 py-4 text-slate-600 font-medium">${log.date}</td>
+                        <td class="px-6 py-4 text-slate-800 font-semibold">${log.roll} - ${log.name}</td>
+                        <td class="px-6 py-4 text-slate-500 font-medium">${log.session}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badgeClass}">${log.status}</span>
+                        </td>
+                    `;
+                    container.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Failed to query activity logs: " + err.message);
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">Failed to load logs.</td></tr>`;
+            }
         }
     </script>
 </body>
