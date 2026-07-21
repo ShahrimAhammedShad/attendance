@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +35,7 @@
                     <label class="block text-sm font-medium mb-1">Password</label>
                     <input type="password" id="loginPassword" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
-                <button type="submit" id="btnAuthSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition">Log In</button>
+                <button type="submit" id="btnAuthSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition font-medium">Log In</button>
             </form>
             <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
         </div>
@@ -117,7 +116,7 @@
                             <span class="text-sm text-slate-500 font-medium">Matched Student Name:</span>
                             <span id="liveStudentName" class="font-bold text-indigo-600 text-lg">Type a valid 6-digit roll...</span>
                         </div>
-                        <button onclick="saveIndividualAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">Save Record</button>
+                        <button onclick="saveIndividualAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm font-medium">Save Record</button>
                     </div>
 
                     <!-- Batch Entry -->
@@ -193,14 +192,19 @@
                     </div>
 
                     <!-- Export Tool -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between gap-4">
                         <div>
                             <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="download" class="text-indigo-600"></i> Export Tools</h3>
                             <p class="text-slate-500 text-xs mb-4">Download your entire student database directly into Excel sheet formats or clean backups.</p>
                         </div>
-                        <button onclick="exportStudentsToExcel()" class="w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2 font-medium">
-                            <i data-lucide="external-link" class="w-4 h-4"></i> Export Students to Excel
-                        </button>
+                        <div class="space-y-2">
+                            <button onclick="exportStudentsToExcel()" class="w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2 font-medium">
+                                <i data-lucide="external-link" class="w-4 h-4"></i> Export Students to Excel
+                            </button>
+                            <button onclick="exportStudentsToPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2 font-medium">
+                                <i data-lucide="file-text" class="w-4 h-4"></i> Export Roster PDF (Ascending)
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -255,10 +259,10 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2 justify-end mb-4">
-                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
+                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 text-medium">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
                         </button>
-                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
+                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 text-medium">
                             <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
                         </button>
                     </div>
@@ -366,7 +370,7 @@
                         <div class="p-5 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-xl shadow-sm">
                             <h4 class="text-rose-100 text-sm font-medium mb-1 uppercase tracking-wider">Students At Risk</h4>
                             <p id="statAtRisk" class="text-3xl font-extrabold">0</p>
-                            <span class="text-rose-200 text-xs">Attendance rate < 60%</span>
+                            <span class="text-rose-200 text-xs">Attendance rate &lt; 60%</span>
                         </div>
                         <div class="p-5 bg-gradient-to-br from-amber-500 to-amber-600 text-white rounded-xl shadow-sm">
                             <h4 class="text-amber-100 text-sm font-medium mb-1 uppercase tracking-wider">Perfect Attenders</h4>
@@ -403,6 +407,32 @@
                         </div>
                     </div>
 
+                    <!-- Local AI Advisory Report Card -->
+                    <div class="bg-white p-5 rounded-xl border border-indigo-100 shadow-sm mb-8">
+                        <div class="flex items-center gap-2 mb-3 text-indigo-600">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <h4 class="text-slate-800 font-bold tracking-wide">AI Advisory Report (Batch Health Summary)</h4>
+                        </div>
+                        <p id="aiBatchAdvisoryText" class="text-slate-600 text-sm leading-relaxed">Please query and run batch statistics first to compile the system diagnostics advisory output.</p>
+                    </div>
+
+                    <!-- AI Student Diagnostic Copilot Tool -->
+                    <div class="bg-white p-6 rounded-xl border border-indigo-100 shadow-sm mb-8">
+                        <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-indigo-600">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i> AI Student Diagnostic Copilot
+                        </h3>
+                        <p class="text-slate-500 text-xs mb-4">Select or enter a student roll to generate an instant diagnostic counseling analysis, pattern recognition, and recommendations report.</p>
+                        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                            <input type="text" id="aiSearchRoll" maxlength="6" placeholder="Enter student roll (e.g. 102030)" class="border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 flex-grow">
+                            <button onclick="runAIDiagnostic()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-6 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 self-start sm:self-auto">
+                                <i data-lucide="wand2" class="w-4 h-4"></i> Generate Diagnostics
+                            </button>
+                        </div>
+                        <div id="aiDiagnosticOutput" class="hidden p-4 bg-indigo-50/50 border border-indigo-100 rounded-lg text-sm space-y-2">
+                            <!-- Dynamically generated -->
+                        </div>
+                    </div>
+
                     <!-- Search and Dynamic Filter Bar -->
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
@@ -420,7 +450,7 @@
                                 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
                             </button>
                             <button onclick="exportStatsPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
+                                <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF (Rate Ascending)
                             </button>
                         </div>
                     </div>
@@ -448,7 +478,7 @@
                 </div>
             </section>
 
-            <!-- 5. ACTIVITY LOGS TAB (ADMIN ONLY) -->
+            <!-- 5. ACTIVITY LOGS TAB -->
             <section id="logsTab" class="tab-content space-y-6 hidden">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i data-lucide="clipboard-list" class="text-indigo-600"></i> Inputter Activity Logs</h2>
@@ -635,7 +665,7 @@
         let currentlyMarkingSessionStudents = [];
         let queriedRecords = [];
         let queriedStats = [];
-        let statsCycleDetails = { totalDays: 0, session: '', start: '', end: '' };
+        let statsCycleDetails = { totalDays: 0, session: '', start: '', end: '', avgRate: '0.0' };
         
         let indivQueriedRecords = [];
         let indivSelectedStudent = null;
@@ -1160,6 +1190,9 @@
                 return;
             }
 
+            // Always display in ascending roll format
+            filtered.sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
+
             filtered.forEach(student => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
@@ -1194,7 +1227,9 @@
                 alert("No student data available to extract.");
                 return;
             }
-            const sheetData = studentsCache.map(s => ({
+            // Sort by roll ascending
+            const sortedStudents = [...studentsCache].sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
+            const sheetData = sortedStudents.map(s => ({
                 "Roll": s.roll,
                 "Name": s.name,
                 "Session": s.session
@@ -1202,7 +1237,47 @@
             const worksheet = XLSX.utils.json_to_sheet(sheetData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-            XLSX.writeFile(workbook, "SAMS_Student_Database.xlsx");
+            XLSX.writeFile(workbook, "ICC_Student_Roster_Ascending.xlsx");
+        }
+
+        function exportStudentsToPDF() {
+            if (studentsCache.length === 0) {
+                alert("No student data available to extract.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Ideal Coaching Center", 14, 20);
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Student Database Directory (Sorted Ascending)", 14, 28);
+            
+            // Sort by roll ascending
+            const sortedStudents = [...studentsCache].sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
+            
+            const tableRows = sortedStudents.map(s => [
+                s.roll,
+                s.name,
+                s.session
+            ]);
+            
+            doc.autoTable({
+                startY: 35,
+                head: [['Roll', 'Name', 'Session']],
+                body: tableRows,
+                theme: 'striped',
+                didDrawPage: function(data) {
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10);
+                }
+            });
+            
+            doc.save("ICC_Student_Roster_Ascending.pdf");
         }
 
 
@@ -1439,7 +1514,8 @@
                     totalDays: totalDaysCount,
                     session: session,
                     start: start,
-                    end: end
+                    end: end,
+                    avgRate: '0.0'
                 };
                 
                 document.getElementById('statTotalDays').textContent = totalDaysCount;
@@ -1455,6 +1531,7 @@
                     document.getElementById('statLeastAttenderPresents').textContent = "Presents count: 0";
                     document.getElementById('statMostLate').textContent = "N/A";
                     document.getElementById('statMostLateCount').textContent = "Lates count: 0";
+                    document.getElementById('aiBatchAdvisoryText').textContent = "No data is logged in this range to compile advisory diagnostics.";
                     return;
                 }
 
@@ -1498,10 +1575,15 @@
                 });
 
                 const batchAvgRate = sessionStudents.length > 0 ? (totalRateSum / sessionStudents.length).toFixed(1) : 0;
+                statsCycleDetails.avgRate = batchAvgRate;
 
                 document.getElementById('statBatchAvg').textContent = batchAvgRate + "%";
                 document.getElementById('statAtRisk').textContent = atRiskCount;
                 document.getElementById('statPerfect').textContent = perfectCount;
+
+                // Generate AI Insights Advisory Text Block
+                const advisoryText = generateAIAdvisory(queriedStats);
+                document.getElementById('aiBatchAdvisoryText').textContent = advisoryText;
 
                 // Render metrics elements using filtering layer (keeps search & dynamic queries active)
                 filterStatsTable();
@@ -1512,6 +1594,46 @@
                 alert("Stats assembly failed: " + err.message);
                 container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">Failed to render statistical dashboard.</td></tr>`;
             }
+        }
+
+        // Generate heuristics natural-language AI insights
+        function generateAIAdvisory(stats) {
+            if (!stats || stats.length === 0) return "No statistical data evaluated.";
+            let summary = "";
+            let lowCount = 0;
+            let lateCountMax = -1;
+            let lateLeader = "N/A";
+            let topCount = 0;
+            let topNames = [];
+            
+            stats.forEach(s => {
+                if (s.rateNum < 75) lowCount++;
+                if (s.rateNum === 100) {
+                    topCount++;
+                    topNames.push(s.name);
+                }
+                if (s.late > lateCountMax) {
+                    lateCountMax = s.late;
+                    lateLeader = s.name;
+                }
+            });
+            
+            summary += `This batch shows a cumulative average attendance rate of ${statsCycleDetails.avgRate}%. `;
+            if (lowCount > 0) {
+                summary += `There are ${lowCount} student(s) currently performing below the critical 75% attendance threshold, indicating an urgent need for academic and behavioral coaching. `;
+            } else {
+                summary += "All students in this batch are currently maintaining attendance rates above the 75% critical baseline, which is a strong positive indicator. ";
+            }
+            
+            if (lateCountMax > 0) {
+                summary += `Lateness is a notable concern for certain individuals, with ${lateLeader} logging the highest frequency of lates (${lateCountMax} times) during this date cycle. `;
+            }
+            
+            if (topCount > 0) {
+                summary += `Excellent consistency is observed from ${topNames.slice(0, 3).join(", ")}${topNames.length > 3 ? ' and others' : ''} with perfect attendance records.`;
+            }
+            
+            return summary;
         }
 
         // Search and filter analytics results
@@ -1547,6 +1669,9 @@
                 return;
             }
 
+            // UPDATE: Sort by attendance rate ascending as requested (lowest attendance rates first)
+            filtered.sort((a, b) => a.rateNum - b.rateNum);
+
             filtered.forEach(stat => {
                 const rateVal = stat.rateNum;
                 let barColor = "bg-green-500";
@@ -1573,7 +1698,7 @@
                             <div class="w-24 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block">
                                 <div class="${barColor} h-full" style="width: ${rateVal}%"></div>
                             </div>
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-lg ${textClass}">${stat.rate}</span>
+                            <span class="px-2 py-1 text-xs font-bold rounded-lg ${textClass}">${stat.rate}</span>
                         </div>
                     </td>
                 `;
@@ -1638,7 +1763,9 @@
                 alert("Run dynamic statistics query before compiling extract sheets.");
                 return;
             }
-            const data = queriedStats.map(s => ({
+            // UPDATE: Sort by attendance rate ascending
+            const sortedStats = [...queriedStats].sort((a, b) => a.rateNum - b.rateNum);
+            const data = sortedStats.map(s => ({
                 "Roll": s.roll,
                 "Name": s.name,
                 "Presents": s.present,
@@ -1652,7 +1779,7 @@
             XLSX.writeFile(wb, `Stats_${statsCycleDetails.session}_Cycle.xlsx`);
         }
 
-        // Export Stats PDF with Ideal Coaching Center Branding
+        // Export Stats PDF with Ideal Coaching Center Branding & Attendance Rate Ascending sorting
         function exportStatsPDF() {
             if (queriedStats.length === 0) {
                 alert("Run dynamic statistics query before generating pdf.");
@@ -1668,14 +1795,18 @@
             
             doc.setFontSize(12);
             doc.setFont("helvetica", "normal");
-            doc.text("Attendance Cycle Analytics Report", 14, 28);
+            doc.text("Attendance Cycle Analytics Report (Rate Ascending)", 14, 28);
             
             doc.setFontSize(10);
             doc.text(`Session: ${statsCycleDetails.session}`, 14, 35);
             doc.text(`Date Cycle: ${statsCycleDetails.start} to ${statsCycleDetails.end}`, 14, 41);
             doc.text(`Total Active Class Days Logged: ${statsCycleDetails.totalDays}`, 14, 47);
+            doc.text(`Batch Cumulative Attendance Rate: ${statsCycleDetails.avgRate}%`, 14, 53);
 
-            const tableRows = queriedStats.map(s => [
+            // UPDATE: Sort by attendance rate ascending as requested (lowest rates first)
+            const sortedStats = [...queriedStats].sort((a, b) => a.rateNum - b.rateNum);
+
+            const tableRows = sortedStats.map(s => [
                 s.roll,
                 s.name,
                 s.present,
@@ -1685,7 +1816,7 @@
             ]);
 
             doc.autoTable({
-                startY: 53,
+                startY: 59,
                 head: [['Roll', 'Name', 'Presents', 'Lates', 'Absents', 'Rate']],
                 body: tableRows,
                 theme: 'grid',
@@ -1971,7 +2102,7 @@
             }
         }
 
-        // Export Individual Student Report PDF with Ideal Coaching Center Branding
+        // Export Individual Student Report PDF with Ideal Coaching Center Branding and Bottom AI Advisory Report Box
         async function exportIndivPDF() {
             if (indivQueriedRecords.length === 0 || !indivSelectedStudent) {
                 alert("No records currently queried to build PDF report.");
@@ -1981,6 +2112,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            // Set main title
             doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
             doc.text("Ideal Coaching Center", 14, 20);
@@ -2011,6 +2143,69 @@
                     doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10);
                 }
             });
+
+            // Calculate contextual individual student diagnostics
+            const total = indivQueriedRecords.length;
+            const presents = indivQueriedRecords.filter(r => r.status === "Present").length;
+            const lates = indivQueriedRecords.filter(r => r.status === "Late").length;
+            const absents = indivQueriedRecords.filter(r => r.status === "Absent").length;
+            const rate = total > 0 ? (((presents + lates) / total) * 100).toFixed(1) : '0.0';
+
+            let advisoryText = "";
+            if (total === 0) {
+                advisoryText = "No attendance metrics recorded for this student.";
+            } else {
+                advisoryText = `This student has an attendance rate of ${rate}% over ${total} tracked sessions, with ${presents} Present, ${lates} Late, and ${absents} Absent days. `;
+                if (parseFloat(rate) < 60) {
+                    advisoryText += "Critical attendance issues are detected. The student is at a high risk of academic detachment. Immediate guardian consultation is strongly advised.";
+                } else if (parseFloat(rate) < 75) {
+                    advisoryText += "Attendance is below the recommended baseline. Periodic punctuality drop-offs have been observed. Close monitoring is advised to prevent chronic absenteeism.";
+                } else if (lates > 3) {
+                    advisoryText += "The student maintains good general attendance but shows a recurring pattern of lateness. Advisory counseling on morning commutes or punctuality is recommended.";
+                } else {
+                    advisoryText += "The student demonstrates consistency in class attendance. Punctuality is well-maintained. A positive reinforcement acknowledgment is recommended.";
+                }
+            }
+
+            // Draw a beautiful boxed block for the AI Advisory report under the table.
+            let boxY = doc.lastAutoTable.finalY + 10;
+            const boxHeight = 35;
+            const margin = 14;
+            const width = doc.internal.pageSize.width - (margin * 2);
+            const pageHeight = doc.internal.pageSize.height;
+
+            // Safe page break handling to prevent text clipping at bottom margin
+            if (boxY + boxHeight > pageHeight - 20) {
+                doc.addPage();
+                boxY = 20; 
+            }
+
+            // Draw container box
+            doc.setFillColor(245, 247, 250); 
+            doc.rect(margin, boxY, width, boxHeight, "F");
+            doc.setDrawColor(226, 232, 240); 
+            doc.rect(margin, boxY, width, boxHeight, "D");
+
+            // Write header
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(79, 70, 229); 
+            doc.text("advisory report", margin + 5, boxY + 7);
+
+            // Write wrapped advisory summary text
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(51, 65, 85); 
+
+            const splitText = doc.splitTextToSize(advisoryText, width - 10);
+            doc.text(splitText, margin + 5, boxY + 15);
+
+            // Re-render signature footer on the last page if a new page was added
+            if (boxY === 20) {
+                doc.setFontSize(9);
+                doc.setTextColor(100);
+                doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, pageHeight - 10);
+            }
 
             doc.save(`Attendance_Report_${indivSelectedStudent.roll}.pdf`);
         }
@@ -2086,6 +2281,85 @@
                 alert("Failed to query activity logs: " + err.message);
                 container.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-500">Failed to load logs.</td></tr>`;
             }
+        }
+
+        // ==========================================
+        // 8. AI COUNSELOR DIAGNOSTICS COPILOT
+        // ==========================================
+        function runAIDiagnostic() {
+            const roll = document.getElementById('aiSearchRoll').value.trim();
+            const outputBox = document.getElementById('aiDiagnosticOutput');
+            
+            if (roll.length !== 6) {
+                alert("Please enter a valid 6-digit roll number.");
+                return;
+            }
+            
+            const student = studentsCache.find(s => s.roll === roll);
+            if (!student) {
+                alert("Student roll not found in active cache.");
+                return;
+            }
+            
+            const stat = queriedStats.find(s => s.roll === roll);
+            if (!stat) {
+                alert("Please query and run batch statistics first so SAMS can compile a contextual analytics model for this student.");
+                return;
+            }
+            
+            outputBox.classList.remove('hidden');
+            
+            let riskStatus = "Low Risk Profile";
+            let riskColor = "text-green-600";
+            if (stat.rateNum < 60) {
+                riskStatus = "High Risk (Critical Detachment)";
+                riskColor = "text-rose-600";
+            } else if (stat.rateNum < 75) {
+                riskStatus = "Medium Risk (Academic Warning Baseline)";
+                riskColor = "text-amber-500";
+            }
+            
+            let latenessTendency = "Excellent punctuality records.";
+            if (stat.late > 4) {
+                latenessTendency = "Chronically Late. Punctuality requires structural counseling intervention.";
+            } else if (stat.late > 0) {
+                latenessTendency = "Moderate late trends noted. Minor behavioral corrections recommended.";
+            }
+            
+            let actionPlan = "";
+            if (stat.rateNum < 75) {
+                actionPlan = "Initiate contact with parent/guardian. Call for a formal student attendance review meeting. Prohibit auxiliary batch transfers.";
+            } else if (stat.late > 3) {
+                actionPlan = "Issue late warning advisory. Counsel on commute scheduling. Enforce student sign-in log sheet on arrival.";
+            } else {
+                actionPlan = "Acknowledge consistent performance. Maintain standard academic surveillance patterns.";
+            }
+            
+            outputBox.innerHTML = `
+                <div class="flex justify-between items-center border-b border-indigo-100 pb-2 mb-2">
+                    <span class="font-bold text-indigo-900 text-base">${stat.name} (${stat.roll}) Diagnostics Report</span>
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-indigo-100 text-indigo-800 rounded-full">AI Evaluation Layer</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Risk Assessment Profile</p>
+                        <p class="font-bold ${riskColor}">${riskStatus}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 font-semibold uppercase">Punctuality Pattern</p>
+                        <p class="font-medium text-slate-700">${latenessTendency}</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="text-xs text-slate-500 font-semibold uppercase">Predictive Diagnostic Forecast</p>
+                    <p class="text-slate-700 mt-1">SAMS forecasts the student's next-month class commitment rate will lie within <strong>${(stat.rateNum * 0.95).toFixed(1)}% - ${(stat.rateNum * 1.05).toFixed(1)}%</strong>. ${stat.rateNum < 75 ? 'Current analytics show an active decline trend. High risk of course separation.' : 'Standard commit models show sustained consistency.'}</p>
+                </div>
+                <div class="mt-3 pt-2 border-t border-indigo-100">
+                    <p class="text-xs text-indigo-700 font-semibold uppercase">Recommended Action Plan</p>
+                    <p class="text-indigo-900 font-medium mt-1">${actionPlan}</p>
+                </div>
+            `;
+            initIcons();
         }
     </script>
 </body>
