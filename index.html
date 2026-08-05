@@ -1,9 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ideal Coaching Center - Attendance Management System</title>
+    <!-- Google Fonts: Noto Sans Bengali for Webpage Unicode rendering -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -14,7 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <!-- SheetJS (XLSX) CDN -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- jsPDF and AutoTable CDNs -->
+    <!-- jsPDF and AutoTable CDNs for stable PDF exports -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -35,7 +38,7 @@
                     <label class="block text-sm font-medium mb-1">Password</label>
                     <input type="password" id="loginPassword" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
-                <button type="submit" id="btnAuthSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition font-medium">Log In</button>
+                <button type="submit" id="btnAuthSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition">Log In</button>
             </form>
             <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
         </div>
@@ -62,6 +65,9 @@
                 </button>
                 <button onclick="switchTab('statsTab')" id="btn-statsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i> <span>Statistics & Reports</span>
+                </button>
+                <button onclick="switchTab('feesTab')" id="btn-feesTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+                    <i data-lucide="dollar-sign" class="w-5 h-5"></i> <span>Fee Management</span>
                 </button>
                 <button onclick="switchTab('logsTab')" id="btn-logsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
                     <i data-lucide="clipboard-list" class="w-5 h-5"></i> <span>Activity Logs</span>
@@ -177,6 +183,16 @@
                                 <label class="block text-sm font-medium mb-1">Session / Batch</label>
                                 <input type="text" id="studentSession" required placeholder="e.g., 2023-24" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Custom Monthly Fee</label>
+                                    <input type="number" id="studentMonthlyFee" value="1500" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Cycle Start Date</label>
+                                    <input type="date" id="studentStartDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
                             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition font-medium">Register Student</button>
                         </form>
                     </div>
@@ -185,10 +201,10 @@
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
                         <div>
                             <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="file-spreadsheet" class="text-green-600"></i> Bulk Excel Upload</h3>
-                            <p class="text-slate-500 text-xs mb-4">Upload an Excel file (.xlsx) with columns explicitly named: <strong class="text-indigo-600">Roll, Name, Session</strong>. Make sure Roll is 6 digits.</p>
+                            <p class="text-slate-500 text-xs mb-4">Upload an Excel file (.xlsx) with columns: <strong class="text-indigo-600">Roll, Name, Session, StartDate (YYYY-MM-DD), MonthlyFee</strong>.</p>
                             <input type="file" id="excelFile" accept=".xlsx, .xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer mb-4">
                         </div>
-                        <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition font-medium">Upload Excel Data</button>
+                        <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition font-medium font-medium">Upload Excel Data</button>
                     </div>
 
                     <!-- Export Tool -->
@@ -223,6 +239,8 @@
                                     <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Roll</th>
                                     <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Name</th>
                                     <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Session</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Monthly Fee</th>
+                                    <th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Cycle Start</th>
                                     <th class="px-6 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Action</th>
                                 </tr>
                             </thead>
@@ -259,10 +277,10 @@
                     </div>
 
                     <div class="flex flex-wrap gap-2 justify-end mb-4">
-                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 text-medium">
+                        <button onclick="exportHistoryExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Export to Excel
                         </button>
-                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 text-medium">
+                        <button onclick="exportHistoryPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium font-medium">
                             <i data-lucide="file-text" class="w-4 h-4"></i> Export to PDF
                         </button>
                     </div>
@@ -297,7 +315,7 @@
                             <input type="text" id="indivRollSearch" maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
                         </div>
                         <div class="md:col-span-2 flex items-end">
-                            <button onclick="queryIndividualHistory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm w-full md:w-auto font-medium font-medium">Search Student History</button>
+                            <button onclick="queryIndividualHistory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-sm w-full md:w-auto font-medium">Search Student History</button>
                         </div>
                     </div>
                     <div class="p-3 bg-slate-50 rounded-lg flex items-center justify-between border border-slate-100 mb-4">
@@ -309,7 +327,7 @@
                     <div id="indivHistoryResultSection" class="hidden">
                         <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
                             <h4 class="text-md font-bold text-slate-700">Attendance Log for <span id="indivResultName" class="text-indigo-600"></span></h4>
-                            <button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
+                            <button id="btnExportIndivPDF" onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 font-medium">
                                 <i data-lucide="file-text" class="w-4 h-4"></i> Export Student PDF
                             </button>
                         </div>
@@ -424,7 +442,7 @@
                         <p class="text-slate-500 text-xs mb-4">Select or enter a student roll to generate an instant diagnostic counseling analysis, pattern recognition, and recommendations report.</p>
                         <div class="flex flex-col sm:flex-row gap-3 mb-4">
                             <input type="text" id="aiSearchRoll" maxlength="6" placeholder="Enter student roll (e.g. 102030)" class="border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 flex-grow">
-                            <button onclick="runAIDiagnostic()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-6 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 self-start sm:self-auto">
+                            <button onclick="runAIDiagnostic()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-6 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 self-start sm:self-auto font-medium">
                                 <i data-lucide="wand2" class="w-4 h-4"></i> Generate Diagnostics
                             </button>
                         </div>
@@ -478,7 +496,114 @@
                 </div>
             </section>
 
-            <!-- 5. ACTIVITY LOGS TAB -->
+            <!-- 5. FEE MANAGEMENT TAB (ADMIN ONLY) -->
+            <section id="feesTab" class="tab-content space-y-6 hidden">
+                <!-- Real-Time Monthly Earnings Summary Widget -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Monthly Revenue Summary</h3>
+                    <div id="monthlyEarningsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Collect Fee Card -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="dollar-sign" class="text-indigo-600"></i> Record Student Fee</h2>
+                        <form id="collectFeeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Roll Number (6 Digits)</label>
+                                <input type="text" id="feeRollInput" required maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg flex flex-col gap-1 border border-slate-100 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500 font-medium">Matched Student:</span>
+                                    <span id="feeStudentMatchedName" class="font-bold text-indigo-600">Type a valid 6-digit roll...</span>
+                                </div>
+                                <div id="feeStudentDuesGuide" class="flex justify-between hidden mt-1 border-t border-slate-100 pt-1 text-slate-600 font-medium">
+                                    <span>Cycle Baseline Info:</span>
+                                    <span id="feeStudentDuesDetails" class="text-amber-600"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Fee Category</label>
+                                <select id="feeTypeInput" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="Tuition Fee" selected>Tuition Fee</option>
+                                    <option value="Admission Fee">Admission Fee</option>
+                                    <option value="Exam Fee">Exam Fee</option>
+                                    <option value="Notes Fee">Notes/Sheet Fee</option>
+                                    <option value="Other Fee">Other Fee</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Billing Month / Target Cycle</label>
+                                <input type="month" id="feeMonthInput" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Amount Paid (BDT)</label>
+                                <input type="number" id="feeAmountInput" required placeholder="e.g. 1500" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Transaction Date</label>
+                                <input type="date" id="feeDateInput" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium">Record Payment</button>
+                        </form>
+                    </div>
+
+                    <!-- Fee Directory / Ledger -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+                        <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="book-open" class="text-indigo-600"></i> Fee Ledger & Dues Tracker</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Select Batch</label>
+                                <select id="feeBatchFilter" class="w-full border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Select Target Billing Month</label>
+                                <input type="month" id="feeLedgerMonth" class="w-full border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="queryFeeLedger()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-sm transition">Query Ledger</button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 mb-4">
+                            <button onclick="exportLedgerExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 font-medium">
+                                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Export Excel
+                            </button>
+                            <button onclick="exportLedgerPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1 font-medium">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Export PDF
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Roll</th>
+                                        <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Billed (Tuition)</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Total Paid</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Outstanding Dues</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase tracking-wider">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="feeLedgerTableBody" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-6 text-slate-400">Query a batch and target billing cycle month to view dues structure.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. ACTIVITY LOGS TAB -->
             <section id="logsTab" class="tab-content space-y-6 hidden">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                     <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i data-lucide="clipboard-list" class="text-indigo-600"></i> Inputter Activity Logs</h2>
@@ -524,7 +649,7 @@
                 </div>
             </section>
 
-            <!-- 6. USER MANAGEMENT TAB (ADMIN ONLY) -->
+            <!-- 7. USER MANAGEMENT TAB (ADMIN ONLY) -->
             <section id="usersTab" class="tab-content space-y-6 hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Create Inputter -->
@@ -547,7 +672,7 @@
                                     <!-- Populated dynamically -->
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition font-medium">Create Account</button>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg transition font-medium font-medium">Create Account</button>
                         </form>
                         <p id="inputterFormMessage" class="text-center text-sm font-semibold mt-4 hidden"></p>
                     </div>
@@ -631,6 +756,183 @@
         </div>
     </div>
 
+    <!-- Edit Student Profile Modal -->
+    <div id="editStudentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md border border-slate-100 space-y-4">
+            <h3 class="text-lg font-bold text-slate-800">Edit Student Profile</h3>
+            <div>
+                <label class="block text-sm font-medium mb-1">Name</label>
+                <input type="text" id="editStudentName" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Session / Batch</label>
+                <input type="text" id="editStudentSession" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Custom Monthly Fee (BDT)</label>
+                <input type="number" id="editStudentMonthlyFee" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Cycle Start Date</label>
+                <input type="date" id="editStudentStartDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <input type="hidden" id="editStudentRoll">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditStudentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-600 transition font-semibold font-medium">Cancel</button>
+                <button onclick="saveEditStudent()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition font-semibold font-medium">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Student Financial Profile Ledger Modal -->
+    <div id="viewStudentFinanceModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Student Financial Ledger Card</h3>
+                <button onclick="closeStudentFinanceModal()" class="text-slate-400 hover:text-slate-600 transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-lg mb-4 text-xs">
+                <div>
+                    <span class="text-slate-400 block font-semibold">NAME</span>
+                    <strong id="finName" class="text-slate-800 text-sm"></strong>
+                </div>
+                <div>
+                    <span class="text-slate-400 block font-semibold">CYCLE START</span>
+                    <strong id="finStart" class="text-slate-800 text-sm"></strong>
+                </div>
+                <div>
+                    <span class="text-slate-400 block font-semibold">MONTHLY FEE</span>
+                    <strong id="finMonthly" class="text-slate-800 text-sm"></strong>
+                </div>
+                <div>
+                    <span class="text-slate-400 block font-semibold">ACCUMULATED BALANCE</span>
+                    <strong id="finDues" class="text-sm"></strong>
+                </div>
+            </div>
+
+            <!-- Financial Sub-Tabs Navigation -->
+            <div class="flex border-b mb-4">
+                <button onclick="switchFinanceTab('payments')" id="btnFinPayments" class="px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600">Payments History</button>
+                <button onclick="switchFinanceTab('adjustments')" id="btnFinAdjustments" class="px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent">Billing Adjustments / Holds</button>
+            </div>
+
+            <!-- TAB 1: PAYMENTS HISTORY -->
+            <div id="financePaymentsView" class="flex flex-col flex-grow overflow-hidden">
+                <h4 class="font-bold text-sm text-slate-700 mb-2">Transaction History</h4>
+                <div class="overflow-y-auto flex-grow border border-slate-100 rounded-lg">
+                    <table class="min-w-full text-xs text-left divide-y divide-slate-100 bg-white">
+                        <thead class="bg-slate-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2">Date</th>
+                                <th class="px-4 py-2">Cycle/Month</th>
+                                <th class="px-4 py-2">Type</th>
+                                <th class="px-4 py-2">Amount Paid</th>
+                                <th class="px-4 py-2">Status</th>
+                                <th class="px-4 py-2 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentFinanceTableBody" class="divide-y divide-slate-100">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: BILLING ADJUSTMENTS / HOLDS -->
+            <div id="financeAdjustmentsView" class="hidden flex flex-col flex-grow overflow-hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow overflow-hidden">
+                    <!-- Left: Create Exemption -->
+                    <div class="border p-4 rounded-lg bg-slate-50 space-y-3 overflow-y-auto">
+                        <h4 class="font-bold text-sm text-indigo-600">Apply Billing Exemption</h4>
+                        <form id="applyAdjustmentForm" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Target Billing Month</label>
+                                <input type="month" id="adjMonth" required class="w-full border px-2 py-1 text-xs rounded outline-none focus:ring-1 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Exemption Type</label>
+                                <select id="adjType" onchange="updateAdjustmentAmountCalculation()" required class="w-full border px-2 py-1 text-xs rounded outline-none focus:ring-1 focus:ring-indigo-500 bg-white">
+                                    <option value="Hold">Account Hold (No Billing)</option>
+                                    <option value="Full Waiver">Full Tuition Waiver (100% Free)</option>
+                                    <option value="Partial Waiver">Partial Waiver (Scholarship)</option>
+                                    <option value="Absence Deduction">Daily Absence Deduction</option>
+                                    <option value="Discount">Manual Bill Discount</option>
+                                </select>
+                            </div>
+                            <div id="adjAbsentDaysContainer" class="hidden">
+                                <label class="block text-xs font-semibold mb-1">Total Absent Days</label>
+                                <input type="number" id="adjAbsentDays" oninput="updateAdjustmentAmountCalculation()" placeholder="e.g., 5" class="w-full border px-2 py-1 text-xs rounded outline-none focus:ring-1 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Amount to Deduct (BDT)</label>
+                                <input type="number" id="adjAmount" required class="w-full border px-2 py-1 text-xs rounded outline-none focus:ring-1 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1">Exemption Note</label>
+                                <input type="text" id="adjNote" required placeholder="e.g., Student was sick" class="w-full border px-2 py-1 text-xs rounded outline-none focus:ring-1 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 text-xs rounded transition">Apply Exemption</button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Active Exemptions List -->
+                    <div class="border rounded-lg p-2 bg-white flex flex-col overflow-hidden">
+                        <h4 class="font-bold text-xs text-slate-700 mb-2 px-2">Active Exemptions</h4>
+                        <div class="overflow-y-auto flex-grow">
+                            <table class="min-w-full text-[11px] text-left divide-y divide-slate-100">
+                                <thead class="bg-slate-50 sticky top-0">
+                                    <tr>
+                                        <th class="px-2 py-1">Month</th>
+                                        <th class="px-2 py-1">Type</th>
+                                        <th class="px-2 py-1">Deducted</th>
+                                        <th class="px-2 py-1 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentAdjustmentsTableBody" class="divide-y divide-slate-100">
+                                    <!-- Loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 border-t pt-3 mt-4">
+                <button onclick="closeStudentFinanceModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-600 text-sm font-semibold transition font-medium">Close Ledger Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Specific Payment Modal -->
+    <div id="editPaymentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md border border-slate-100 space-y-4">
+            <h3 class="text-lg font-bold">Edit Payment Transaction</h3>
+            <div>
+                <label class="block text-sm font-medium mb-1">Fee Type</label>
+                <select id="editPaymentType" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="Tuition Fee">Tuition Fee</option>
+                    <option value="Admission Fee">Admission Fee</option>
+                    <option value="Exam Fee">Exam Fee</option>
+                    <option value="Notes Fee">Notes/Sheet Fee</option>
+                    <option value="Other Fee">Other Fee</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Target Month</label>
+                <input type="month" id="editPaymentMonth" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Amount Paid (BDT)</label>
+                <input type="number" id="editPaymentAmount" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <input type="hidden" id="editPaymentId">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeEditPaymentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-slate-600 transition font-semibold font-medium">Cancel</button>
+                <button onclick="saveEditPayment()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition font-semibold font-medium">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER DEVELOPMENT ATTRIBUTION -->
     <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
         <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition font-semibold underline decoration-2 underline-offset-4 font-medium">Shahrim Ahammed Shad</a></p>
@@ -671,6 +973,17 @@
         let indivSelectedStudent = null;
 
         let inputtersCache = [];
+        let cachedBengaliFont = localStorage.getItem('NotoSansBengali_Base64');
+
+        let queriedPayments = [];
+        let activeLedgerMonth = '';
+        let activeLedgerBatch = '';
+        
+        let financeStudentTransactions = [];
+        let financeStudentAdjustments = [];
+        let selectedFinanceStudentRoll = '';
+        
+        let earningsCacheByMonth = {};
 
         // DOM Elements
         const loginSection = document.getElementById('loginSection');
@@ -696,6 +1009,7 @@
                     await syncCache();
                     if (role === 'admin') {
                         syncInputters();
+                        syncMonthlyEarnings(); // Load earnings aggregated summaries!
                     }
                 } else {
                     showLoginScreen();
@@ -719,6 +1033,15 @@
             // Default dates for the Activity Logs Tab
             document.getElementById('logStartDate').value = today;
             document.getElementById('logEndDate').value = today;
+
+            // Default dates for the Fee Management tab
+            const currentMonth = new Date().toISOString().substring(0, 7); // "YYYY-MM"
+            document.getElementById('feeMonthInput').value = currentMonth;
+            document.getElementById('feeLedgerMonth').value = currentMonth;
+            document.getElementById('feeDateInput').value = today;
+            
+            // Student cycle default start month
+            document.getElementById('studentStartDate').value = today;
         }
 
         // ==========================================
@@ -841,7 +1164,8 @@
             const dropdowns = [
                 'historySessionFilter',
                 'statsSession',
-                'inputterSessionAssign'
+                'inputterSessionAssign',
+                'feeBatchFilter'
             ];
 
             dropdowns.forEach(id => {
@@ -1091,6 +1415,8 @@
             const name = document.getElementById('studentName').value.trim();
             const roll = document.getElementById('studentRoll').value.trim();
             const session = document.getElementById('studentSession').value.trim();
+            const monthlyFee = parseFloat(document.getElementById('studentMonthlyFee').value);
+            const startDate = document.getElementById('studentStartDate').value;
 
             if (roll.length !== 6 || isNaN(roll)) {
                 alert("Roll number must be precisely 6 numerical digits.");
@@ -1107,11 +1433,14 @@
                 await db.collection('students').doc(roll).set({
                     roll: roll,
                     name: name,
-                    session: session
+                    session: session,
+                    monthlyFee: monthlyFee,
+                    startDate: startDate
                 });
 
                 alert("Student recorded successfully.");
                 document.getElementById('studentForm').reset();
+                setDefaultDates();
             } catch (err) {
                 alert("Error writing record: " + err.message);
             }
@@ -1143,12 +1472,16 @@
                 let addedCount = 0;
                 let failedCount = 0;
                 const batch = db.batch();
+                const defaultStartDate = new Date().toISOString().split('T')[0];
 
                 for (let i = 0; i < json.length; i++) {
                     const row = json[i];
                     const name = row.Name || row.name || row.NAME;
                     let roll = row.Roll || row.roll || row.ROLL;
                     const session = row.Session || row.session || row.SESSION;
+                    
+                    const monthlyFee = parseFloat(row.MonthlyFee || row.monthlyfee || row.MONTHLYFEE || 1500);
+                    const startDate = (row.StartDate || row.startdate || row.STARTDATE || defaultStartDate).toString().trim();
 
                     if (roll) roll = roll.toString().trim();
 
@@ -1157,7 +1490,9 @@
                         batch.set(docRef, {
                             name: name.toString().trim(),
                             roll: roll,
-                            session: session.toString().trim()
+                            session: session.toString().trim(),
+                            monthlyFee: monthlyFee,
+                            startDate: startDate
                         });
                         addedCount++;
                     } else {
@@ -1167,7 +1502,7 @@
 
                 try {
                     await batch.commit();
-                    alert(`Upload successful! Registered: ${addedCount} students. Skipped: ${failedCount} malformed records.`);
+                    alert(`Upload successful! Registered: ${addedCount} students with custom billing parameters. Skipped: ${failedCount} malformed records.`);
                     fileInput.value = "";
                 } catch (error) {
                     alert("Batch database ingestion error: " + error.message);
@@ -1186,7 +1521,7 @@
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">No matching student records found.</td></tr>`;
+                container.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-400">No matching student records found.</td></tr>`;
                 return;
             }
 
@@ -1194,15 +1529,23 @@
             filtered.sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
 
             filtered.forEach(student => {
+                const customFee = student.monthlyFee !== undefined ? student.monthlyFee : 1500;
+                const cycleStart = student.startDate || "N/A";
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50";
                 tr.innerHTML = `
                     <td class="px-6 py-4 font-semibold text-slate-700">${student.roll}</td>
                     <td class="px-6 py-4 text-slate-800 font-medium">${student.name}</td>
                     <td class="px-6 py-4 text-slate-500 font-medium">${student.session}</td>
-                    <td class="px-6 py-4 text-center">
-                        <button onclick="deleteStudent('${student.roll}')" class="text-rose-600 hover:text-rose-800 font-semibold text-xs flex items-center justify-center gap-1 mx-auto transition">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+                    <td class="px-6 py-4 text-slate-600 font-semibold">${customFee} BDT</td>
+                    <td class="px-6 py-4 text-slate-500 font-medium">${cycleStart}</td>
+                    <td class="px-6 py-4 text-center space-x-2 font-medium">
+                        <button onclick="openEditStudentModal('${student.roll}')" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs inline-flex items-center gap-1 transition">
+                            <i data-lucide="edit" class="w-3.5 h-3.5 inline"></i> Edit
+                        </button>
+                        <button onclick="deleteStudent('${student.roll}')" class="text-rose-600 hover:text-rose-800 font-semibold text-xs inline-flex items-center gap-1 transition">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i> Delete
                         </button>
                     </td>
                 `;
@@ -1232,7 +1575,9 @@
             const sheetData = sortedStudents.map(s => ({
                 "Roll": s.roll,
                 "Name": s.name,
-                "Session": s.session
+                "Session": s.session,
+                "MonthlyFee": s.monthlyFee !== undefined ? s.monthlyFee : 1500,
+                "StartDate": s.startDate || "N/A"
             }));
             const worksheet = XLSX.utils.json_to_sheet(sheetData);
             const workbook = XLSX.utils.book_new();
@@ -1262,12 +1607,14 @@
             const tableRows = sortedStudents.map(s => [
                 s.roll,
                 s.name,
-                s.session
+                s.session,
+                `${s.monthlyFee !== undefined ? s.monthlyFee : 1500} BDT`,
+                s.startDate || "N/A"
             ]);
             
             doc.autoTable({
                 startY: 35,
-                head: [['Roll', 'Name', 'Session']],
+                head: [['Roll', 'Name', 'Session', 'Monthly Fee', 'Cycle Start']],
                 body: tableRows,
                 theme: 'striped',
                 didDrawPage: function(data) {
@@ -1669,7 +2016,7 @@
                 return;
             }
 
-            // UPDATE: Sort by attendance rate ascending as requested (lowest attendance rates first)
+            // Sort by attendance rate ascending
             filtered.sort((a, b) => a.rateNum - b.rateNum);
 
             filtered.forEach(stat => {
@@ -2102,8 +2449,149 @@
             }
         }
 
-        // Export Individual Student Report PDF with Ideal Coaching Center Branding and Bottom AI Advisory Report Box
-        async function exportIndivPDF() {
+        async function loadBengaliFont() {
+            if (cachedBengaliFont) return cachedBengaliFont;
+            try {
+                // Fetch Noto Sans Bengali hinted Regular font file from stable Google CDN GitHub distribution
+                const url = 'https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSansBengali/hinted/ttf/NotoSansBengali-Regular.ttf';
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Google raw font distribution returned non-success code.");
+                const arrayBuffer = await response.arrayBuffer();
+                
+                let binary = '';
+                const bytes = new Uint8Array(arrayBuffer);
+                const len = bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                cachedBengaliFont = window.btoa(binary);
+                localStorage.setItem('NotoSansBengali_Base64', cachedBengaliFont);
+                return cachedBengaliFont;
+            } catch (err) {
+                console.warn("Could not download Unicode Bengali font dynamically for PDF generation. Fallback mode is active.", err);
+                return null;
+            }
+        }
+
+        // HTML report template used by html2pdf for flawless complex script rendering
+        function getStudentReportHTML(student, records, advisoryEN, advisoryBN) {
+            const total = records.length;
+            const presents = records.filter(r => r.status === "Present").length;
+            const lates = records.filter(r => r.status === "Late").length;
+            const absents = records.filter(r => r.status === "Absent").length;
+            const rate = total > 0 ? (((presents + lates) / total) * 100).toFixed(1) : '0.0';
+
+            let tableRowsHTML = records.map(r => `
+                <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 10px 16px; color: #475569; font-weight: 500;">${r.date}</td>
+                    <td style="padding: 10px 16px;">
+                        <span style="padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 9999px; ${
+                            r.status === 'Present' ? 'background-color: #dcfce7; color: #166534;' :
+                            r.status === 'Late' ? 'background-color: #fef3c7; color: #92400e;' : 
+                            'background-color: #fee2e2; color: #991b1b;'
+                        }">${r.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            return `
+                <div style="padding: 40px; background-color: #ffffff; color: #1e293b; font-family: 'Nirmala UI', 'SolaimanLipi', 'Vrinda', 'Noto Sans Bengali', sans-serif; max-width: 650px; margin: 0 auto; box-sizing: border-box;">
+                    <!-- Header -->
+                    <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 15px; margin-bottom: 25px;">
+                        <h1 style="font-size: 26px; font-weight: 800; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: -0.5px;">Ideal Coaching Center</h1>
+                        <p style="color: #4f46e5; font-weight: 600; font-size: 13px; margin: 5px 0 0 0;">Individual Student Attendance Report</p>
+                    </div>
+
+                    <!-- Student Profile Grid -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 8px;">
+                        <tr>
+                            <td style="padding: 12px; width: 50%;">
+                                <span style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; display: block;">Student Name</span>
+                                <strong style="font-size: 14px; color: #1e293b; display: block; margin-top: 2px;">${student.name}</strong>
+                            </td>
+                            <td style="padding: 12px; width: 50%;">
+                                <span style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; display: block;">Roll Number</span>
+                                <strong style="font-size: 14px; color: #1e293b; display: block; margin-top: 2px;">${student.roll}</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px;">
+                                <span style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; display: block;">Session / Batch</span>
+                                <strong style="font-size: 14px; color: #1e293b; display: block; margin-top: 2px;">${student.session}</strong>
+                            </td>
+                            <td style="padding: 12px;">
+                                <span style="color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; display: block;">Report Generated</span>
+                                <strong style="font-size: 14px; color: #1e293b; display: block; margin-top: 2px;">${new Date().toLocaleString()}</strong>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Attendance Stats Cards -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                        <div style="flex: 1; padding: 12px; background-color: #f1f5f9; border-radius: 8px; text-align: center;">
+                            <span style="color: #64748b; font-size: 11px; font-weight: 500; display: block;">Total Sessions</span>
+                            <strong style="font-size: 18px; color: #1e293b; display: block; margin-top: 4px;">${total}</strong>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background-color: #ecfdf5; border-radius: 8px; text-align: center;">
+                            <span style="color: #047857; font-size: 11px; font-weight: 500; display: block;">Present</span>
+                            <strong style="font-size: 18px; color: #065f46; display: block; margin-top: 4px;">${presents}</strong>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background-color: #fffbeb; border-radius: 8px; text-align: center;">
+                            <span style="color: #b45309; font-size: 11px; font-weight: 500; display: block;">Late</span>
+                            <strong style="font-size: 18px; color: #92400e; display: block; margin-top: 4px;">${lates}</strong>
+                        </div>
+                        <div style="flex: 1; padding: 12px; background-color: #fef2f2; border-radius: 8px; text-align: center;">
+                            <span style="color: #b91c1c; font-size: 11px; font-weight: 500; display: block;">Absent</span>
+                            <strong style="font-size: 18px; color: #991b1b; display: block; margin-top: 4px;">${absents}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Table -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; letter-spacing: 0.5px; margin: 0 0 10px 0;">Detailed Attendance Logs</h3>
+                        <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                                <thead style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                    <tr>
+                                        <th style="padding: 10px 16px; font-weight: 600; color: #64748b;">Date</th>
+                                        <th style="padding: 10px 16px; font-weight: 600; color: #64748b;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRowsHTML || '<tr><td colspan="2" style="padding: 20px; text-align: center; color: #94a3b8;">No records logged.</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Box 1: English Advisory -->
+                    <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; page-break-inside: avoid;">
+                        <h4 style="color: #4f46e5; font-size: 11px; font-weight: 700; text-transform: uppercase; margin: 0 0 5px 0; letter-spacing: 0.5px;">Advisory Report</h4>
+                        <p style="color: #334155; font-size: 12px; line-height: 1.5; margin: 0;">${advisoryEN}</p>
+                    </div>
+
+                    <!-- Box 2: Bengali Advisory -->
+                    <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 25px; page-break-inside: avoid;">
+                        <h4 style="color: #4f46e5; font-size: 11px; font-weight: 700; text-transform: uppercase; margin: 0 0 5px 0; letter-spacing: 0.5px; font-family: 'Noto Sans Bengali', sans-serif;">পরামর্শ প্রতিবেদন (Advisory Report)</h4>
+                        <p style="color: #334155; font-size: 12px; line-height: 1.5; margin: 0; font-family: 'Noto Sans Bengali', sans-serif;">${advisoryBN}</p>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 30px; page-break-inside: avoid;">
+                        <div>
+                            <p style="margin: 0;">Designed by Shahrim Ahammed Shad</p>
+                            <p style="margin: 2px 0 0 0; color: #cbd5e1;">shad.iam.bd</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-weight: 700; color: #475569; margin: 0;">SD/- Shahrim Ahammed Shad&lt;shad.iam.bd&gt;</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Export Individual Student Report PDF safely with 100% stable jsPDF (Strictly in English [1])
+        function exportIndivPDF() {
             if (indivQueriedRecords.length === 0 || !indivSelectedStudent) {
                 alert("No records currently queried to build PDF report.");
                 return;
@@ -2112,7 +2600,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Set main title
+            // Header - Ideal Coaching Center
             doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
             doc.text("Ideal Coaching Center", 14, 20);
@@ -2144,68 +2632,55 @@
                 }
             });
 
-            // Calculate contextual individual student diagnostics
+            // Calculate student metrics
             const total = indivQueriedRecords.length;
             const presents = indivQueriedRecords.filter(r => r.status === "Present").length;
             const lates = indivQueriedRecords.filter(r => r.status === "Late").length;
             const absents = indivQueriedRecords.filter(r => r.status === "Absent").length;
             const rate = total > 0 ? (((presents + lates) / total) * 100).toFixed(1) : '0.0';
 
-            let advisoryText = "";
-            if (total === 0) {
-                advisoryText = "No attendance metrics recorded for this student.";
+            let advisoryText = `This student has maintained an attendance rate of ${rate}% over ${total} sessions, recording ${presents} Present, ${lates} Late, and ${absents} Absent days. `;
+            if (parseFloat(rate) < 60) {
+                advisoryText += "Critical attendance warning. Direct guardian contact and immediate academic intervention are strongly recommended to correct persistent absence patterns.";
+            } else if (parseFloat(rate) < 75) {
+                advisoryText += "Slight attendance drop-offs observed. Close observation and counseling are recommended to maintain standard commitment levels.";
+            } else if (lates > 3) {
+                advisoryText += "General attendance remains consistent, but habitual lateness is becoming an issue. Guardian notice regarding coaching session start times is advised.";
             } else {
-                advisoryText = `This student has an attendance rate of ${rate}% over ${total} tracked sessions, with ${presents} Present, ${lates} Late, and ${absents} Absent days. `;
-                if (parseFloat(rate) < 60) {
-                    advisoryText += "Critical attendance issues are detected. The student is at a high risk of academic detachment. Immediate guardian consultation is strongly advised.";
-                } else if (parseFloat(rate) < 75) {
-                    advisoryText += "Attendance is below the recommended baseline. Periodic punctuality drop-offs have been observed. Close monitoring is advised to prevent chronic absenteeism.";
-                } else if (lates > 3) {
-                    advisoryText += "The student maintains good general attendance but shows a recurring pattern of lateness. Advisory counseling on morning commutes or punctuality is recommended.";
-                } else {
-                    advisoryText += "The student demonstrates consistency in class attendance. Punctuality is well-maintained. A positive reinforcement acknowledgment is recommended.";
-                }
+                advisoryText += "Exemplary attendance consistency and punctuality patterns observed. No academic actions required.";
             }
 
-            // Draw a beautiful boxed block for the AI Advisory report under the table.
+            // Draw Box under table on the page
             let boxY = doc.lastAutoTable.finalY + 10;
             const boxHeight = 35;
             const margin = 14;
             const width = doc.internal.pageSize.width - (margin * 2);
             const pageHeight = doc.internal.pageSize.height;
 
-            // Safe page break handling to prevent text clipping at bottom margin
             if (boxY + boxHeight > pageHeight - 20) {
                 doc.addPage();
                 boxY = 20; 
             }
 
-            // Draw container box
+            // Card box styling
             doc.setFillColor(245, 247, 250); 
             doc.rect(margin, boxY, width, boxHeight, "F");
             doc.setDrawColor(226, 232, 240); 
             doc.rect(margin, boxY, width, boxHeight, "D");
 
-            // Write header
+            // Box Header
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
             doc.setTextColor(79, 70, 229); 
             doc.text("advisory report", margin + 5, boxY + 7);
 
-            // Write wrapped advisory summary text
+            // Box Body
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(51, 65, 85); 
 
             const splitText = doc.splitTextToSize(advisoryText, width - 10);
             doc.text(splitText, margin + 5, boxY + 15);
-
-            // Re-render signature footer on the last page if a new page was added
-            if (boxY === 20) {
-                doc.setFontSize(9);
-                doc.setTextColor(100);
-                doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, pageHeight - 10);
-            }
 
             doc.save(`Attendance_Report_${indivSelectedStudent.roll}.pdf`);
         }
@@ -2360,6 +2835,835 @@
                 </div>
             `;
             initIcons();
+        }
+
+        // ==========================================
+        // 9. TUITION FEE (BETON) MANAGEMENT MODULE (ADMIN ONLY)
+        // ==========================================
+        const feeRollInput = document.getElementById('feeRollInput');
+        const feeStudentMatchedName = document.getElementById('feeStudentMatchedName');
+        const feeStudentDuesGuide = document.getElementById('feeStudentDuesGuide');
+        const feeStudentDuesDetails = document.getElementById('feeStudentDuesDetails');
+        let feeSelectedStudent = null;
+
+        // Live student matching logic on key inputs (calculates outstanding dues preview dynamically)
+        feeRollInput.addEventListener('input', async () => {
+            const roll = feeRollInput.value.trim();
+            if (roll.length === 6) {
+                const matched = studentsCache.find(s => s.roll === roll);
+                if (matched) {
+                    feeSelectedStudent = matched;
+                    feeStudentMatchedName.textContent = `${matched.name} (Batch: ${matched.session})`;
+                    feeStudentMatchedName.className = "font-bold text-green-600 text-xs";
+                    
+                    // Fetch dues breakdown to display in real-time
+                    const targetMonth = document.getElementById('feeMonthInput').value;
+                    const calculatedData = await calculateStudentOutstandingBalance(matched.roll, targetMonth);
+                    feeStudentDuesGuide.classList.remove('hidden');
+                    
+                    if (calculatedData.netDues < 0) {
+                        const absCredit = Math.abs(calculatedData.netDues);
+                        feeStudentDuesDetails.textContent = `${absCredit} BDT (Advance Credit) - Monthly: ${matched.monthlyFee} BDT`;
+                        feeStudentDuesDetails.className = "text-green-600 font-bold";
+                    } else {
+                        feeStudentDuesDetails.textContent = `${calculatedData.netDues} BDT Overdue - Monthly: ${matched.monthlyFee} BDT`;
+                        feeStudentDuesDetails.className = "text-rose-600 font-bold";
+                    }
+                } else {
+                    feeStudentMatchedName.textContent = "Roll not found in database!";
+                    feeStudentMatchedName.className = "font-bold text-red-500 text-xs";
+                    feeStudentDuesGuide.classList.add('hidden');
+                    feeSelectedStudent = null;
+                }
+            } else {
+                feeStudentMatchedName.textContent = "Type a valid 6-digit roll...";
+                feeStudentMatchedName.className = "font-bold text-slate-500 text-xs";
+                feeStudentDuesGuide.classList.add('hidden');
+                feeSelectedStudent = null;
+            }
+        });
+
+        // Trigger real-time calculation changes if the target month shifts
+        document.getElementById('feeMonthInput').addEventListener('change', () => {
+            if (feeSelectedStudent) {
+                const event = new Event('input');
+                feeRollInput.dispatchEvent(event);
+            }
+        });
+
+        // Record Payments Submissions
+        document.getElementById('collectFeeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const month = document.getElementById('feeMonthInput').value;
+            const amount = parseFloat(document.getElementById('feeAmountInput').value);
+            const date = document.getElementById('feeDateInput').value;
+            const feeType = document.getElementById('feeTypeInput').value;
+
+            if (!feeSelectedStudent) {
+                alert("Please match a valid student roll number first.");
+                return;
+            }
+
+            // AUTOMATIC STATUS CALCULATION ENGINE:
+            // Statuses are determined directly in-code, saving valuable manual entry overhead.
+            let calculatedStatus = "Paid";
+            if (feeType === "Tuition Fee") {
+                const customFee = feeSelectedStudent.monthlyFee !== undefined ? feeSelectedStudent.monthlyFee : 1500;
+                if (amount >= customFee) {
+                    calculatedStatus = "Paid";
+                } else if (amount > 0) {
+                    calculatedStatus = "Partial";
+                } else {
+                    calculatedStatus = "Unpaid";
+                }
+            } else {
+                calculatedStatus = amount > 0 ? "Paid" : "Unpaid";
+            }
+
+            const docId = `${feeSelectedStudent.roll}_${feeType.replace(/\s+/g, '')}_${month}`;
+            try {
+                await db.collection('payments').doc(docId).set({
+                    roll: feeSelectedStudent.roll,
+                    name: feeSelectedStudent.name,
+                    session: feeSelectedStudent.session,
+                    month: month,
+                    amount: amount,
+                    status: calculatedStatus,
+                    feeType: feeType,
+                    paymentDate: date,
+                    receivedBy: currentUser.uid,
+                    receivedByEmail: currentUser.email,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert("Payment record saved successfully!");
+                document.getElementById('collectFeeForm').reset();
+                feeSelectedStudent = null;
+                feeStudentMatchedName.textContent = "Type a valid 6-digit roll...";
+                feeStudentMatchedName.className = "font-bold text-slate-500 text-xs";
+                feeStudentDuesGuide.classList.add('hidden');
+                setDefaultDates();
+                
+                // Refresh active query results automatically
+                if (activeLedgerMonth && activeLedgerBatch) {
+                    queryFeeLedger();
+                }
+            } catch (err) {
+                alert("Failed to save payment record: " + err.message);
+            }
+        });
+
+        // Ledger Calculations Helpers
+        function parseMonthYear(monthStr) {
+            const [year, month] = monthStr.split('-').map(Number);
+            return { year, month };
+        }
+
+        function calculateBilledMonths(startDateStr, evaluationDateStr) {
+            if (!startDateStr || !evaluationDateStr) return 0;
+            const start = new Date(startDateStr);
+            const evalDate = new Date(evaluationDateStr);
+            
+            if (evalDate < start) return 0;
+            
+            // Calculate base month difference
+            let months = (evalDate.getFullYear() - start.getFullYear()) * 12 + (evalDate.getMonth() - start.getMonth());
+            
+            // If the day of the month of evalDate is greater than or equal to the day of start, 
+            // the billing cycle for this month has triggered.
+            if (evalDate.getDate() >= start.getDate()) {
+                months += 1;
+            }
+            
+            return months > 0 ? months : 0;
+        }
+
+        // Calculates Billing Exemptions & Adjustments (Holds, Waivers, Deductions, Discounts)
+        async function fetchStudentAdjustments(roll) {
+            let adjustments = {};
+            try {
+                const snapshot = await db.collection('adjustments').where('roll', '==', roll).get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    adjustments[data.month] = data;
+                });
+            } catch (e) {
+                console.error("Error fetching billing adjustments:", e);
+            }
+            return adjustments;
+        }
+
+        // FIXED TYPO: Changed targetMonthYearStr to targetMonth to resolve runtime ledger crash
+        async function calculateStudentOutstandingBalance(roll, targetMonth) {
+            const student = studentsCache.find(s => s.roll === roll);
+            if (!student) return { expectedTuition: 0, otherFees: 0, totalPaid: 0, netDues: 0 };
+
+            const customFee = student.monthlyFee !== undefined ? student.monthlyFee : 1500;
+            const [year, month] = targetMonth.split('-').map(Number);
+            const evaluationDateStr = new Date(year, month, 0).toISOString().split('T')[0]; // last day of month
+
+            // Fetch billing exemptions/holds
+            const adjustments = await fetchStudentAdjustments(roll);
+
+            // Compute month-by-month expected fee compilation
+            const start = new Date(student.startDate);
+            const end = new Date(year, month - 1, 1);
+            let expectedTuition = 0;
+
+            let current = new Date(start.getFullYear(), start.getMonth(), 1);
+            while (current <= end) {
+                const y = current.getFullYear();
+                const m = String(current.getMonth() + 1).padStart(2, '0');
+                const mStr = `${y}-${m}`;
+
+                const adj = adjustments[mStr];
+                if (adj) {
+                    if (adj.type === "Hold" || adj.type === "Full Waiver") {
+                        // Billed as 0 BDT for suspended/waived cycles
+                    } else if (adj.type === "Partial Waiver" || adj.type === "Discount" || adj.type === "Absence Deduction") {
+                        expectedTuition += Math.max(0, customFee - (adj.amount || 0));
+                    }
+                } else {
+                    expectedTuition += customFee;
+                }
+                current.setMonth(current.getMonth() + 1);
+            }
+
+            let otherFees = 0;
+            let totalPaid = 0;
+
+            try {
+                const snapshot = await db.collection('payments').where('roll', '==', roll).get();
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    if (p.feeType !== "Tuition Fee") {
+                        otherFees += p.amount;
+                    }
+                    totalPaid += p.amount;
+                });
+            } catch (e) {
+                console.error("Error retrieving ledger balance details:", e);
+            }
+
+            const totalBilled = expectedTuition + otherFees;
+            const netDues = totalBilled - totalPaid;
+
+            return {
+                expectedTuition,
+                otherFees,
+                totalPaid,
+                netDues: netDues
+            };
+        }
+
+        // Query Fee Ledgers & Tracker with Auto-Unpaid detection and billing exemptions
+        async function queryFeeLedger() {
+            const batch = document.getElementById('feeBatchFilter').value;
+            const month = document.getElementById('feeLedgerMonth').value;
+            const container = document.getElementById('feeLedgerTableBody');
+
+            if (!batch || !month) {
+                alert("Please select both a batch and a billing month.");
+                return;
+            }
+
+            container.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-slate-400">Loading ledger data...</td></tr>`;
+            activeLedgerMonth = month;
+            activeLedgerBatch = batch;
+
+            try {
+                // Fetch student batch directory
+                const batchStudents = studentsCache.filter(s => s.session === batch);
+                if (batchStudents.length === 0) {
+                    container.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-500">No registered students found in batch: ${batch}</td></tr>`;
+                    return;
+                }
+
+                // Query all recorded payments for this batch
+                const snapshot = await db.collection('payments').where('session', '==', batch).get();
+                let batchPayments = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    batchPayments.push(data);
+                });
+
+                // Query all adjustments for this batch
+                const adjSnapshot = await db.collection('adjustments').where('session', '==', batch).get();
+                let batchAdjustments = [];
+                adjSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    batchAdjustments.push(data);
+                });
+
+                const [year, mNum] = month.split('-').map(Number);
+                const endLimit = new Date(year, mNum - 1, 1);
+
+                queriedPayments = batchStudents.map(student => {
+                    const studentPayments = batchPayments.filter(p => p.roll === student.roll);
+                    const studentAdjustments = batchAdjustments.filter(a => a.roll === student.roll);
+                    
+                    const customFee = student.monthlyFee !== undefined ? student.monthlyFee : 1500;
+                    
+                    // Month-by-month expected fee compilation
+                    const start = new Date(student.startDate);
+                    let expectedTuition = 0;
+
+                    let current = new Date(start.getFullYear(), start.getMonth(), 1);
+                    while (current <= endLimit) {
+                        const y = current.getFullYear();
+                        const m = String(current.getMonth() + 1).padStart(2, '0');
+                        const mStr = `${y}-${m}`;
+
+                        const adj = studentAdjustments.find(a => a.month === mStr);
+                        if (adj) {
+                            if (adj.type === "Hold" || adj.type === "Full Waiver") {
+                                // Billed as 0
+                            } else if (adj.type === "Partial Waiver" || adj.type === "Discount" || adj.type === "Absence Deduction") {
+                                expectedTuition += Math.max(0, customFee - (adj.amount || 0));
+                            }
+                        } else {
+                            expectedTuition += customFee;
+                        }
+                        current.setMonth(current.getMonth() + 1);
+                    }
+
+                    let otherFees = 0;
+                    let totalPaid = 0;
+
+                    studentPayments.forEach(p => {
+                        if (p.feeType !== "Tuition Fee") {
+                            otherFees += p.amount;
+                        }
+                        totalPaid += p.amount;
+                    });
+
+                    const totalBilled = expectedTuition + otherFees;
+                    const netDues = totalBilled - totalPaid;
+
+                    let status = "Unpaid";
+                    if (netDues < 0) status = "Advance Paid";
+                    else if (netDues === 0 && totalPaid > 0) status = "Paid";
+                    else if (totalPaid > 0 && netDues > 0) status = "Partial";
+
+                    return {
+                        roll: student.roll,
+                        name: student.name,
+                        session: student.session,
+                        expectedTuition: expectedTuition,
+                        totalPaid: totalPaid,
+                        netDues: netDues,
+                        status: status
+                    };
+                });
+
+                // Sort ascending by roll
+                queriedPayments.sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
+
+                container.innerHTML = "";
+                queriedPayments.forEach(payment => {
+                    let badgeClass = "bg-green-100 text-green-800";
+                    let duesText = `${payment.netDues} BDT`;
+                    let duesClass = "text-rose-600 font-bold";
+
+                    if (payment.status === "Partial") badgeClass = "bg-amber-100 text-amber-800";
+                    if (payment.status === "Unpaid") badgeClass = "bg-rose-100 text-rose-800";
+                    if (payment.status === "Advance Paid") {
+                        badgeClass = "bg-blue-100 text-blue-800";
+                        duesText = `${Math.abs(payment.netDues)} BDT (Advance)`;
+                        duesClass = "text-blue-600 font-bold";
+                    } else if (payment.netDues <= 0) {
+                        duesText = "0 BDT";
+                        duesClass = "text-green-600 font-bold";
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 font-semibold text-slate-700">${payment.roll}</td>
+                        <td class="px-4 py-3 text-slate-800 font-medium">${payment.name}</td>
+                        <td class="px-4 py-3 text-center text-slate-600 font-medium">${payment.expectedTuition} BDT</td>
+                        <td class="px-4 py-3 text-center text-green-600 font-bold">${payment.totalPaid} BDT</td>
+                        <td class="px-4 py-3 text-center ${duesClass}">${duesText}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badgeClass}">${payment.status}</span>
+                        </td>
+                        <td class="px-4 py-3 text-center space-x-2">
+                            <button onclick="quickCollectFee('${payment.roll}')" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold inline-flex items-center gap-0.5">
+                                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Payment
+                            </button>
+                            <button onclick="viewStudentFinanceCard('${payment.roll}')" class="text-slate-600 hover:text-slate-800 text-xs font-bold inline-flex items-center gap-0.5">
+                                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Ledger Card
+                            </button>
+                        </td>
+                    `;
+                    container.appendChild(tr);
+                });
+                initIcons();
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load fee ledger: " + err.message);
+                container.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-500">Failed to load ledger records.</td></tr>`;
+            }
+        }
+
+        function quickCollectFee(roll) {
+            const student = studentsCache.find(s => s.roll === roll);
+            if (student) {
+                document.getElementById('feeRollInput').value = student.roll;
+                // Dispatch input event to trigger auto-matching list
+                const event = new Event('input');
+                document.getElementById('feeRollInput').dispatchEvent(event);
+                document.getElementById('feeMonthInput').value = activeLedgerMonth;
+                document.getElementById('feeRollInput').focus();
+            }
+        }
+
+        // Detailed Personal Ledger Card Operations
+        async function viewStudentFinanceCard(roll) {
+            selectedFinanceStudentRoll = roll;
+            const student = studentsCache.find(s => s.roll === roll);
+            if (!student) return;
+
+            document.getElementById('finName').textContent = student.name;
+            document.getElementById('finStart').textContent = student.startDate || "N/A";
+            document.getElementById('finMonthly').textContent = `${student.monthlyFee !== undefined ? student.monthlyFee : 1500} BDT`;
+            
+            const targetM = activeLedgerMonth || new Date().toISOString().substring(0, 7);
+            const calculated = await calculateStudentOutstandingBalance(roll, targetM);
+            
+            const duesBox = document.getElementById('finDues');
+            if (calculated.netDues < 0) {
+                duesBox.textContent = `${Math.abs(calculated.netDues)} BDT (Advance Paid)`;
+                duesBox.className = "text-blue-600 text-sm font-bold";
+            } else {
+                duesBox.textContent = `${calculated.netDues} BDT`;
+                duesBox.className = "text-rose-600 text-sm font-bold";
+            }
+
+            // Default to Payments sub-tab first
+            switchFinanceTab('payments');
+            await reloadStudentFinanceTable();
+            await reloadStudentAdjustmentsTable();
+            
+            document.getElementById('viewStudentFinanceModal').classList.remove('hidden');
+        }
+
+        function switchFinanceTab(tabType) {
+            const btnPay = document.getElementById('btnFinPayments');
+            const btnAdj = document.getElementById('btnFinAdjustments');
+            const viewPay = document.getElementById('financePaymentsView');
+            const viewAdj = document.getElementById('financeAdjustmentsView');
+
+            if (tabType === 'payments') {
+                btnPay.className = "px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600";
+                btnAdj.className = "px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent";
+                viewPay.classList.remove('hidden');
+                viewAdj.classList.add('hidden');
+            } else {
+                btnAdj.className = "px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600";
+                btnPay.className = "px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent";
+                viewPay.classList.add('hidden');
+                viewAdj.classList.remove('hidden');
+                
+                // Pre-populate adjustment months in modal
+                const currentMonth = new Date().toISOString().substring(0, 7);
+                document.getElementById('adjMonth').value = currentMonth;
+                updateAdjustmentAmountCalculation();
+            }
+        }
+
+        async function reloadStudentFinanceTable() {
+            const tableBody = document.getElementById('studentFinanceTableBody');
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-400">Loading transactions...</td></tr>`;
+
+            try {
+                const snapshot = await db.collection('payments').where('roll', '==', selectedFinanceStudentRoll).get();
+                financeStudentTransactions = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    financeStudentTransactions.push(data);
+                });
+
+                // Sort descending (newest transaction first)
+                financeStudentTransactions.sort((a, b) => b.month.localeCompare(a.month));
+
+                tableBody.innerHTML = "";
+                if (financeStudentTransactions.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-400">No payment records saved for this student.</td></tr>`;
+                    return;
+                }
+
+                financeStudentTransactions.forEach(t => {
+                    let badgeClass = "bg-green-100 text-green-800";
+                    if (t.status === "Partial") badgeClass = "bg-amber-100 text-amber-800";
+                    if (t.status === "Unpaid") badgeClass = "bg-rose-100 text-rose-800";
+                    if (t.status === "Advance Paid") badgeClass = "bg-blue-100 text-blue-800";
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 font-medium text-slate-600">${t.paymentDate}</td>
+                        <td class="px-4 py-2 text-slate-800 font-semibold">${t.month}</td>
+                        <td class="px-4 py-2 text-slate-500 font-medium">${t.feeType || 'Tuition Fee'}</td>
+                        <td class="px-4 py-2 text-slate-800 font-bold">${t.amount} BDT</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2.5 py-0.5 rounded-full font-semibold ${badgeClass}">${t.status}</span>
+                        </td>
+                        <td class="px-4 py-2 text-center space-x-1">
+                            <button onclick="openEditPaymentModal('${t.id}')" class="text-indigo-600 hover:text-indigo-800 font-semibold"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+                            <button onclick="deletePaymentTransaction('${t.id}')" class="text-rose-600 hover:text-rose-800 font-semibold"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                initIcons();
+            } catch (err) {
+                console.error(err);
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-red-500">Failed to load transactions.</td></tr>`;
+            }
+        }
+
+        async function reloadStudentAdjustmentsTable() {
+            const tableBody = document.getElementById('studentAdjustmentsTableBody');
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">Loading adjustments...</td></tr>`;
+
+            try {
+                const snapshot = await db.collection('adjustments').where('roll', '==', selectedFinanceStudentRoll).get();
+                financeStudentAdjustments = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    financeStudentAdjustments.push(data);
+                });
+
+                financeStudentAdjustments.sort((a, b) => b.month.localeCompare(a.month));
+
+                tableBody.innerHTML = "";
+                if (financeStudentAdjustments.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">No active adjustments/holds applied.</td></tr>`;
+                    return;
+                }
+
+                financeStudentAdjustments.forEach(a => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="px-2 py-1 font-semibold text-slate-800">${a.month}</td>
+                        <td class="px-2 py-1 text-slate-500" title="${a.note}">${a.type}</td>
+                        <td class="px-2 py-1 font-bold text-slate-700">${a.amount} BDT</td>
+                        <td class="px-2 py-1 text-center">
+                            <button onclick="deleteAdjustment('${a.id}')" class="text-rose-600 hover:text-rose-800 font-semibold"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+                initIcons();
+            } catch (err) {
+                console.error(err);
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500 font-semibold">Failed to load active adjustments.</td></tr>`;
+            }
+        }
+
+        function closeStudentFinanceModal() {
+            document.getElementById('viewStudentFinanceModal').classList.add('hidden');
+            selectedFinanceStudentRoll = '';
+            financeStudentTransactions = [];
+            financeStudentAdjustments = [];
+        }
+
+        // Transaction Editing & Deletion handlers
+        function openEditPaymentModal(id) {
+            const p = financeStudentTransactions.find(t => t.id === id);
+            if (!p) return;
+
+            document.getElementById('editPaymentId').value = id;
+            document.getElementById('editPaymentType').value = p.feeType || 'Tuition Fee';
+            document.getElementById('editPaymentMonth').value = p.month;
+            document.getElementById('editPaymentAmount').value = p.amount;
+
+            // Trigger status calculation update if applicable
+            document.getElementById('editPaymentModal').classList.remove('hidden');
+        }
+
+        function closeEditPaymentModal() {
+            document.getElementById('editPaymentModal').classList.add('hidden');
+        }
+
+        async function saveEditPayment() {
+            const id = document.getElementById('editPaymentId').value;
+            const feeType = document.getElementById('editPaymentType').value;
+            const month = document.getElementById('editPaymentMonth').value;
+            const amount = parseFloat(document.getElementById('editPaymentAmount').value);
+
+            const userCached = inputtersCache.find(u => u.uid === selectedFinanceStudentRoll) || studentsCache.find(s => s.roll === selectedFinanceStudentRoll);
+            const customFee = userCached ? (userCached.monthlyFee || 1500) : 1500;
+
+            // Recalculate status during update
+            let calculatedStatus = "Paid";
+            if (feeType === "Tuition Fee") {
+                if (amount >= customFee) {
+                    calculatedStatus = "Paid";
+                } else if (amount > 0) {
+                    calculatedStatus = "Partial";
+                } else {
+                    calculatedStatus = "Unpaid";
+                }
+            } else {
+                calculatedStatus = amount > 0 ? "Paid" : "Unpaid";
+            }
+
+            try {
+                await db.collection('payments').doc(id).update({
+                    feeType: feeType,
+                    month: month,
+                    amount: amount,
+                    status: calculatedStatus
+                });
+                alert("Payment transaction successfully updated.");
+                closeEditPaymentModal();
+                
+                // Refresh modal and general tracker outputs
+                await reloadStudentFinanceTable();
+                
+                // Recalculate modal summary dues
+                const calculated = await calculateStudentOutstandingBalance(selectedFinanceStudentRoll, activeLedgerMonth || new Date().toISOString().substring(0, 7));
+                
+                const duesBox = document.getElementById('finDues');
+                if (calculated.netDues < 0) {
+                    duesBox.textContent = `${Math.abs(calculated.netDues)} BDT (Advance Paid)`;
+                    duesBox.className = "text-blue-600 text-sm font-bold";
+                } else {
+                    duesBox.textContent = `${calculated.netDues} BDT`;
+                    duesBox.className = "text-rose-600 text-sm font-bold";
+                }
+                
+                if (activeLedgerMonth && activeLedgerBatch) {
+                    queryFeeLedger();
+                }
+            } catch (err) {
+                alert("Failed to update transaction: " + err.message);
+            }
+        }
+
+        async function deletePaymentTransaction(id) {
+            if (confirm("Are you sure you want to permanently delete this tuition fee record? This action will adjust the student balance ledger.")) {
+                try {
+                    await db.collection('payments').doc(id).delete();
+                    alert("Payment record dropped successfully.");
+                    await reloadStudentFinanceTable();
+                    
+                    const calculated = await calculateStudentOutstandingBalance(selectedFinanceStudentRoll, activeLedgerMonth || new Date().toISOString().substring(0, 7));
+                    
+                    const duesBox = document.getElementById('finDues');
+                    if (calculated.netDues < 0) {
+                        duesBox.textContent = `${Math.abs(calculated.netDues)} BDT (Advance Paid)`;
+                        duesBox.className = "text-blue-600 text-sm font-bold";
+                    } else {
+                        duesBox.textContent = `${calculated.netDues} BDT`;
+                        duesBox.className = "text-rose-600 text-sm font-bold";
+                    }
+                    
+                    if (activeLedgerMonth && activeLedgerBatch) {
+                        queryFeeLedger();
+                    }
+                } catch (err) {
+                    alert("Failed to delete record: " + err.message);
+                }
+            }
+        }
+
+        // ==========================================
+        // 10. REAL-TIME MONTHLY REVENUE TRACKER (ADMIN ONLY)
+        // ==========================================
+        function syncMonthlyEarnings() {
+            if (currentUserRole !== 'admin') return;
+            db.collection('payments').onSnapshot(snapshot => {
+                earningsCacheByMonth = {};
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    const month = p.month;
+                    const amount = Number(p.amount) || 0;
+                    if (month) {
+                        earningsCacheByMonth[month] = (earningsCacheByMonth[month] || 0) + amount;
+                    }
+                });
+                renderEarningsSummary();
+            });
+        }
+
+        function renderEarningsSummary() {
+            const container = document.getElementById('monthlyEarningsContainer');
+            if (!container) return;
+            container.innerHTML = "";
+
+            const months = Object.keys(earningsCacheByMonth).sort((a, b) => b.localeCompare(a)); // Sort descending (newest first)
+            
+            if (months.length === 0) {
+                container.innerHTML = `<div class="text-sm text-slate-400">No payment logs recorded in database.</div>`;
+                return;
+            }
+
+            months.slice(0, 4).forEach(month => { // Display latest 4 months
+                const amount = earningsCacheByMonth[month];
+                const card = document.createElement('div');
+                card.className = "p-4 bg-slate-50 border border-slate-100 rounded-lg";
+                card.innerHTML = `
+                    <p class="text-xs text-slate-400 font-semibold uppercase">${month}</p>
+                    <p class="text-lg font-bold text-indigo-600 mt-1">${amount.toLocaleString()} BDT</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==========================================
+        // 11. STUDENT DETAIL PROFILE MODIFIERS (ADMIN ONLY)
+        // ==========================================
+        function openEditStudentModal(roll) {
+            const student = studentsCache.find(s => s.roll === roll);
+            if (!student) return;
+
+            document.getElementById('editStudentRoll').value = roll;
+            document.getElementById('editStudentName').value = student.name;
+            document.getElementById('editStudentSession').value = student.session;
+            document.getElementById('editStudentMonthlyFee').value = student.monthlyFee !== undefined ? student.monthlyFee : 1500;
+            document.getElementById('editStudentStartDate').value = student.startDate || '';
+
+            document.getElementById('editStudentModal').classList.remove('hidden');
+        }
+
+        function closeEditStudentModal() {
+            document.getElementById('editStudentModal').classList.add('hidden');
+        }
+
+        async function saveEditStudent() {
+            const roll = document.getElementById('editStudentRoll').value;
+            const name = document.getElementById('editStudentName').value.trim();
+            const session = document.getElementById('editStudentSession').value.trim();
+            const monthlyFee = parseFloat(document.getElementById('editStudentMonthlyFee').value);
+            const startDate = document.getElementById('editStudentStartDate').value;
+
+            if (!name || !session || isNaN(monthlyFee) || !startDate) {
+                alert("Please fill in all student profile details.");
+                return;
+            }
+
+            try {
+                await db.collection('students').doc(roll).update({
+                    name: name,
+                    session: session,
+                    monthlyFee: monthlyFee,
+                    startDate: startDate
+                });
+                alert("Student profile updated successfully.");
+                closeEditStudentModal();
+            } catch (err) {
+                alert("Failed to update student profile: " + err.message);
+            }
+        }
+
+        // ==========================================
+        // 12. EXEMPTIONS & BILLING ADJUSTMENTS HANDLERS (ADMIN ONLY)
+        // ==========================================
+        function updateAdjustmentAmountCalculation() {
+            const type = document.getElementById('adjType').value;
+            const amountInput = document.getElementById('adjAmount');
+            const absentDaysInput = document.getElementById('adjAbsentDays');
+            const absentDaysContainer = document.getElementById('adjAbsentDaysContainer');
+            
+            const student = studentsCache.find(s => s.roll === selectedFinanceStudentRoll);
+            const monthlyFee = student ? (student.monthlyFee || 1500) : 1500;
+            
+            if (type === "Hold" || type === "Full Waiver") {
+                absentDaysContainer.classList.add('hidden');
+                amountInput.value = monthlyFee;
+                amountInput.disabled = true;
+            } else if (type === "Absence Deduction") {
+                absentDaysContainer.classList.remove('hidden');
+                amountInput.disabled = false;
+                const days = parseInt(absentDaysInput.value) || 0;
+                const dailyRate = monthlyFee / 30;
+                amountInput.value = Math.round(days * dailyRate);
+            } else {
+                absentDaysContainer.classList.add('hidden');
+                amountInput.disabled = false;
+                amountInput.value = "";
+            }
+        }
+
+        document.getElementById('applyAdjustmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const month = document.getElementById('adjMonth').value;
+            const type = document.getElementById('adjType').value;
+            const amount = parseFloat(document.getElementById('adjAmount').value) || 0;
+            const note = document.getElementById('adjNote').value.trim();
+
+            const student = studentsCache.find(s => s.roll === selectedFinanceStudentRoll);
+            if (!student) return;
+
+            const docId = `${selectedFinanceStudentRoll}_${month}`;
+            try {
+                await db.collection('adjustments').doc(docId).set({
+                    roll: selectedFinanceStudentRoll,
+                    session: student.session,
+                    month: month,
+                    type: type,
+                    amount: amount,
+                    note: note,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("Billing exemption applied successfully!");
+                document.getElementById('applyAdjustmentForm').reset();
+                updateAdjustmentAmountCalculation();
+                
+                // Refresh modal ledgers & active views
+                await reloadStudentAdjustmentsTable();
+                
+                const calculated = await calculateStudentOutstandingBalance(selectedFinanceStudentRoll, activeLedgerMonth || new Date().toISOString().substring(0, 7));
+                const duesBox = document.getElementById('finDues');
+                if (calculated.netDues < 0) {
+                    duesBox.textContent = `${Math.abs(calculated.netDues)} BDT (Advance Paid)`;
+                    duesBox.className = "text-blue-600 text-sm font-bold";
+                } else {
+                    duesBox.textContent = `${calculated.netDues} BDT`;
+                    duesBox.className = "text-rose-600 text-sm font-bold";
+                }
+
+                if (activeLedgerMonth && activeLedgerBatch) {
+                    queryFeeLedger();
+                }
+            } catch (err) {
+                alert("Failed to apply exemption: " + err.message);
+            }
+        });
+
+        async function deleteAdjustment(id) {
+            if (confirm("Are you sure you want to drop this billing exemption? The student's expected total will instantly adjust back to baseline values.")) {
+                try {
+                    await db.collection('adjustments').doc(id).delete();
+                    alert("Billing exemption successfully dropped.");
+                    await reloadStudentAdjustmentsTable();
+                    
+                    const calculated = await calculateStudentOutstandingBalance(selectedFinanceStudentRoll, activeLedgerMonth || new Date().toISOString().substring(0, 7));
+                    const duesBox = document.getElementById('finDues');
+                    if (calculated.netDues < 0) {
+                        duesBox.textContent = `${Math.abs(calculated.netDues)} BDT (Advance Paid)`;
+                        duesBox.className = "text-blue-600 text-sm font-bold";
+                    } else {
+                        duesBox.textContent = `${calculated.netDues} BDT`;
+                        duesBox.className = "text-rose-600 text-sm font-bold";
+                    }
+
+                    if (activeLedgerMonth && activeLedgerBatch) {
+                        queryFeeLedger();
+                    }
+                } catch (err) {
+                    alert("Failed to drop exemption: " + err.message);
+                }
+            }
         }
     </script>
 </body>
