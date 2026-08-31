@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ideal Coaching Center - Attendance Management System</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+<title>Ideal Coaching Center - Management System</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -13,7 +12,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
@@ -21,7 +19,7 @@
 <div id="loginSection" class="flex-grow flex items-center justify-center p-4">
 <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-slate-100">
 <h2 class="text-2xl font-extrabold text-indigo-600 text-center mb-2">Ideal Coaching Center</h2>
-<p class="text-slate-500 text-center mb-6 text-sm">Attendance Management System</p>
+<p class="text-slate-500 text-center mb-6 text-sm">Management System</p>
 <form id="loginForm" class="space-y-4">
 <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" id="loginEmail" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></div>
 <div><label class="block text-sm font-medium mb-1">Password</label><input type="password" id="loginPassword" required class="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></div>
@@ -60,10 +58,6 @@
 <button onclick="toggleEntryMode('individual')" id="btnModeInd" class="px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600">Individual Entry</button>
 <button onclick="toggleEntryMode('bulk')" id="btnModeBulk" class="px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent">Batch Entry</button>
 </div>
-<div id="bulkEmailToggle" class="hidden flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100 mb-4">
-<input type="checkbox" id="bulkSendEmails" class="w-4 h-4 text-indigo-600 rounded">
-<label for="bulkSendEmails" class="text-sm font-medium text-indigo-700">📧 Send email notifications</label>
-</div>
 <div id="individualEntryView" class="space-y-4">
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 <div><label class="block text-sm font-medium mb-1">Date</label><input type="date" id="singleDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
@@ -92,21 +86,22 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
 <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-indigo-600"></i> Add Student</h3>
+<p class="text-emerald-600 text-xs font-semibold mb-3 bg-emerald-50 px-3 py-2 rounded-lg flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Auto syncs to Result Portal</p>
 <form id="studentForm" class="space-y-4">
 <div><label class="block text-sm font-medium mb-1">Name</label><input type="text" id="studentName" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Roll (6 Digits)</label><input type="text" id="studentRoll" required maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Session / Batch</label><input type="text" id="studentSession" required placeholder="e.g., 2023-24" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
+<div><label class="block text-sm font-medium mb-1">Joining Date</label><input type="date" id="studentJoiningDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div class="grid grid-cols-2 gap-2">
 <div><label class="block text-sm font-medium mb-1">Monthly Fee</label><input type="number" id="studentMonthlyFee" value="1500" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Cycle Start</label><input type="date" id="studentStartDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 </div>
-<div><label class="block text-sm font-medium mb-1">Email <span class="text-slate-400 text-xs">(optional)</span></label><input type="email" id="studentEmail" placeholder="student@example.com" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Register Student</button>
 </form>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between">
 <div><h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i data-lucide="file-spreadsheet" class="text-green-600"></i> Bulk Excel Upload</h3>
-<p class="text-slate-500 text-xs mb-4">Columns: <strong>Roll, Name, Session, StartDate, MonthlyFee, Email</strong></p>
+<p class="text-slate-500 text-xs mb-4">Columns: <strong>Roll, Name, Session, JoiningDate, StartDate, MonthlyFee</strong></p>
 <input type="file" id="excelFile" accept=".xlsx,.xls" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 cursor-pointer mb-4"></div>
 <button onclick="handleExcelUpload()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">Upload Excel</button>
 </div>
@@ -127,9 +122,9 @@
 <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th>
 <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th>
 <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Session</th>
+<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Joining Date</th>
 <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Fee</th>
-<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Start</th>
-<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Email</th>
+<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Cycle Start</th>
 <th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th>
 </tr></thead><tbody id="studentTableBody" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
@@ -152,7 +147,7 @@
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Session</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Actions</th></tr></thead><tbody id="historyTableBody" class="divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-6 text-slate-400">Apply filters to load records.</td></tr></tbody></table></div>
 </div>
 
-<!-- INDIVIDUAL SEARCH WITH MONTH PRINT -->
+<!-- Individual Search + Monthly Print -->
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 mt-6">
 <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i data-lucide="user-search" class="text-indigo-600"></i> Individual Student Search</h3>
 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -170,7 +165,7 @@
 <div id="indivHistoryResultSection" class="hidden">
 <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
 <h4 class="text-md font-bold text-slate-700">Attendance Log for <span id="indivResultName" class="text-indigo-600"></span></h4>
-<button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i> Export Full PDF</button>
+<button onclick="exportIndivPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i> Full PDF</button>
 </div>
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-6 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Status</th></tr></thead><tbody id="indivHistoryTableBody" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
@@ -240,42 +235,38 @@
 <div><label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Billing Month</label><input type="month" id="feeLedgerMonth" class="w-full border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div class="flex items-end"><button onclick="queryFeeLedger()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 rounded-lg text-sm transition">Query Ledger</button></div>
 </div>
-
-<!-- ✨ NEW: SUMMARY BAR -->
+<!-- Summary Bar -->
 <div class="grid grid-cols-3 gap-3 mb-4">
-<div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
-<p class="text-xs text-slate-400 font-semibold uppercase">Total Billed</p>
-<p id="ledgerTotalBilled" class="text-lg font-bold text-slate-800">৳0</p>
+<div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center"><p class="text-xs text-slate-400 font-semibold uppercase">Total Billed</p><p id="ledgerTotalBilled" class="text-lg font-bold text-slate-800">৳0</p></div>
+<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-center"><p class="text-xs text-emerald-500 font-semibold uppercase">Collected</p><p id="ledgerTotalCollected" class="text-lg font-bold text-emerald-600">৳0</p></div>
+<div class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-center"><p class="text-xs text-rose-500 font-semibold uppercase">Total Due</p><p id="ledgerTotalDue" class="text-lg font-bold text-rose-600">৳0</p></div>
 </div>
-<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
-<p class="text-xs text-emerald-500 font-semibold uppercase">Total Collected</p>
-<p id="ledgerTotalCollected" class="text-lg font-bold text-emerald-600">৳0</p>
-</div>
-<div class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-center">
-<p class="text-xs text-rose-500 font-semibold uppercase">Total Due</p>
-<p id="ledgerTotalDue" class="text-lg font-bold text-rose-600">৳0</p>
-</div>
-</div>
-
-<!-- ✨ NEW: SEARCH + STATUS FILTER + EXPORT -->
+<!-- Search + Filter + Export -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
 <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
 <input type="text" id="feeLedgerSearch" oninput="filterFeeLedger()" placeholder="Search Roll/Name..." class="border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-48">
-<select id="feeStatusFilter" onchange="filterFeeLedgerByStatus()" class="border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-40">
+<select id="feeStatusFilter" onchange="filterFeeLedger()" class="border px-3 py-1.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-40">
 <option value="all">All Students</option>
 <option value="Paid">✓ Paid</option>
 <option value="Unpaid">✗ Unpaid</option>
-<option value="Partial">⚠ Partial Paid</option>
-<option value="Advance Paid">⚡ Advance Paid</option>
+<option value="Partial">⚠ Partial</option>
+<option value="Advance Paid">⚡ Advance</option>
 </select>
 </div>
 <div class="flex gap-2">
 <button onclick="exportLedgerExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Excel</button>
-<button onclick="exportLedgerPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Print Session</button>
+<button onclick="exportLedgerPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Print</button>
 </div>
 </div>
-
-<div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Billed</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Paid</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Dues</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th></tr></thead><tbody id="feeLedgerTableBody" class="divide-y divide-slate-100"><tr><td colspan="7" class="text-center py-6 text-slate-400">Query a batch and month.</td></tr></tbody></table></div>
+<div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr>
+<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th>
+<th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th>
+<th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Billed</th>
+<th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Paid</th>
+<th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Dues</th>
+<th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th>
+<th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th>
+</tr></thead><tbody id="feeLedgerTableBody" class="divide-y divide-slate-100"><tr><td colspan="7" class="text-center py-6 text-slate-400">Query a batch and month.</td></tr></tbody></table></div>
 </div>
 </div>
 </section>
@@ -345,66 +336,11 @@
 <h3 class="text-lg font-bold">Edit Student</h3>
 <div><label class="block text-sm font-medium mb-1">Name</label><input type="text" id="editStudentName" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div><label class="block text-sm font-medium mb-1">Session</label><input type="text" id="editStudentSession" required class="w-full border px-3 py-2 rounded-lg"></div>
+<div><label class="block text-sm font-medium mb-1">Joining Date</label><input type="date" id="editStudentJoiningDate" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div><label class="block text-sm font-medium mb-1">Monthly Fee</label><input type="number" id="editStudentMonthlyFee" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div><label class="block text-sm font-medium mb-1">Cycle Start</label><input type="date" id="editStudentStartDate" required class="w-full border px-3 py-2 rounded-lg"></div>
-<div><label class="block text-sm font-medium mb-1">Email</label><input type="email" id="editStudentEmail" class="w-full border px-3 py-2 rounded-lg"></div>
 <input type="hidden" id="editStudentRoll">
 <div class="flex justify-end gap-2"><button onclick="closeEditStudentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditStudent()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
-</div>
-</div>
-
-<div id="viewStudentFinanceModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl flex flex-col max-h-[85vh]">
-<div class="flex justify-between items-center border-b pb-3 mb-4">
-<h3 class="text-lg font-bold">Student Financial Ledger</h3>
-<button onclick="closeStudentFinanceModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-lg mb-4 text-xs">
-<div><span class="text-slate-400 block font-semibold">NAME</span><strong id="finName" class="text-slate-800 text-sm"></strong></div>
-<div><span class="text-slate-400 block font-semibold">CYCLE START</span><strong id="finStart" class="text-slate-800 text-sm"></strong></div>
-<div><span class="text-slate-400 block font-semibold">MONTHLY FEE</span><strong id="finMonthly" class="text-slate-800 text-sm"></strong></div>
-<div><span class="text-slate-400 block font-semibold">BALANCE</span><strong id="finDues" class="text-sm"></strong></div>
-</div>
-<div class="flex border-b mb-4">
-<button onclick="switchFinanceTab('payments')" id="btnFinPayments" class="px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600">Payments</button>
-<button onclick="switchFinanceTab('adjustments')" id="btnFinAdjustments" class="px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent">Adjustments</button>
-</div>
-<div id="financePaymentsView" class="flex flex-col flex-grow overflow-hidden">
-<div class="overflow-y-auto flex-grow border border-slate-100 rounded-lg">
-<table class="min-w-full text-xs text-left divide-y divide-slate-100 bg-white"><thead class="bg-slate-50 sticky top-0"><tr><th class="px-4 py-2">Date</th><th class="px-4 py-2">Month</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Amount</th><th class="px-4 py-2">Status</th><th class="px-4 py-2 text-center">Action</th></tr></thead><tbody id="studentFinanceTableBody" class="divide-y divide-slate-100"></tbody></table>
-</div>
-</div>
-<div id="financeAdjustmentsView" class="hidden flex flex-col flex-grow overflow-hidden space-y-4">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow overflow-hidden">
-<div class="border p-4 rounded-lg bg-slate-50 space-y-3 overflow-y-auto">
-<h4 class="font-bold text-sm text-indigo-600">Apply Exemption</h4>
-<form id="applyAdjustmentForm" class="space-y-3">
-<div><label class="block text-xs font-semibold mb-1">Month</label><input type="month" id="adjMonth" required class="w-full border px-2 py-1 text-xs rounded bg-white"></div>
-<div><label class="block text-xs font-semibold mb-1">Type</label><select id="adjType" onchange="updateAdjustmentAmountCalculation()" required class="w-full border px-2 py-1 text-xs rounded bg-white"><option value="Hold">Account Hold</option><option value="Full Waiver">Full Waiver</option><option value="Partial Waiver">Partial Waiver</option><option value="Absence Deduction">Absence Deduction</option><option value="Discount">Discount</option></select></div>
-<div id="adjAbsentDaysContainer" class="hidden"><label class="block text-xs font-semibold mb-1">Absent Days</label><input type="number" id="adjAbsentDays" oninput="updateAdjustmentAmountCalculation()" class="w-full border px-2 py-1 text-xs rounded bg-white"></div>
-<div><label class="block text-xs font-semibold mb-1">Amount (BDT)</label><input type="number" id="adjAmount" required class="w-full border px-2 py-1 text-xs rounded bg-white"></div>
-<div><label class="block text-xs font-semibold mb-1">Note</label><input type="text" id="adjNote" required class="w-full border px-2 py-1 text-xs rounded bg-white"></div>
-<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 text-xs rounded transition">Apply</button>
-</form>
-</div>
-<div class="border rounded-lg p-2 bg-white flex flex-col overflow-hidden">
-<h4 class="font-bold text-xs text-slate-700 mb-2 px-2">Active Exemptions</h4>
-<div class="overflow-y-auto flex-grow"><table class="min-w-full text-[11px] text-left divide-y divide-slate-100"><thead class="bg-slate-50 sticky top-0"><tr><th class="px-2 py-1">Month</th><th class="px-2 py-1">Type</th><th class="px-2 py-1">Amount</th><th class="px-2 py-1 text-center">Del</th></tr></thead><tbody id="studentAdjustmentsTableBody" class="divide-y divide-slate-100"></tbody></table></div>
-</div>
-</div>
-</div>
-<div class="flex justify-end gap-2 border-t pt-3 mt-4"><button onclick="closeStudentFinanceModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-sm font-semibold">Close</button></div>
-</div>
-</div>
-
-<div id="editPaymentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
-<h3 class="text-lg font-bold">Edit Payment</h3>
-<div><label class="block text-sm font-medium mb-1">Fee Type</label><select id="editPaymentType" class="w-full border px-3 py-2 rounded-lg"><option value="Tuition Fee">Tuition</option><option value="Admission Fee">Admission</option><option value="Exam Fee">Exam</option><option value="Notes Fee">Notes</option><option value="Other Fee">Other</option></select></div>
-<div><label class="block text-sm font-medium mb-1">Month</label><input type="month" id="editPaymentMonth" class="w-full border px-3 py-2 rounded-lg"></div>
-<div><label class="block text-sm font-medium mb-1">Amount</label><input type="number" id="editPaymentAmount" class="w-full border px-3 py-2 rounded-lg"></div>
-<input type="hidden" id="editPaymentId">
-<div class="flex justify-end gap-2"><button onclick="closeEditPaymentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditPayment()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
 </div>
 </div>
 
@@ -413,214 +349,469 @@
 </footer>
 
 <script>
-// ===== FIREBASE =====
-const firebaseConfig = {apiKey:"AIzaSyCYKiRqkuyKyk6vELYSAuxMviT-owg_DiY",authDomain:"attendance-64352.firebaseapp.com",projectId:"attendance-64352",storageBucket:"attendance-64352.firebasestorage.app",messagingSenderId:"625341651770",appId:"1:625341651770:web:6e644bad3641532c33ce03"};
+// ===== MAIN FIREBASE =====
+const firebaseConfig={apiKey:"AIzaSyCYKiRqkuyKyk6vELYSAuxMviT-owg_DiY",authDomain:"attendance-64352.firebaseapp.com",projectId:"attendance-64352",storageBucket:"attendance-64352.firebasestorage.app",messagingSenderId:"625341651770",appId:"1:625341651770:web:6e644bad3641532c33ce03"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth=firebase.auth();
+const db=firebase.firestore();
 
-// ===== EMAILJS =====
-const EMAILJS_PUBLIC_KEY = "7yXgdy5svbfIHI1SM";
-const EMAILJS_SERVICE_ID = "service_4kyubba";
-const EMAILJS_TEMPLATE_ID = "template_mtzibwy";
-emailjs.init(EMAILJS_PUBLIC_KEY);
+// ===== RESULT PORTAL FIREBASE (Auto Sync) =====
+const resultFirebaseConfig={apiKey:"AIzaSyBxxDm2MoiqMcKVknuffitT4wBPku0HKn0",authDomain:"result-13-ba007.firebaseapp.com",projectId:"result-13-ba007",storageBucket:"result-13-ba007.firebasestorage.app",messagingSenderId:"935685272084",appId:"1:935685272084:web:1dff03ce78c7f4b393ad01"};
+const RESULT_ADMIN_EMAIL="admin@coaching.local";
+const RESULT_ADMIN_PASSWORD="752002";
+let resultApp=null,resultDb=null,resultAuth=null;
+try{resultApp=firebase.initializeApp(resultFirebaseConfig,"ResultApp");resultDb=resultApp.firestore();resultAuth=resultApp.auth();}catch(e){console.error("Result Firebase init error:",e);}
 
-async function sendAttendanceEmail(student, date, status) {
-if (!student.email || student.email.trim() === "") return false;
-try { await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {to_email:student.email,student_name:student.name,roll:student.roll,session:student.session,date:date,status:status}); return true; } catch(e) { console.error("Email failed:", e); return false; }
-}
+async function ensureResultAuth(){if(!resultAuth)return false;if(resultAuth.currentUser)return true;try{await resultAuth.signInWithEmailAndPassword(RESULT_ADMIN_EMAIL,RESULT_ADMIN_PASSWORD);return true;}catch(e){console.error("Result auth failed:",e);return false;}}
 
-// ===== STATE =====
-let currentUser=null, currentUserRole=null, currentUserAssignedSession=null;
-let studentsCache=[], sessionsCache=[], currentlyMarkingSessionStudents=[];
-let queriedRecords=[], queriedStats=[];
+async function syncStudentToResultPortal(roll,name,session,joiningDate=""){
+try{if(!(await ensureResultAuth()))return;
+await resultDb.collection('students').doc(roll).set({roll,name,batch:session,joiningDate:joiningDate||"",updatedAt:new Date().toISOString()},{merge:true});
+console.log(`Student ${roll} synced to Result Portal`);}catch(e){console.error("Result portal sync error:",e);}}
+
+async function deleteStudentFromResultPortal(roll){
+try{if(!(await ensureResultAuth()))return;
+await resultDb.collection('students').doc(roll).delete();}catch(e){console.error("Result portal delete error:",e);}}
+
+// ===== JOINING DATE HELPERS =====
+function getStudentJoiningDate(student){return student?.joiningDate||student?.startDate||"";}
+function isDateOnOrAfterJoining(dateStr,student){const jd=getStudentJoiningDate(student);if(!jd)return true;return dateStr>=jd;}
+function getEligibleClassDatesForStudent(classDates,student){return classDates.filter(date=>isDateOnOrAfterJoining(date,student));}
+
+// ===== APP STATES =====
+let currentUser=null,currentUserRole=null,currentUserAssignedSession=null;
+let studentsCache=[],sessionsCache=[],currentlyMarkingSessionStudents=[];
+let queriedRecords=[],queriedStats=[];
 let statsCycleDetails={totalDays:0,session:'',start:'',end:'',avgRate:'0.0'};
-let indivQueriedRecords=[], indivSelectedStudent=null, inputtersCache=[];
-let queriedPayments=[], activeLedgerMonth='', activeLedgerBatch='';
-let financeStudentTransactions=[], financeStudentAdjustments=[], selectedFinanceStudentRoll='';
+let indivQueriedRecords=[],indivSelectedStudent=null,inputtersCache=[];
+let queriedPayments=[],activeLedgerMonth='',activeLedgerBatch='';
 let earningsCacheByMonth={};
 
-// ===== INIT =====
-window.addEventListener('DOMContentLoaded', () => {
-initIcons(); setDefaultDates();
-auth.onAuthStateChanged(async (user) => {
-if (user) { currentUser=user; const role=await getUserRole(user.uid); currentUserRole=role; setupDashboardForRole(role); await syncCache(); if(role==='admin'){syncInputters();syncMonthlyEarnings();} }
-else showLoginScreen();
-});
-});
+const loginSection=document.getElementById('loginSection');
+const dashboardSection=document.getElementById('dashboardSection');
+const loginForm=document.getElementById('loginForm');
+const loginEmail=document.getElementById('loginEmail');
+const loginPassword=document.getElementById('loginPassword');
+const loginError=document.getElementById('loginError');
+const userRoleBadge=document.getElementById('userRoleBadge');
+
+window.addEventListener('DOMContentLoaded',()=>{
+initIcons();setDefaultDates();
+auth.onAuthStateChanged(async(user)=>{
+if(user){currentUser=user;const role=await getUserRole(user.uid);currentUserRole=role;setupDashboardForRole(role);await syncCache();if(role==='admin'){syncInputters();syncMonthlyEarnings();}}
+else showLoginScreen();});});
 
 function initIcons(){lucide.createIcons();}
-function setDefaultDates(){
-const today=new Date().toISOString().split('T')[0];
-['singleDate','bulkDate','historyStartDate','historyEndDate','statsStartDate','statsEndDate','logStartDate','logEndDate','feeDateInput','studentStartDate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today;});
+function setDefaultDates(){const today=new Date().toISOString().split('T')[0];
+['singleDate','bulkDate','historyStartDate','historyEndDate','statsStartDate','statsEndDate','logStartDate','logEndDate','feeDateInput','studentStartDate','studentJoiningDate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today;});
 const cm=new Date().toISOString().substring(0,7);
 document.getElementById('feeMonthInput').value=cm;
-document.getElementById('feeLedgerMonth').value=cm;
-}
+document.getElementById('feeLedgerMonth').value=cm;}
 
 // ===== AUTH =====
-async function getUserRole(uid){try{const d=await db.collection('users').doc(uid).get();if(d.exists){const data=d.data();currentUserRole=data.role;currentUserAssignedSession=data.assignedSession||null;return data.role;}let role='inputter';if(currentUser&&currentUser.email&&currentUser.email.toLowerCase().includes('admin'))role='admin';else{const s=await db.collection('users').limit(1).get();if(s.empty)role='admin';}await db.collection('users').doc(uid).set({email:currentUser.email,role});currentUserRole=role;return role;}catch(e){return'admin';}}
-document.getElementById('loginForm').addEventListener('submit',async(e)=>{e.preventDefault();document.getElementById('loginError').classList.add('hidden');try{await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value.trim(),document.getElementById('loginPassword').value);}catch(err){const el=document.getElementById('loginError');el.textContent=err.message;el.classList.remove('hidden');}});
-function logOut(){auth.signOut().then(()=>showLoginScreen());}
-function showLoginScreen(){document.getElementById('loginSection').classList.remove('hidden');document.getElementById('dashboardSection').classList.add('hidden');currentUser=null;currentUserRole=null;}
-function setupDashboardForRole(role){document.getElementById('loginSection').classList.add('hidden');document.getElementById('dashboardSection').classList.remove('hidden');document.getElementById('userRoleBadge').textContent=role;document.querySelectorAll('.admin-only').forEach(el=>role==='admin'?el.classList.remove('hidden'):el.classList.add('hidden'));switchTab('markTab');}
-function switchTab(id){document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('aside nav button').forEach(b=>b.classList.remove('bg-slate-800'));const btn=document.getElementById('btn-'+id);if(btn)btn.classList.add('bg-slate-800');}
+async function getUserRole(uid){try{const userDoc=await db.collection('users').doc(uid).get();
+if(userDoc.exists){const data=userDoc.data();currentUserRole=data.role;currentUserAssignedSession=data.assignedSession||null;return data.role;}
+let assignedRole='inputter';
+if(currentUser&&currentUser.email&&currentUser.email.toLowerCase().includes('admin'))assignedRole='admin';
+else{const usersSnap=await db.collection('users').limit(1).get();if(usersSnap.empty)assignedRole='admin';}
+await db.collection('users').doc(uid).set({email:currentUser.email,role:assignedRole});
+currentUserRole=assignedRole;currentUserAssignedSession=null;return assignedRole;}catch(e){return'admin';}}
 
-// ===== CACHE =====
-async function syncCache(){db.collection('students').onSnapshot(snap=>{studentsCache=[];sessionsCache=new Set();snap.forEach(doc=>{const s=doc.data();studentsCache.push(s);if(s.session)sessionsCache.add(s.session);});updateDropdowns();renderStudentList();});}
-function updateDropdowns(){const sorted=Array.from(sessionsCache).sort();['historySessionFilter','statsSession','inputterSessionAssign','feeBatchFilter'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=id.includes('history')?'<option value="">All Sessions</option>':'<option value="">-- Select Batch --</option>';sorted.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);});});const bf=document.getElementById('bulkSessionFilter'),bc=document.getElementById('bulkSessionFilterContainer');bf.innerHTML='<option value="">-- Choose Session --</option>';if(currentUserRole==='inputter'&&currentUserAssignedSession){bc.classList.add('hidden');const o=document.createElement('option');o.value=currentUserAssignedSession;o.textContent=currentUserAssignedSession;o.selected=true;bf.appendChild(o);bf.disabled=true;loadStudentsForBulkMarking();}else{bc.classList.remove('hidden');bf.disabled=false;sorted.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;bf.appendChild(o);});}}
+loginForm.addEventListener('submit',async(e)=>{e.preventDefault();loginError.classList.add('hidden');
+try{await auth.signInWithEmailAndPassword(loginEmail.value.trim(),loginPassword.value);}catch(err){loginError.textContent=err.message;loginError.classList.remove('hidden');}});
+function logOut(){auth.signOut();if(resultAuth)resultAuth.signOut();showLoginScreen();}
+function showLoginScreen(){loginSection.classList.remove('hidden');dashboardSection.classList.add('hidden');currentUser=null;currentUserRole=null;currentUserAssignedSession=null;}
+function setupDashboardForRole(role){loginSection.classList.add('hidden');dashboardSection.classList.remove('hidden');userRoleBadge.textContent=role;
+if(role==='admin'){document.querySelectorAll('.admin-only').forEach(el=>el.classList.remove('hidden'));switchTab('markTab');}
+else{document.querySelectorAll('.admin-only').forEach(el=>el.classList.add('hidden'));switchTab('markTab');}}
+
+function switchTab(tabId){document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));document.getElementById(tabId).classList.remove('hidden');
+document.querySelectorAll('aside nav button').forEach(btn=>btn.classList.remove('bg-slate-800'));
+const activeBtn=document.getElementById(`btn-${tabId}`);if(activeBtn)activeBtn.classList.add('bg-slate-800');}
+
+async function syncCache(){db.collection('students').onSnapshot(snapshot=>{studentsCache=[];sessionsCache=new Set();
+snapshot.forEach(doc=>{const s=doc.data();studentsCache.push(s);if(s.session)sessionsCache.add(s.session);});
+updateDropdowns();renderStudentList();});}
+
+function updateDropdowns(){const sorted=Array.from(sessionsCache).sort();
+['historySessionFilter','statsSession','inputterSessionAssign','feeBatchFilter'].forEach(id=>{const el=document.getElementById(id);if(!el)return;
+el.innerHTML=id.includes('history')?'<option value="">All Sessions</option>':'<option value="">-- Select Batch --</option>';
+sorted.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;el.appendChild(o);});});
+const bf=document.getElementById('bulkSessionFilter'),bc=document.getElementById('bulkSessionFilterContainer');
+bf.innerHTML='<option value="">-- Choose Session --</option>';
+if(currentUserRole==='inputter'&&currentUserAssignedSession){bc.classList.add('hidden');const o=document.createElement('option');o.value=currentUserAssignedSession;o.textContent=currentUserAssignedSession;o.selected=true;bf.appendChild(o);bf.disabled=true;loadStudentsForBulkMarking();}
+else{bc.classList.remove('hidden');bf.disabled=false;sorted.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;bf.appendChild(o);});}}
 
 // ===== ATTENDANCE ENTRY =====
 let entryMode='individual';
-function toggleEntryMode(mode){entryMode=mode;document.getElementById('individualEntryView').classList.toggle('hidden',mode!=='individual');document.getElementById('bulkEntryView').classList.toggle('hidden',mode!=='bulk');document.getElementById('bulkEmailToggle').classList.toggle('hidden',mode!=='bulk');document.getElementById('btnModeInd').className=mode==='individual'?'px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600':'px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent';document.getElementById('btnModeBulk').className=mode==='bulk'?'px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600':'px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent';}
+function toggleEntryMode(mode){entryMode=mode;
+if(mode==='individual'){document.getElementById('individualEntryView').classList.remove('hidden');document.getElementById('bulkEntryView').classList.add('hidden');document.getElementById('btnModeInd').classList.add('border-indigo-600','text-indigo-600');document.getElementById('btnModeBulk').classList.remove('border-indigo-600','text-indigo-600');document.getElementById('btnModeBulk').classList.add('border-transparent','text-slate-500');}
+else{document.getElementById('individualEntryView').classList.add('hidden');document.getElementById('bulkEntryView').classList.remove('hidden');document.getElementById('btnModeBulk').classList.add('border-indigo-600','text-indigo-600');document.getElementById('btnModeInd').classList.remove('border-indigo-600','text-indigo-600');document.getElementById('btnModeInd').classList.add('border-transparent','text-slate-500');}}
 
 const singleRollInput=document.getElementById('singleRoll');
-singleRollInput.addEventListener('input',()=>{const roll=singleRollInput.value.trim(),el=document.getElementById('liveStudentName');if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);if(m){if(currentUserRole==='inputter'&&currentUserAssignedSession&&m.session!==currentUserAssignedSession){el.textContent="Access Blocked";el.className="font-bold text-red-500 text-lg";}else{el.textContent=`${m.name} (${m.session})`;el.className="font-bold text-green-600 text-lg";}}else{el.textContent="Roll not found!";el.className="font-bold text-red-500 text-lg";}}else{el.textContent="Type a valid 6-digit roll...";el.className="font-bold text-slate-500 text-lg";}});
+const liveStudentName=document.getElementById('liveStudentName');
+singleRollInput.addEventListener('input',()=>{const roll=singleRollInput.value.trim();
+if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);
+if(m){if(currentUserRole==='inputter'&&currentUserAssignedSession&&m.session!==currentUserAssignedSession){liveStudentName.textContent="Access Blocked";liveStudentName.className="font-bold text-red-500 text-lg";}
+else{liveStudentName.textContent=`${m.name} (${m.session})`;liveStudentName.className="font-bold text-green-600 text-lg";}}
+else{liveStudentName.textContent="Roll not found!";liveStudentName.className="font-bold text-red-500 text-lg";}}
+else{liveStudentName.textContent="Type a valid 6-digit roll...";liveStudentName.className="font-bold text-slate-500 text-lg";}});
 
-async function saveIndividualAttendance(){const date=document.getElementById('singleDate').value,roll=singleRollInput.value.trim(),status=document.getElementById('singleStatus').value;if(!date||roll.length!==6){alert("Provide valid date and roll.");return;}const m=studentsCache.find(s=>s.roll===roll);if(!m){alert("Roll not found.");return;}if(currentUserRole==='inputter'&&currentUserAssignedSession&&m.session!==currentUserAssignedSession){alert("Access Blocked.");return;}try{await db.collection('attendance').doc(`${date}_${roll}`).set({date,roll,name:m.name,session:m.session,status,markedBy:currentUser.uid,markedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});const sent=await sendAttendanceEmail(m,date,status);alert(sent?"Saved & email sent!":"Saved!");singleRollInput.value="";document.getElementById('liveStudentName').textContent="Type a valid 6-digit roll...";}catch(e){alert("Error: "+e.message);}}
+async function saveIndividualAttendance(){const date=document.getElementById('singleDate').value,roll=singleRollInput.value.trim(),status=document.getElementById('singleStatus').value;
+if(!date||roll.length!==6){alert("Provide valid date and roll.");return;}
+const m=studentsCache.find(s=>s.roll===roll);if(!m){alert("Roll not found.");return;}
+if(currentUserRole==='inputter'&&currentUserAssignedSession&&m.session!==currentUserAssignedSession){alert("Access Blocked.");return;}
+try{await db.collection('attendance').doc(`${date}_${roll}`).set({date,roll,name:m.name,session:m.session,status,markedBy:currentUser.uid,markedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+alert("Saved!");singleRollInput.value="";liveStudentName.textContent="Type a valid 6-digit roll...";liveStudentName.className="font-bold text-slate-500 text-lg";}catch(e){alert("Error: "+e.message);}}
 
-async function loadStudentsForBulkMarking(){const date=document.getElementById('bulkDate').value,session=document.getElementById('bulkSessionFilter').value,c=document.getElementById('bulkMarkingTableBody');if(!date||!session){c.innerHTML='<tr><td colspan="3" class="text-center py-6 text-slate-400">Select date and session.</td></tr>';currentlyMarkingSessionStudents=[];return;}currentlyMarkingSessionStudents=studentsCache.filter(s=>s.session===session);if(!currentlyMarkingSessionStudents.length){c.innerHTML='<tr><td colspan="3" class="text-center py-6 text-slate-400">No students.</td></tr>';return;}let existing={};try{const snap=await db.collection('attendance').where('date','==',date).where('session','==',session).get();snap.forEach(d=>{existing[d.data().roll]=d.data().status;});}catch(e){}c.innerHTML="";currentlyMarkingSessionStudents.forEach(s=>{const st=existing[s.roll]||"Absent";c.innerHTML+=`<tr class="hover:bg-slate-50/50"><td class="px-6 py-4 font-semibold">${s.roll}</td><td class="px-6 py-4 font-medium">${s.name}</td><td class="px-6 py-4 text-center"><select data-roll="${s.roll}" class="bulk-status-select border rounded-lg px-3 py-1 bg-white font-medium"><option value="Present" ${st==='Present'?'selected':''}>Present</option><option value="Late" ${st==='Late'?'selected':''}>Late</option><option value="Absent" ${st==='Absent'?'selected':''}>Absent</option></select></td></tr>`;});}
+async function loadStudentsForBulkMarking(){const date=document.getElementById('bulkDate').value,session=document.getElementById('bulkSessionFilter').value,c=document.getElementById('bulkMarkingTableBody');
+if(!date||!session){c.innerHTML='<tr><td colspan="3" class="text-center py-6 text-slate-400">Select date and session.</td></tr>';currentlyMarkingSessionStudents=[];return;}
+currentlyMarkingSessionStudents=studentsCache.filter(s=>s.session===session);
+if(!currentlyMarkingSessionStudents.length){c.innerHTML='<tr><td colspan="3" class="text-center py-6 text-slate-400">No students.</td></tr>';return;}
+let existing={};try{const snap=await db.collection('attendance').where('date','==',date).where('session','==',session).get();snap.forEach(d=>{existing[d.data().roll]=d.data().status;});}catch(e){}
+c.innerHTML="";currentlyMarkingSessionStudents.forEach(s=>{const st=existing[s.roll]||"Absent";
+c.innerHTML+=`<tr class="hover:bg-slate-50/50"><td class="px-6 py-4 font-semibold">${s.roll}</td><td class="px-6 py-4 font-medium">${s.name}</td><td class="px-6 py-4 text-center"><select data-roll="${s.roll}" class="bulk-status-select border rounded-lg px-3 py-1 bg-white font-medium"><option value="Present" ${st==='Present'?'selected':''}>Present</option><option value="Late" ${st==='Late'?'selected':''}>Late</option><option value="Absent" ${st==='Absent'?'selected':''}>Absent</option></select></td></tr>`;});}
 
-async function saveBulkAttendance(){const date=document.getElementById('bulkDate').value,session=document.getElementById('bulkSessionFilter').value;if(!date||!session){alert("Select date and session.");return;}const selects=document.querySelectorAll('.bulk-status-select');if(!selects.length){alert("No students.");return;}const shouldEmail=document.getElementById('bulkSendEmails').checked;const batch=db.batch();const emailQueue=[];selects.forEach(sel=>{const roll=sel.getAttribute('data-roll'),status=sel.value,s=currentlyMarkingSessionStudents.find(x=>x.roll===roll);if(s){batch.set(db.collection('attendance').doc(`${date}_${roll}`),{date,roll,name:s.name,session:s.session,status,markedBy:currentUser.uid,markedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});if(shouldEmail&&s.email)emailQueue.push({student:s,status});}});if(shouldEmail&&emailQueue.length>0){if(!confirm(`Send ${emailQueue.length} emails?`))return;}try{await batch.commit();let sent=0;for(const item of emailQueue){if(await sendAttendanceEmail(item.student,date,item.status))sent++;await new Promise(r=>setTimeout(r,400));}alert(`Saved! Emails: ${sent}/${emailQueue.length}`);document.getElementById('bulkSessionFilter').value="";loadStudentsForBulkMarking();}catch(e){alert("Error: "+e.message);}}
+async function saveBulkAttendance(){const date=document.getElementById('bulkDate').value,session=document.getElementById('bulkSessionFilter').value;
+if(!date||!session){alert("Select date and session.");return;}
+const selects=document.querySelectorAll('.bulk-status-select');if(!selects.length){alert("No students.");return;}
+const batch=db.batch();selects.forEach(sel=>{const roll=sel.getAttribute('data-roll'),status=sel.value,s=currentlyMarkingSessionStudents.find(x=>x.roll===roll);
+if(s)batch.set(db.collection('attendance').doc(`${date}_${roll}`),{date,roll,name:s.name,session:s.session,status,markedBy:currentUser.uid,markedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});});
+try{await batch.commit();alert(`Saved for: ${session}`);document.getElementById('bulkSessionFilter').value="";loadStudentsForBulkMarking();}catch(e){alert("Error: "+e.message);}}
 
-// ===== STUDENT DB =====
-document.getElementById('studentForm').addEventListener('submit',async(e)=>{e.preventDefault();const name=document.getElementById('studentName').value.trim(),roll=document.getElementById('studentRoll').value.trim(),session=document.getElementById('studentSession').value.trim(),fee=parseFloat(document.getElementById('studentMonthlyFee').value),sd=document.getElementById('studentStartDate').value,email=document.getElementById('studentEmail').value.trim();if(roll.length!==6||isNaN(roll)){alert("Roll must be 6 digits.");return;}try{const chk=await db.collection('students').doc(roll).get();if(chk.exists){alert("Roll exists!");return;}await db.collection('students').doc(roll).set({roll,name,session,monthlyFee:fee,startDate:sd,email:email||""});alert("Registered.");document.getElementById('studentForm').reset();setDefaultDates();}catch(e){alert("Error: "+e.message);}});
+// ===== STUDENT REGISTRATION WITH RESULT PORTAL SYNC =====
+document.getElementById('studentForm').addEventListener('submit',async(e)=>{e.preventDefault();
+const name=document.getElementById('studentName').value.trim(),roll=document.getElementById('studentRoll').value.trim(),session=document.getElementById('studentSession').value.trim();
+const joiningDate=document.getElementById('studentJoiningDate').value;
+const monthlyFee=parseFloat(document.getElementById('studentMonthlyFee').value),startDate=document.getElementById('studentStartDate').value;
+if(roll.length!==6||isNaN(roll)){alert("Roll must be 6 digits.");return;}
+try{const chk=await db.collection('students').doc(roll).get();if(chk.exists){alert("Roll exists!");return;}
+await db.collection('students').doc(roll).set({roll,name,session,joiningDate,monthlyFee,startDate});
+await syncStudentToResultPortal(roll,name,session,joiningDate);
+alert("Student registered & synced to Result Portal!");
+document.getElementById('studentForm').reset();setDefaultDates();}catch(e){alert("Error: "+e.message);}});
 
-function handleExcelUpload(){const file=document.getElementById('excelFile').files[0];if(!file){alert("Select a file.");return;}const reader=new FileReader();reader.onload=async function(e){const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);if(!json.length){alert("No records.");return;}let added=0,failed=0;const batch=db.batch();const defStart=new Date().toISOString().split('T')[0];json.forEach(row=>{const name=row.Name||row.name,session=row.Session||row.session;let roll=(row.Roll||row.roll||'').toString().trim();const fee=parseFloat(row.MonthlyFee||row.monthlyfee||1500);const sd=(row.StartDate||row.startdate||defStart).toString().trim();const email=(row.Email||row.email||'').toString().trim();if(name&&roll.length===6&&session){batch.set(db.collection('students').doc(roll),{name:name.toString().trim(),roll,session:session.toString().trim(),monthlyFee:fee,startDate:sd,email});added++;}else failed++;});try{await batch.commit();alert(`Uploaded: ${added}, Skipped: ${failed}`);document.getElementById('excelFile').value="";}catch(e){alert("Error: "+e.message);}};reader.readAsArrayBuffer(file);}
+function handleExcelUpload(){const file=document.getElementById('excelFile').files[0];if(!file){alert("Select a file.");return;}
+const reader=new FileReader();reader.onload=async function(e){const data=new Uint8Array(e.target.result);
+const wb=XLSX.read(data,{type:'array'});const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+if(!json.length){alert("No records.");return;}
+let added=0,failed=0;const batch=db.batch();const defStart=new Date().toISOString().split('T')[0];
+const authOk=await ensureResultAuth();let resultBatch=null;if(authOk)resultBatch=resultDb.batch();
+json.forEach(row=>{const name=row.Name||row.name||row.NAME;let roll=(row.Roll||row.roll||'').toString().trim();
+const session=row.Session||row.session||row.SESSION;
+const joiningDate=(row.JoiningDate||row.joiningDate||defStart).toString().trim();
+const monthlyFee=parseFloat(row.MonthlyFee||row.monthlyfee||1500);const startDate=(row.StartDate||row.startdate||defStart).toString().trim();
+if(name&&roll.length===6&&session){batch.set(db.collection('students').doc(roll),{name:name.toString().trim(),roll,session,joiningDate,monthlyFee,startDate});
+if(resultBatch)resultBatch.set(resultDb.collection('students').doc(roll),{roll,name:name.toString().trim(),batch:session,joiningDate,updatedAt:new Date().toISOString()},{merge:true});added++;}else failed++;});
+try{await batch.commit();if(resultBatch)await resultBatch.commit();alert(`Uploaded: ${added}, Skipped: ${failed}. Synced to Result Portal.`);document.getElementById('excelFile').value="";}catch(e){alert("Error: "+e.message);}};
+reader.readAsArrayBuffer(file);}
 
-function renderStudentList(){const c=document.getElementById('studentTableBody'),q=document.getElementById('studentSearch').value.toLowerCase().trim();c.innerHTML="";const filtered=studentsCache.filter(s=>s.name.toLowerCase().includes(q)||s.roll.includes(q));if(!filtered.length){c.innerHTML='<tr><td colspan="7" class="text-center py-4 text-slate-400">No records.</td></tr>';return;}filtered.sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));filtered.forEach(s=>{const fee=s.monthlyFee??1500;c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${s.roll}</td><td class="px-4 py-3 font-medium">${s.name}</td><td class="px-4 py-3 text-slate-500">${s.session}</td><td class="px-4 py-3 font-semibold">${fee} BDT</td><td class="px-4 py-3 text-slate-500">${s.startDate||'N/A'}</td><td class="px-4 py-3 text-slate-400 text-xs">${s.email||'-'}</td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditStudentModal('${s.roll}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteStudent('${s.roll}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});initIcons();}
-async function deleteStudent(roll){if(confirm(`Delete ${roll}?`)){try{await db.collection('students').doc(roll).delete();alert("Deleted.");}catch(e){alert("Error: "+e.message);}}}
-function exportStudentsToExcel(){if(!studentsCache.length){alert("No data.");return;}const sorted=[...studentsCache].sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));const ws=XLSX.utils.json_to_sheet(sorted.map(s=>({Roll:s.roll,Name:s.name,Session:s.session,MonthlyFee:s.monthlyFee??1500,StartDate:s.startDate||'N/A',Email:s.email||''})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Students");XLSX.writeFile(wb,"ICC_Students.xlsx");}
-function exportStudentsToPDF(){if(!studentsCache.length){alert("No data.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Student Directory',14,28);const sorted=[...studentsCache].sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));doc.autoTable({startY:35,head:[['Roll','Name','Session','Fee','Start','Email']],body:sorted.map(s=>[s.roll,s.name,s.session,`${s.monthlyFee??1500}`,s.startDate||'N/A',s.email||'-']),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save("ICC_Students.pdf");}
+function renderStudentList(){const c=document.getElementById('studentTableBody'),q=document.getElementById('studentSearch').value.toLowerCase().trim();c.innerHTML="";
+const filtered=studentsCache.filter(s=>s.name.toLowerCase().includes(q)||s.roll.includes(q));
+if(!filtered.length){c.innerHTML='<tr><td colspan="7" class="text-center py-4 text-slate-400">No records.</td></tr>';return;}
+filtered.sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));
+filtered.forEach(s=>{const fee=s.monthlyFee??1500;const jd=s.joiningDate||s.startDate||'N/A';const cs=s.startDate||'N/A';
+c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${s.roll}</td><td class="px-4 py-3 font-medium">${s.name}</td><td class="px-4 py-3 text-slate-500">${s.session}</td><td class="px-4 py-3 text-slate-500">${jd}</td><td class="px-4 py-3 font-semibold">${fee} BDT</td><td class="px-4 py-3 text-slate-500">${cs}</td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditStudentModal('${s.roll}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteStudent('${s.roll}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});
+initIcons();}
+
+async function deleteStudent(roll){if(confirm(`Delete student ${roll}? This also removes from Result Portal.`)){
+try{await db.collection('students').doc(roll).delete();await deleteStudentFromResultPortal(roll);alert("Deleted from both systems.");}catch(e){alert("Error: "+e.message);}}}
+
+function exportStudentsToExcel(){if(!studentsCache.length){alert("No data.");return;}
+const sorted=[...studentsCache].sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));
+const ws=XLSX.utils.json_to_sheet(sorted.map(s=>({"Roll":s.roll,"Name":s.name,"Session":s.session,"JoiningDate":s.joiningDate||s.startDate||"N/A","MonthlyFee":s.monthlyFee??1500,"StartDate":s.startDate||"N/A"})));
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Students");XLSX.writeFile(wb,"ICC_Students.xlsx");}
+
+function exportStudentsToPDF(){if(!studentsCache.length){alert("No data.");return;}
+const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);
+doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Student Directory',14,28);
+const sorted=[...studentsCache].sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));
+doc.autoTable({startY:35,head:[['Roll','Name','Session','Joining','Fee','Start']],body:sorted.map(s=>[s.roll,s.name,s.session,s.joiningDate||s.startDate||'N/A',`${s.monthlyFee??1500}`,s.startDate||'N/A']),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});
+doc.save("ICC_Students.pdf");}
 
 // ===== ATTENDANCE HISTORY =====
-async function queryAttendanceRecords(){const start=document.getElementById('historyStartDate').value,end=document.getElementById('historyEndDate').value,session=document.getElementById('historySessionFilter').value,c=document.getElementById('historyTableBody');if(!start||!end){alert("Select dates.");return;}c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading...</td></tr>';try{const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();queriedRecords=[];snap.forEach(d=>{const data=d.data();data.id=d.id;if(!session||data.session===session)queriedRecords.push(data);});queriedRecords.sort((a,b)=>a.date.localeCompare(b.date));renderHistoryTable();}catch(e){alert("Error: "+e.message);}}
-function renderHistoryTable(){const c=document.getElementById('historyTableBody');c.innerHTML="";if(!queriedRecords.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}queriedRecords.forEach((r,i)=>{let badge=r.status==='Late'?'bg-amber-100 text-amber-800':r.status==='Absent'?'bg-rose-100 text-rose-800':'bg-green-100 text-green-800';c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3">${r.date}</td><td class="px-4 py-3 font-semibold">${r.roll}</td><td class="px-4 py-3 font-medium">${r.name}</td><td class="px-4 py-3 text-slate-500">${r.session}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${r.status}</span></td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditModal('${r.id}','${r.name}','${r.roll}','${r.status}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteAttendanceRecord('${r.id}',${i})" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});initIcons();}
+async function queryAttendanceRecords(){const start=document.getElementById('historyStartDate').value,end=document.getElementById('historyEndDate').value,session=document.getElementById('historySessionFilter').value,c=document.getElementById('historyTableBody');
+if(!start||!end){alert("Select dates.");return;}c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading...</td></tr>';
+try{const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();
+queriedRecords=[];snap.forEach(d=>{const data=d.data();data.id=d.id;if(!session||data.session===session)queriedRecords.push(data);});
+queriedRecords.sort((a,b)=>a.date.localeCompare(b.date));renderHistoryTable();}catch(e){alert("Error: "+e.message);}}
+
+function renderHistoryTable(){const c=document.getElementById('historyTableBody');c.innerHTML="";
+if(!queriedRecords.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}
+queriedRecords.forEach((r,i)=>{let badge=r.status==="Late"?"bg-amber-100 text-amber-800":r.status==="Absent"?"bg-rose-100 text-rose-800":"bg-green-100 text-green-800";
+c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3">${r.date}</td><td class="px-4 py-3 font-semibold">${r.roll}</td><td class="px-4 py-3 font-medium">${r.name}</td><td class="px-4 py-3 text-slate-500">${r.session}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${r.status}</span></td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditModal('${r.id}','${r.name}','${r.roll}','${r.status}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteAttendanceRecord('${r.id}',${i})" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});
+initIcons();}
+
 function openEditModal(id,name,roll,status){document.getElementById('editModalDocId').value=id;document.getElementById('editModalName').value=name;document.getElementById('editModalRoll').value=roll;document.getElementById('editModalStatus').value=status;document.getElementById('editModal').classList.remove('hidden');}
 function closeEditModal(){document.getElementById('editModal').classList.add('hidden');}
-async function saveEditModal(){const id=document.getElementById('editModalDocId').value,st=document.getElementById('editModalStatus').value;try{await db.collection('attendance').doc(id).update({status:st});alert("Updated.");const i=queriedRecords.findIndex(r=>r.id===id);if(i!==-1){queriedRecords[i].status=st;renderHistoryTable();}closeEditModal();}catch(e){alert("Error: "+e.message);}}
+async function saveEditModal(){const id=document.getElementById('editModalDocId').value,st=document.getElementById('editModalStatus').value;
+try{await db.collection('attendance').doc(id).update({status:st});alert("Updated.");const i=queriedRecords.findIndex(r=>r.id===id);if(i!==-1){queriedRecords[i].status=st;renderHistoryTable();}closeEditModal();}catch(e){alert("Error: "+e.message);}}
 async function deleteAttendanceRecord(id,i){if(confirm("Delete?")){try{await db.collection('attendance').doc(id).delete();queriedRecords.splice(i,1);renderHistoryTable();}catch(e){alert("Error: "+e.message);}}}
-function exportHistoryExcel(){if(!queriedRecords.length){alert("No data.");return;}const ws=XLSX.utils.json_to_sheet(queriedRecords.map(r=>({Date:r.date,Roll:r.roll,Name:r.name,Session:r.session,Status:r.status})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"History");XLSX.writeFile(wb,"Attendance_History.xlsx");}
-function exportHistoryPDF(){if(!queriedRecords.length){alert("No data.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Attendance History',14,28);doc.autoTable({startY:35,head:[['Date','Roll','Name','Session','Status']],body:queriedRecords.map(r=>[r.date,r.roll,r.name,r.session,r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save("Attendance_History.pdf");}
+function exportHistoryExcel(){if(!queriedRecords.length){alert("No data.");return;}const ws=XLSX.utils.json_to_sheet(queriedRecords.map(r=>({"Date":r.date,"Roll":r.roll,"Name":r.name,"Session":r.session,"Status":r.status})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"History");XLSX.writeFile(wb,"Attendance_History.xlsx");}
+function exportHistoryPDF(){if(!queriedRecords.length){alert("No data.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Attendance History',14,28);doc.autoTable({startY:35,head:[['Date','Roll','Name','Session','Status']],body:queriedRecords.map(r=>[r.date,r.roll,r.name,r.session,r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});doc.save("Attendance_History.pdf");}
 
-// ===== INDIVIDUAL SEARCH =====
+// ===== INDIVIDUAL SEARCH + MONTHLY PRINT =====
 const indivRollInput=document.getElementById('indivRollSearch');
-indivRollInput.addEventListener('input',()=>{const roll=indivRollInput.value.trim(),el=document.getElementById('indivStudentMatchedName');if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);if(m){el.textContent=`${m.name} (${m.session})`;el.className="font-bold text-green-600 text-lg";indivSelectedStudent=m;}else{el.textContent="Not found!";el.className="font-bold text-red-500 text-lg";indivSelectedStudent=null;}}else{el.textContent="Type a valid 6-digit roll...";el.className="font-bold text-slate-500 text-lg";indivSelectedStudent=null;}});
-async function queryIndividualHistory(){const rs=document.getElementById('indivHistoryResultSection'),tb=document.getElementById('indivHistoryTableBody');if(!indivSelectedStudent){alert("Enter valid roll.");return;}tb.innerHTML='<tr><td colspan="2" class="text-center py-6 text-slate-400">Loading...</td></tr>';rs.classList.remove('hidden');document.getElementById('indivResultName').textContent=`${indivSelectedStudent.name} (${indivSelectedStudent.roll})`;try{const snap=await db.collection('attendance').where('roll','==',indivSelectedStudent.roll).get();indivQueriedRecords=[];snap.forEach(d=>indivQueriedRecords.push(d.data()));indivQueriedRecords.sort((a,b)=>b.date.localeCompare(a.date));tb.innerHTML="";if(!indivQueriedRecords.length){tb.innerHTML='<tr><td colspan="2" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}indivQueriedRecords.forEach(r=>{let badge=r.status==='Late'?'bg-amber-100 text-amber-800':r.status==='Absent'?'bg-rose-100 text-rose-800':'bg-green-100 text-green-800';tb.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium">${r.date}</td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${r.status}</span></td></tr>`;});}catch(e){alert("Error: "+e.message);}}
+indivRollInput.addEventListener('input',()=>{const roll=indivRollInput.value.trim(),el=document.getElementById('indivStudentMatchedName');
+if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);if(m){el.textContent=`${m.name} (${m.session})`;el.className="font-bold text-green-600 text-lg";indivSelectedStudent=m;}else{el.textContent="Not found!";el.className="font-bold text-red-500 text-lg";indivSelectedStudent=null;}}else{el.textContent="Type a valid 6-digit roll...";el.className="font-bold text-slate-500 text-lg";indivSelectedStudent=null;}});
 
-function printMonthlyAttendance(){if(!indivSelectedStudent){alert("Search a student first.");return;}const mf=document.getElementById('indivMonthFilter').value;if(!mf){alert("Select a month.");return;}const recs=indivQueriedRecords.filter(r=>r.date.startsWith(mf));if(!recs.length){alert("No records for this month.");return;}const total=recs.length,p=recs.filter(r=>r.status==='Present').length,lt=recs.filter(r=>r.status==='Late').length,ab=recs.filter(r=>r.status==='Absent').length,rate=total>0?(((p+lt)/total)*100).toFixed(1):'0.0';const monthName=new Date(mf+'-01').toLocaleString('en',{month:'long',year:'numeric'});const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Monthly Attendance Report',14,28);doc.setFontSize(10);doc.text(`Student: ${indivSelectedStudent.name} (${indivSelectedStudent.roll})`,14,36);doc.text(`Session: ${indivSelectedStudent.session}`,14,42);doc.text(`Month: ${monthName}`,14,48);doc.setFont('helvetica','bold');doc.text(`Total ${total} | Present ${p} | Late ${lt} | Absent ${ab} | Rate ${rate}%`,14,56);doc.setFont('helvetica','normal');doc.autoTable({startY:62,head:[['Date','Day','Status']],body:recs.map(r=>[r.date,new Date(r.date).toLocaleDateString('en',{weekday:'long'}),r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save(`Monthly_Att_${indivSelectedStudent.roll}_${mf}.pdf`);}
+async function queryIndividualHistory(){const rs=document.getElementById('indivHistoryResultSection'),tb=document.getElementById('indivHistoryTableBody');
+if(!indivSelectedStudent){alert("Enter valid roll.");return;}
+tb.innerHTML='<tr><td colspan="2" class="text-center py-6 text-slate-400">Loading...</td></tr>';rs.classList.remove('hidden');
+document.getElementById('indivResultName').textContent=`${indivSelectedStudent.name} (${indivSelectedStudent.roll})`;
+try{const snap=await db.collection('attendance').where('roll','==',indivSelectedStudent.roll).get();
+indivQueriedRecords=[];snap.forEach(d=>{const data=d.data();if(isDateOnOrAfterJoining(data.date,indivSelectedStudent))indivQueriedRecords.push(data);});
+indivQueriedRecords.sort((a,b)=>b.date.localeCompare(a.date));tb.innerHTML="";
+if(!indivQueriedRecords.length){tb.innerHTML='<tr><td colspan="2" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}
+indivQueriedRecords.forEach(r=>{let badge=r.status==="Late"?"bg-amber-100 text-amber-800":r.status==="Absent"?"bg-rose-100 text-rose-800":"bg-green-100 text-green-800";
+tb.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium">${r.date}</td><td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${r.status}</span></td></tr>`;});}catch(e){alert("Error: "+e.message);}}
 
-function exportIndivPDF(){if(!indivQueriedRecords.length||!indivSelectedStudent){alert("No data.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Attendance Report - ${indivSelectedStudent.name} (${indivSelectedStudent.roll})`,14,28);doc.setFontSize(10);doc.text(`Session: ${indivSelectedStudent.session}`,14,35);doc.autoTable({startY:42,head:[['Date','Status']],body:indivQueriedRecords.map(r=>[r.date,r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save(`Attendance_${indivSelectedStudent.roll}.pdf`);}
+function printMonthlyAttendance(){if(!indivSelectedStudent){alert("Search a student first.");return;}
+const mf=document.getElementById('indivMonthFilter').value;if(!mf){alert("Select a month.");return;}
+const recs=indivQueriedRecords.filter(r=>r.date.startsWith(mf));if(!recs.length){alert("No records for this month.");return;}
+const total=recs.length,presents=recs.filter(r=>r.status==="Present").length,lates=recs.filter(r=>r.status==="Late").length,absents=recs.filter(r=>r.status==="Absent").length;
+const rate=total>0?(((presents+lates)/total)*100).toFixed(1):'0.0';
+const monthName=new Date(mf+'-01').toLocaleString('en',{month:'long',year:'numeric'});
+const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);
+doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text('Monthly Attendance Report',14,28);doc.setFontSize(10);
+doc.text(`Student: ${indivSelectedStudent.name} (${indivSelectedStudent.roll})`,14,36);
+doc.text(`Session: ${indivSelectedStudent.session}`,14,42);doc.text(`Month: ${monthName}`,14,48);
+doc.setFont('helvetica','bold');doc.text(`Total ${total} | Present ${presents} | Late ${lates} | Absent ${absents} | Rate ${rate}%`,14,56);
+doc.setFont('helvetica','normal');
+doc.autoTable({startY:62,head:[['Date','Day','Status']],body:recs.map(r=>[r.date,new Date(r.date).toLocaleDateString('en',{weekday:'long'}),r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});
+doc.save(`Monthly_Att_${indivSelectedStudent.roll}_${mf}.pdf`);}
 
-// ===== STATISTICS =====
-async function generateStatistics(){const start=document.getElementById('statsStartDate').value,end=document.getElementById('statsEndDate').value,session=document.getElementById('statsSession').value,c=document.getElementById('statsTableBody');if(!start||!end||!session){alert("All fields required.");return;}c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Analyzing...</td></tr>';try{const ss=studentsCache.filter(s=>s.session===session);if(!ss.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-red-500">No students.</td></tr>';return;}const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();const logs=[],dates=new Set();snap.forEach(d=>{const data=d.data();if(data.session===session){logs.push(data);dates.add(data.date);}});const totalDays=dates.size;statsCycleDetails={totalDays,session,start,end,avgRate:'0.0'};document.getElementById('statTotalDays').textContent=totalDays;if(!totalDays){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No data.</td></tr>';return;}let rateSum=0,atRisk=0,perfect=0;queriedStats=ss.map(s=>{const sl=logs.filter(l=>l.roll===s.roll);const p=sl.filter(l=>l.status==='Present').length,lt=sl.filter(l=>l.status==='Late').length,ab=sl.filter(l=>l.status==='Absent').length;const absent=ab+(totalDays-sl.length);const rateNum=totalDays>0?((p+lt)/totalDays)*100:0;rateSum+=rateNum;if(rateNum<60)atRisk++;if(rateNum===100)perfect++;return{roll:s.roll,name:s.name,session:s.session,present:p,late:lt,absent,rate:rateNum.toFixed(1)+'%',rateNum};});const avg=ss.length?(rateSum/ss.length).toFixed(1):0;statsCycleDetails.avgRate=avg;document.getElementById('statBatchAvg').textContent=avg+'%';document.getElementById('statAtRisk').textContent=atRisk;document.getElementById('statPerfect').textContent=perfect;document.getElementById('aiBatchAdvisoryText').textContent=generateAIAdvisory(queriedStats);filterStatsTable();}catch(e){alert("Error: "+e.message);}}
-function generateAIAdvisory(stats){if(!stats||!stats.length)return"No data.";let low=0,maxLate=-1,lateLeader='N/A',tops=[];stats.forEach(s=>{if(s.rateNum<75)low++;if(s.rateNum===100)tops.push(s.name);if(s.late>maxLate){maxLate=s.late;lateLeader=s.name;}});let txt=`Batch average: ${statsCycleDetails.avgRate}%. `;txt+=low>0?`${low} student(s) below 75%. `:"All above 75%. ";if(maxLate>0)txt+=`${lateLeader} has most lates (${maxLate}). `;if(tops.length)txt+=`Perfect: ${tops.slice(0,3).join(', ')}.`;return txt;}
-function filterStatsTable(){const q=document.getElementById('statsSearch').value.toLowerCase().trim(),criteria=document.getElementById('statsCriteriaFilter').value,c=document.getElementById('statsTableBody');c.innerHTML="";if(!queriedStats.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Generate first.</td></tr>';return;}let filtered=queriedStats.filter(s=>{const mq=s.name.toLowerCase().includes(q)||s.roll.includes(q);let mc=true;if(criteria==='low')mc=s.rateNum<60;else if(criteria==='high')mc=s.rateNum>=90;else if(criteria==='lates')mc=s.late>0;return mq&&mc;});if(!filtered.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No matches.</td></tr>';return;}filtered.sort((a,b)=>a.rateNum-b.rateNum);filtered.forEach(s=>{let bar='bg-green-500',tc='text-green-700 bg-green-50';if(s.rateNum<60){bar='bg-rose-500';tc='text-rose-700 bg-rose-50';}else if(s.rateNum<90){bar='bg-amber-500';tc='text-amber-700 bg-amber-50';}c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${s.roll}</td><td class="px-4 py-3 font-medium">${s.name}</td><td class="px-4 py-3 text-center text-green-600 font-semibold">${s.present}</td><td class="px-4 py-3 text-center text-amber-600 font-semibold">${s.late}</td><td class="px-4 py-3 text-center text-rose-600 font-semibold">${s.absent}</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-20 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block"><div class="${bar} h-full" style="width:${s.rateNum}%"></div></div><span class="px-2 py-1 text-xs font-bold rounded-lg ${tc}">${s.rate}</span></div></td></tr>`;});}
-function exportStatsExcel(){if(!queriedStats.length){alert("Run first.");return;}const sorted=[...queriedStats].sort((a,b)=>a.rateNum-b.rateNum);const ws=XLSX.utils.json_to_sheet(sorted.map(s=>({Roll:s.roll,Name:s.name,Present:s.present,Late:s.late,Absent:s.absent,Rate:s.rate})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Stats");XLSX.writeFile(wb,`Stats_${statsCycleDetails.session}.xlsx`);}
-function exportStatsPDF(){if(!queriedStats.length){alert("Run first.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Analytics - ${statsCycleDetails.session}`,14,28);doc.setFontSize(10);doc.text(`Cycle: ${statsCycleDetails.start} to ${statsCycleDetails.end} | Days: ${statsCycleDetails.totalDays} | Avg: ${statsCycleDetails.avgRate}%`,14,35);const sorted=[...queriedStats].sort((a,b)=>a.rateNum-b.rateNum);doc.autoTable({startY:42,head:[['Roll','Name','Present','Late','Absent','Rate']],body:sorted.map(s=>[s.roll,s.name,s.present,s.late,s.absent,s.rate]),theme:'grid',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save(`Stats_${statsCycleDetails.session}.pdf`);}
+function exportIndivPDF(){if(!indivQueriedRecords.length||!indivSelectedStudent){alert("No data.");return;}
+const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);
+doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Attendance Report - ${indivSelectedStudent.name} (${indivSelectedStudent.roll})`,14,28);
+doc.setFontSize(10);doc.text(`Session: ${indivSelectedStudent.session}`,14,35);
+doc.autoTable({startY:42,head:[['Date','Status']],body:indivQueriedRecords.map(r=>[r.date,r.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});
+doc.save(`Attendance_${indivSelectedStudent.roll}.pdf`);}
+
+// ===== STATISTICS (Joining Date Aware) =====
+async function generateStatistics(){const start=document.getElementById('statsStartDate').value,end=document.getElementById('statsEndDate').value,session=document.getElementById('statsSession').value,c=document.getElementById('statsTableBody');
+if(!start||!end||!session){alert("All filters required.");return;}
+c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Analyzing...</td></tr>';
+try{const ss=studentsCache.filter(s=>s.session===session);
+if(!ss.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-red-500">No students.</td></tr>';return;}
+const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();
+const logs=[],loggedDates=new Set();snap.forEach(d=>{const data=d.data();if(data.session===session){logs.push(data);loggedDates.add(data.date);}});
+const classDates=Array.from(loggedDates).sort();const totalDaysCount=classDates.length;
+statsCycleDetails={totalDays:totalDaysCount,session,start,end,avgRate:'0.0'};
+document.getElementById('statTotalDays').textContent=totalDaysCount;
+if(!totalDaysCount){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No data.</td></tr>';return;}
+let totalRateSum=0,activeStudentCount=0,atRiskCount=0,perfectCount=0;
+queriedStats=ss.map(student=>{
+const eligibleClassDates=getEligibleClassDatesForStudent(classDates,student);
+const eligibleDays=eligibleClassDates.length;
+const studentLogs=logs.filter(l=>l.roll===student.roll&&isDateOnOrAfterJoining(l.date,student));
+const explicitPresent=studentLogs.filter(l=>l.status==="Present").length;
+const explicitLate=studentLogs.filter(l=>l.status==="Late").length;
+const explicitAbsent=studentLogs.filter(l=>l.status==="Absent").length;
+const missingDays=Math.max(0,eligibleDays-studentLogs.length);
+const totalAbsent=explicitAbsent+missingDays;
+const presentRateNum=eligibleDays>0?((explicitPresent+explicitLate)/eligibleDays)*100:0;
+if(eligibleDays>0){totalRateSum+=presentRateNum;activeStudentCount++;if(presentRateNum<60)atRiskCount++;if(presentRateNum===100)perfectCount++;}
+return{roll:student.roll,name:student.name,session:student.session,joiningDate:getStudentJoiningDate(student)||"N/A",eligibleDays,present:explicitPresent,late:explicitLate,absent:totalAbsent,rate:eligibleDays>0?presentRateNum.toFixed(1)+"%":"N/A",rateNum:presentRateNum};});
+const batchAvgRate=activeStudentCount>0?(totalRateSum/activeStudentCount).toFixed(1):"0.0";
+statsCycleDetails.avgRate=batchAvgRate;
+document.getElementById('statBatchAvg').textContent=batchAvgRate+"%";
+document.getElementById('statAtRisk').textContent=atRiskCount;
+document.getElementById('statPerfect').textContent=perfectCount;
+document.getElementById('aiBatchAdvisoryText').textContent=generateAIAdvisory(queriedStats.filter(s=>s.eligibleDays>0));
+filterStatsTable();calculateDashHighlights();}catch(e){alert("Error: "+e.message);}}
+
+function generateAIAdvisory(stats){if(!stats||!stats.length)return"No data.";let low=0,maxLate=-1,lateLeader='N/A',tops=[];
+stats.forEach(s=>{if(s.rateNum<75)low++;if(s.rateNum===100)tops.push(s.name);if(s.late>maxLate){maxLate=s.late;lateLeader=s.name;}});
+let txt=`Batch average: ${statsCycleDetails.avgRate}%. `;txt+=low>0?`${low} student(s) below 75%. `:"All above 75%. ";
+if(maxLate>0)txt+=`${lateLeader} has most lates (${maxLate}). `;if(tops.length)txt+=`Perfect: ${tops.slice(0,3).join(', ')}.`;return txt;}
+
+function filterStatsTable(){const q=document.getElementById('statsSearch').value.toLowerCase().trim(),criteria=document.getElementById('statsCriteriaFilter').value,c=document.getElementById('statsTableBody');c.innerHTML="";
+if(!queriedStats.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Generate first.</td></tr>';return;}
+const filtered=queriedStats.filter(s=>{const mq=s.name.toLowerCase().includes(q)||s.roll.includes(q);let mc=true;
+if(criteria==='low')mc=s.rateNum<60;else if(criteria==='high')mc=s.rateNum>=90;else if(criteria==='lates')mc=s.late>0;return mq&&mc;});
+if(!filtered.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No matches.</td></tr>';return;}
+filtered.sort((a,b)=>a.rateNum-b.rateNum);
+filtered.forEach(s=>{let bar='bg-green-500',tc='text-green-700 bg-green-50';
+if(s.rateNum<60){bar='bg-rose-500';tc='text-rose-700 bg-rose-50';}else if(s.rateNum<90){bar='bg-amber-500';tc='text-amber-700 bg-amber-50';}
+c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${s.roll}</td><td class="px-4 py-3 font-medium">${s.name}</td><td class="px-4 py-3 text-center text-green-600 font-semibold">${s.present}</td><td class="px-4 py-3 text-center text-amber-600 font-semibold">${s.late}</td><td class="px-4 py-3 text-center text-rose-600 font-semibold">${s.absent}</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-20 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block"><div class="${bar} h-full" style="width:${s.rateNum}%"></div></div><span class="px-2 py-1 text-xs font-bold rounded-lg ${tc}">${s.rate}</span></div></td></tr>`;});}
+
+function calculateDashHighlights(){if(!queriedStats.length)return;let maxPresent=-1,topAttenders=[],minPresent=Infinity,leastAttenders=[],maxLate=-1,mostLates=[];
+queriedStats.forEach(s=>{if(s.present>maxPresent){maxPresent=s.present;topAttenders=[s.name];}else if(s.present===maxPresent&&maxPresent!==-1)topAttenders.push(s.name);
+if(s.present<minPresent){minPresent=s.present;leastAttenders=[s.name];}else if(s.present===minPresent&&minPresent!==Infinity)leastAttenders.push(s.name);
+if(s.late>maxLate){maxLate=s.late;mostLates=[s.name];}else if(s.late===maxLate&&maxLate!==-1)mostLates.push(s.name);});
+document.getElementById('statTopAttender').textContent=maxPresent>0?topAttenders.join(", "):"None";
+document.getElementById('statTopAttenderPresents').textContent=`Presents: ${maxPresent}`;
+document.getElementById('statLeastAttender').textContent=minPresent!==Infinity?leastAttenders.join(", "):"None";
+document.getElementById('statLeastAttenderPresents').textContent=`Presents: ${minPresent!==Infinity?minPresent:0}`;
+document.getElementById('statMostLate').textContent=maxLate>0?mostLates.join(", "):"None";
+document.getElementById('statMostLateCount').textContent=`Lates: ${maxLate}`;}
+
+function exportStatsExcel(){if(!queriedStats.length){alert("Run first.");return;}const sorted=[...queriedStats].sort((a,b)=>a.rateNum-b.rateNum);
+const ws=XLSX.utils.json_to_sheet(sorted.map(s=>({"Roll":s.roll,"Name":s.name,"Present":s.present,"Late":s.late,"Absent":s.absent,"Rate":s.rate})));
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Stats");XLSX.writeFile(wb,`Stats_${statsCycleDetails.session}.xlsx`);}
+
+function exportStatsPDF(){if(!queriedStats.length){alert("Run first.");return;}const{jsPDF}=window.jspdf;const doc=new jsPDF();
+doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);
+doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Analytics - ${statsCycleDetails.session}`,14,28);
+doc.setFontSize(10);doc.text(`Cycle: ${statsCycleDetails.start} to ${statsCycleDetails.end}`,14,35);
+const sorted=[...queriedStats].sort((a,b)=>a.rateNum-b.rateNum);
+doc.autoTable({startY:42,head:[['Roll','Name','Present','Late','Absent','Rate']],body:sorted.map(s=>[s.roll,s.name,s.present,s.late,s.absent,s.rate]),theme:'grid',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});
+doc.save(`Stats_${statsCycleDetails.session}.pdf`);}
 
 // ===== FEE MANAGEMENT =====
 const feeRollInput=document.getElementById('feeRollInput');
 let feeSelectedStudent=null;
-feeRollInput.addEventListener('input',async()=>{const roll=feeRollInput.value.trim(),el=document.getElementById('feeStudentMatchedName');if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);if(m){feeSelectedStudent=m;el.textContent=`${m.name} (${m.session})`;el.className="font-bold text-green-600 text-xs";const bal=await calculateStudentOutstandingBalance(m.roll,document.getElementById('feeMonthInput').value);document.getElementById('feeStudentDuesGuide').classList.remove('hidden');const det=document.getElementById('feeStudentDuesDetails');if(bal.netDues<0){det.textContent=`${Math.abs(bal.netDues)} BDT Advance`;det.className="text-green-600 font-bold";}else{det.textContent=`${bal.netDues} BDT Due`;det.className="text-rose-600 font-bold";}}else{el.textContent="Not found!";el.className="font-bold text-red-500 text-xs";document.getElementById('feeStudentDuesGuide').classList.add('hidden');feeSelectedStudent=null;}}else{el.textContent="Type roll...";el.className="font-bold text-slate-500 text-xs";document.getElementById('feeStudentDuesGuide').classList.add('hidden');feeSelectedStudent=null;}});
+feeRollInput.addEventListener('input',async()=>{const roll=feeRollInput.value.trim(),el=document.getElementById('feeStudentMatchedName');
+if(roll.length===6){const m=studentsCache.find(s=>s.roll===roll);
+if(m){feeSelectedStudent=m;el.textContent=`${m.name} (${m.session})`;el.className="font-bold text-green-600 text-xs";
+const bal=await calculateStudentOutstandingBalance(m.roll,document.getElementById('feeMonthInput').value);
+document.getElementById('feeStudentDuesGuide').classList.remove('hidden');const det=document.getElementById('feeStudentDuesDetails');
+if(bal.netDues<0){det.textContent=`${Math.abs(bal.netDues)} BDT Advance`;det.className="text-green-600 font-bold";}
+else{det.textContent=`${bal.netDues} BDT Due`;det.className="text-rose-600 font-bold";}}
+else{el.textContent="Not found!";el.className="font-bold text-red-500 text-xs";document.getElementById('feeStudentDuesGuide').classList.add('hidden');feeSelectedStudent=null;}}
+else{el.textContent="Type roll...";el.className="font-bold text-slate-500 text-xs";document.getElementById('feeStudentDuesGuide').classList.add('hidden');feeSelectedStudent=null;}});
 document.getElementById('feeMonthInput').addEventListener('change',()=>{if(feeSelectedStudent)feeRollInput.dispatchEvent(new Event('input'));});
-document.getElementById('collectFeeForm').addEventListener('submit',async(e)=>{e.preventDefault();if(!feeSelectedStudent){alert("Match a student first.");return;}const month=document.getElementById('feeMonthInput').value,amount=parseFloat(document.getElementById('feeAmountInput').value),date=document.getElementById('feeDateInput').value,feeType=document.getElementById('feeTypeInput').value;let status="Paid";if(feeType==="Tuition Fee"){const fee=feeSelectedStudent.monthlyFee??1500;status=amount>=fee?"Paid":amount>0?"Partial":"Unpaid";}else status=amount>0?"Paid":"Unpaid";try{await db.collection('payments').doc(`${feeSelectedStudent.roll}_${feeType.replace(/\s+/g,'')}_${month}`).set({roll:feeSelectedStudent.roll,name:feeSelectedStudent.name,session:feeSelectedStudent.session,month,amount,status,feeType,paymentDate:date,receivedBy:currentUser.uid,receivedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});alert("Payment saved!");document.getElementById('collectFeeForm').reset();feeSelectedStudent=null;document.getElementById('feeStudentMatchedName').textContent="Type roll...";document.getElementById('feeStudentDuesGuide').classList.add('hidden');setDefaultDates();if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}});
+
+document.getElementById('collectFeeForm').addEventListener('submit',async(e)=>{e.preventDefault();
+const month=document.getElementById('feeMonthInput').value,amount=parseFloat(document.getElementById('feeAmountInput').value),date=document.getElementById('feeDateInput').value,feeType=document.getElementById('feeTypeInput').value;
+if(!feeSelectedStudent){alert("Match a student first.");return;}
+let status="Paid";if(feeType==="Tuition Fee"){const fee=feeSelectedStudent.monthlyFee??1500;status=amount>=fee?"Paid":amount>0?"Partial":"Unpaid";}else status=amount>0?"Paid":"Unpaid";
+try{await db.collection('payments').doc(`${feeSelectedStudent.roll}_${feeType.replace(/\s+/g,'')}_${month}`).set({roll:feeSelectedStudent.roll,name:feeSelectedStudent.name,session:feeSelectedStudent.session,month,amount,status,feeType,paymentDate:date,receivedBy:currentUser.uid,receivedByEmail:currentUser.email,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+alert("Saved!");document.getElementById('collectFeeForm').reset();feeSelectedStudent=null;
+document.getElementById('feeStudentMatchedName').textContent="Type roll...";document.getElementById('feeStudentMatchedName').className="font-bold text-slate-500 text-xs";
+document.getElementById('feeStudentDuesGuide').classList.add('hidden');setDefaultDates();
+if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}});
 
 async function fetchStudentAdjustments(roll){let adj={};try{const snap=await db.collection('adjustments').where('roll','==',roll).get();snap.forEach(d=>{const data=d.data();adj[data.month]=data;});}catch(e){}return adj;}
 
-async function calculateStudentOutstandingBalance(roll,targetMonth){const student=studentsCache.find(s=>s.roll===roll);if(!student)return{expectedTuition:0,totalPaid:0,netDues:0};const fee=student.monthlyFee??1500;const[y,m]=targetMonth.split('-').map(Number);const adjustments=await fetchStudentAdjustments(roll);const start=new Date(student.startDate),end=new Date(y,m-1,1);let expected=0,cur=new Date(start.getFullYear(),start.getMonth(),1);while(cur<=end){const mStr=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;const adj=adjustments[mStr];if(adj){if(adj.type!=="Hold"&&adj.type!=="Full Waiver")expected+=Math.max(0,fee-(adj.amount||0));}else expected+=fee;cur.setMonth(cur.getMonth()+1);}
+async function calculateStudentOutstandingBalance(roll,targetMonth){const student=studentsCache.find(s=>s.roll===roll);
+if(!student)return{expectedTuition:0,totalPaid:0,netDues:0};const fee=student.monthlyFee??1500;
+const[y,m]=targetMonth.split('-').map(Number);const adjustments=await fetchStudentAdjustments(roll);
+const start=new Date(student.startDate),end=new Date(y,m-1,1);let expected=0,cur=new Date(start.getFullYear(),start.getMonth(),1);
+while(cur<=end){const mStr=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;const adj=adjustments[mStr];
+if(adj){if(adj.type!=="Hold"&&adj.type!=="Full Waiver")expected+=Math.max(0,fee-(adj.amount||0));}else expected+=fee;cur.setMonth(cur.getMonth()+1);}
 const startMonthStr=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}`;
 let totalPaid=0;try{const snap=await db.collection('payments').where('roll','==',roll).get();snap.forEach(d=>{const p=d.data();if(p.month>=startMonthStr&&p.month<=targetMonth)totalPaid+=p.amount||0;});}catch(e){}
 return{expectedTuition:expected,totalPaid,netDues:expected-totalPaid};}
 
-// ✨ UPDATED: queryFeeLedger with summary
-async function queryFeeLedger(){const batch=document.getElementById('feeBatchFilter').value,month=document.getElementById('feeLedgerMonth').value,c=document.getElementById('feeLedgerTableBody');if(!batch||!month){alert("Select batch and month.");return;}c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-slate-400">Loading...</td></tr>';activeLedgerMonth=month;activeLedgerBatch=batch;try{const bs=studentsCache.filter(s=>s.session===batch);if(!bs.length){c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-red-500">No students.</td></tr>';return;}const snap=await db.collection('payments').where('session','==',batch).get();let payments=[];snap.forEach(d=>{const data=d.data();data.id=d.id;payments.push(data);});const adjSnap=await db.collection('adjustments').where('session','==',batch).get();let adjustments=[];adjSnap.forEach(d=>{const data=d.data();data.id=d.id;adjustments.push(data);});const[yy,mm]=month.split('-').map(Number);const endLimit=new Date(yy,mm-1,1);
-queriedPayments=bs.map(student=>{const sp=payments.filter(p=>p.roll===student.roll),sa=adjustments.filter(a=>a.roll===student.roll);const fee=student.monthlyFee??1500;const start=new Date(student.startDate);let expected=0,cur=new Date(start.getFullYear(),start.getMonth(),1);while(cur<=endLimit){const mStr=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;const adj=sa.find(a=>a.month===mStr);if(adj){if(adj.type!=="Hold"&&adj.type!=="Full Waiver")expected+=Math.max(0,fee-(adj.amount||0));}else expected+=fee;cur.setMonth(cur.getMonth()+1);}
+async function queryFeeLedger(){const batch=document.getElementById('feeBatchFilter').value,month=document.getElementById('feeLedgerMonth').value,c=document.getElementById('feeLedgerTableBody');
+if(!batch||!month){alert("Select batch and month.");return;}c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-slate-400">Loading...</td></tr>';
+activeLedgerMonth=month;activeLedgerBatch=batch;
+try{const bs=studentsCache.filter(s=>s.session===batch);if(!bs.length){c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-red-500">No students.</td></tr>';return;}
+const snap=await db.collection('payments').where('session','==',batch).get();let payments=[];snap.forEach(d=>{const data=d.data();data.id=d.id;payments.push(data);});
+const adjSnap=await db.collection('adjustments').where('session','==',batch).get();let adjustments=[];adjSnap.forEach(d=>{const data=d.data();data.id=d.id;adjustments.push(data);});
+const[yy,mm]=month.split('-').map(Number);const endLimit=new Date(yy,mm-1,1);
+queriedPayments=bs.map(student=>{const sp=payments.filter(p=>p.roll===student.roll),sa=adjustments.filter(a=>a.roll===student.roll);
+const fee=student.monthlyFee??1500;const start=new Date(student.startDate);let expected=0,cur=new Date(start.getFullYear(),start.getMonth(),1);
+while(cur<=endLimit){const mStr=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;const adj=sa.find(a=>a.month===mStr);
+if(adj){if(adj.type!=="Hold"&&adj.type!=="Full Waiver")expected+=Math.max(0,fee-(adj.amount||0));}else expected+=fee;cur.setMonth(cur.getMonth()+1);}
 const startMonthStr=`${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}`;
 let totalPaid=0;sp.forEach(p=>{if(p.month>=startMonthStr&&p.month<=month)totalPaid+=p.amount||0;});
 const netDues=expected-totalPaid;let status="Unpaid";if(netDues<0)status="Advance Paid";else if(netDues===0&&totalPaid>0)status="Paid";else if(totalPaid>0&&netDues>0)status="Partial";
 return{roll:student.roll,name:student.name,session:student.session,expectedTuition:expected,totalPaid,netDues,status};});
 queriedPayments.sort((a,b)=>parseInt(a.roll)-parseInt(b.roll));
-
-// ✨ UPDATE SUMMARY BAR
-const totalBilled=queriedPayments.reduce((s,p)=>s+p.expectedTuition,0);
-const totalCollected=queriedPayments.reduce((s,p)=>s+p.totalPaid,0);
-const totalDue=queriedPayments.reduce((s,p)=>s+Math.max(0,p.netDues),0);
-document.getElementById('ledgerTotalBilled').textContent='৳'+totalBilled.toLocaleString();
-document.getElementById('ledgerTotalCollected').textContent='৳'+totalCollected.toLocaleString();
-document.getElementById('ledgerTotalDue').textContent='৳'+totalDue.toLocaleString();
-document.getElementById('feeStatusFilter').value='all';
-document.getElementById('feeLedgerSearch').value='';
-
+updateLedgerSummary(queriedPayments);document.getElementById('feeStatusFilter').value='all';document.getElementById('feeLedgerSearch').value='';
 renderFeeLedgerTable(queriedPayments);}catch(e){alert("Error: "+e.message);}}
 
-function renderFeeLedgerTable(data){const c=document.getElementById('feeLedgerTableBody');c.innerHTML="";if(!data.length){c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}data.forEach(p=>{let badge='bg-green-100 text-green-800',duesText=`${p.netDues} BDT`,duesClass='text-rose-600 font-bold';if(p.status==='Partial')badge='bg-amber-100 text-amber-800';if(p.status==='Unpaid')badge='bg-rose-100 text-rose-800';if(p.status==='Advance Paid'){badge='bg-blue-100 text-blue-800';duesText=`${Math.abs(p.netDues)} (Adv)`;duesClass='text-blue-600 font-bold';}else if(p.netDues<=0){duesText='0 BDT';duesClass='text-green-600 font-bold';}c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${p.roll}</td><td class="px-4 py-3 font-medium">${p.name}</td><td class="px-4 py-3 text-center">${p.expectedTuition} BDT</td><td class="px-4 py-3 text-center text-green-600 font-bold">${p.totalPaid} BDT</td><td class="px-4 py-3 text-center ${duesClass}">${duesText}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${p.status}</span></td><td class="px-4 py-3 text-center space-x-1"><button onclick="quickCollectFee('${p.roll}')" class="text-indigo-600 text-xs font-bold">Add</button><button onclick="viewStudentFinanceCard('${p.roll}')" class="text-slate-600 text-xs font-bold">View</button></td></tr>`;});initIcons();}
+function renderFeeLedgerTable(data){const c=document.getElementById('feeLedgerTableBody');c.innerHTML="";
+if(!data.length){c.innerHTML='<tr><td colspan="7" class="text-center py-6 text-slate-400">No records.</td></tr>';return;}
+data.forEach(p=>{let badge='bg-green-100 text-green-800',duesText=`${p.netDues} BDT`,duesClass='text-rose-600 font-bold';
+if(p.status==='Partial')badge='bg-amber-100 text-amber-800';if(p.status==='Unpaid')badge='bg-rose-100 text-rose-800';
+if(p.status==='Advance Paid'){badge='bg-blue-100 text-blue-800';duesText=`${Math.abs(p.netDues)} (Adv)`;duesClass='text-blue-600 font-bold';}
+else if(p.netDues<=0){duesText='0 BDT';duesClass='text-green-600 font-bold';}
+c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${p.roll}</td><td class="px-4 py-3 font-medium">${p.name}</td><td class="px-4 py-3 text-center">${p.expectedTuition} BDT</td><td class="px-4 py-3 text-center text-green-600 font-bold">${p.totalPaid} BDT</td><td class="px-4 py-3 text-center ${duesClass}">${duesText}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${p.status}</span></td><td class="px-4 py-3 text-center space-x-1"><button onclick="quickCollectFee('${p.roll}')" class="text-indigo-600 text-xs font-bold">Add</button></td></tr>`;});
+initIcons();}
 
-// ✨ UPDATED: Combined search + status filter
-function filterFeeLedger(){
-const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();
-const statusFilter=document.getElementById('feeStatusFilter').value;
-if(!queriedPayments.length)return;
-let filtered=queriedPayments;
-if(statusFilter!=='all')filtered=filtered.filter(p=>p.status===statusFilter);
+function updateLedgerSummary(data){const tb=data.reduce((s,p)=>s+p.expectedTuition,0);const tc=data.reduce((s,p)=>s+p.totalPaid,0);const td=data.reduce((s,p)=>s+Math.max(0,p.netDues),0);
+document.getElementById('ledgerTotalBilled').textContent='৳'+tb.toLocaleString();
+document.getElementById('ledgerTotalCollected').textContent='৳'+tc.toLocaleString();
+document.getElementById('ledgerTotalDue').textContent='৳'+td.toLocaleString();}
+
+function filterFeeLedger(){const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();const sf=document.getElementById('feeStatusFilter').value;
+if(!queriedPayments.length)return;let filtered=queriedPayments;if(sf!=='all')filtered=filtered.filter(p=>p.status===sf);
 if(q)filtered=filtered.filter(p=>p.name.toLowerCase().includes(q)||p.roll.includes(q));
-renderFeeLedgerTable(filtered);
-updateLedgerSummary(filtered);
-}
-
-// ✨ NEW: Status filter change
-function filterFeeLedgerByStatus(){filterFeeLedger();}
-
-// ✨ NEW: Update summary based on current filter
-function updateLedgerSummary(data){
-const totalBilled=data.reduce((s,p)=>s+p.expectedTuition,0);
-const totalCollected=data.reduce((s,p)=>s+p.totalPaid,0);
-const totalDue=data.reduce((s,p)=>s+Math.max(0,p.netDues),0);
-document.getElementById('ledgerTotalBilled').textContent='৳'+totalBilled.toLocaleString();
-document.getElementById('ledgerTotalCollected').textContent='৳'+totalCollected.toLocaleString();
-document.getElementById('ledgerTotalDue').textContent='৳'+totalDue.toLocaleString();
-}
+renderFeeLedgerTable(filtered);updateLedgerSummary(filtered);}
 
 function quickCollectFee(roll){const s=studentsCache.find(x=>x.roll===roll);if(s){document.getElementById('feeRollInput').value=s.roll;feeRollInput.dispatchEvent(new Event('input'));document.getElementById('feeMonthInput').value=activeLedgerMonth;document.getElementById('feeRollInput').focus();}}
+function exportLedgerExcel(){if(!queriedPayments.length){alert("Query first.");return;}const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();const sf=document.getElementById('feeStatusFilter').value;
+let data=queriedPayments;if(sf!=='all')data=data.filter(p=>p.status===sf);if(q)data=data.filter(p=>p.name.toLowerCase().includes(q)||p.roll.includes(q));
+if(!data.length){alert("No matching records.");return;}
+const ws=XLSX.utils.json_to_sheet(data.map(p=>({Roll:p.roll,Name:p.name,Billed:p.expectedTuition,Paid:p.totalPaid,Dues:p.netDues,Status:p.status})));
+const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Ledger");XLSX.writeFile(wb,`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.xlsx`);}
+function exportLedgerPDF(){if(!queriedPayments.length){alert("Query first.");return;}const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();const sf=document.getElementById('feeStatusFilter').value;
+let data=queriedPayments;if(sf!=='all')data=data.filter(p=>p.status===sf);if(q)data=data.filter(p=>p.name.toLowerCase().includes(q)||p.roll.includes(q));
+if(!data.length){alert("No matching records.");return;}const tc=data.reduce((s,p)=>s+p.totalPaid,0),td=data.reduce((s,p)=>s+Math.max(0,p.netDues),0);
+const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);
+doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Fee Ledger - ${activeLedgerBatch}`,14,28);
+doc.setFontSize(10);doc.text(`Month: ${activeLedgerMonth}`,14,35);let iy=41;if(q){doc.text(`Search: "${q}"`,14,iy);iy+=6;}if(sf!=='all'){doc.text(`Filter: ${sf}`,14,iy);iy+=6;}
+doc.text(`Collected: ${tc.toLocaleString()} BDT | Outstanding: ${td.toLocaleString()} BDT`,14,iy);
+doc.autoTable({startY:iy+6,head:[['Roll','Name','Billed','Paid','Dues','Status']],body:data.map(p=>[p.roll,p.name,p.expectedTuition+' BDT',p.totalPaid+' BDT',p.netDues>0?p.netDues+' BDT':(p.netDues<0?Math.abs(p.netDues)+' (Adv)':'0'),p.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>",14,doc.internal.pageSize.height-10);}});
+doc.save(`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.pdf`);}
 
-function exportLedgerExcel(){if(!queriedPayments.length){alert("Query first.");return;}const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();const statusFilter=document.getElementById('feeStatusFilter').value;let data=queriedPayments;if(statusFilter!=='all')data=data.filter(p=>p.status===statusFilter);if(q)data=data.filter(p=>p.name.toLowerCase().includes(q)||p.roll.includes(q));if(!data.length){alert("No matching records.");return;}const ws=XLSX.utils.json_to_sheet(data.map(p=>({Roll:p.roll,Name:p.name,Billed:p.expectedTuition,Paid:p.totalPaid,Dues:p.netDues,Status:p.status})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Ledger");XLSX.writeFile(wb,`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.xlsx`);}
+function syncMonthlyEarnings(){if(currentUserRole!=='admin')return;db.collection('payments').onSnapshot(snap=>{earningsCacheByMonth={};
+snap.forEach(d=>{const p=d.data();if(p.month)earningsCacheByMonth[p.month]=(earningsCacheByMonth[p.month]||0)+(Number(p.amount)||0);});renderEarningsSummary();});}
+function renderEarningsSummary(){const c=document.getElementById('monthlyEarningsContainer');if(!c)return;c.innerHTML="";
+const months=Object.keys(earningsCacheByMonth).sort((a,b)=>b.localeCompare(a));
+if(!months.length){c.innerHTML='<div class="text-sm text-slate-400">No payments.</div>';return;}
+months.slice(0,4).forEach(m=>{c.innerHTML+=`<div class="p-4 bg-slate-50 border border-slate-100 rounded-lg"><p class="text-xs text-slate-400 font-semibold uppercase">${m}</p><p class="text-lg font-bold text-indigo-600 mt-1">${earningsCacheByMonth[m].toLocaleString()} BDT</p></div>`;});}
 
-function exportLedgerPDF(){if(!queriedPayments.length){alert("Query first.");return;}const q=document.getElementById('feeLedgerSearch').value.toLowerCase().trim();const statusFilter=document.getElementById('feeStatusFilter').value;let data=queriedPayments;if(statusFilter!=='all')data=data.filter(p=>p.status===statusFilter);if(q)data=data.filter(p=>p.name.toLowerCase().includes(q)||p.roll.includes(q));if(!data.length){alert("No matching records.");return;}const totalCollected=data.reduce((s,p)=>s+p.totalPaid,0),totalDues=data.reduce((s,p)=>s+Math.max(0,p.netDues),0);const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(22);doc.setFont('helvetica','bold');doc.text('Ideal Coaching Center',14,20);doc.setFontSize(12);doc.setFont('helvetica','normal');doc.text(`Fee Ledger - ${activeLedgerBatch}`,14,28);doc.setFontSize(10);doc.text(`Month: ${activeLedgerMonth}`,14,35);doc.text(`Generated: ${new Date().toLocaleString()}`,14,41);let infoY=47;if(q){doc.text(`Search: "${q}"`,14,infoY);infoY+=6;}if(statusFilter!=='all'){doc.text(`Filter: ${statusFilter}`,14,infoY);infoY+=6;}doc.text(`Collected: ${totalCollected.toLocaleString()} BDT | Outstanding: ${totalDues.toLocaleString()} BDT`,14,infoY);doc.autoTable({startY:infoY+6,head:[['Roll','Name','Billed','Paid','Dues','Status']],body:data.map(p=>[p.roll,p.name,p.expectedTuition+' BDT',p.totalPaid+' BDT',p.netDues>0?p.netDues+' BDT':(p.netDues<0?Math.abs(p.netDues)+' (Adv)':'0'),p.status]),theme:'striped',didDrawPage:()=>{doc.setFontSize(9);doc.setTextColor(100);doc.text('SD/- Shahrim Ahammed Shad<shad.iam.bd>',14,doc.internal.pageSize.height-10);}});doc.save(`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.pdf`);}
-
-// ===== FINANCE MODAL =====
-async function viewStudentFinanceCard(roll){selectedFinanceStudentRoll=roll;const s=studentsCache.find(x=>x.roll===roll);if(!s)return;document.getElementById('finName').textContent=s.name;document.getElementById('finStart').textContent=s.startDate||'N/A';document.getElementById('finMonthly').textContent=`${s.monthlyFee??1500} BDT`;const calc=await calculateStudentOutstandingBalance(roll,activeLedgerMonth||new Date().toISOString().substring(0,7));const dEl=document.getElementById('finDues');if(calc.netDues<0){dEl.textContent=`${Math.abs(calc.netDues)} BDT (Adv)`;dEl.className='text-blue-600 text-sm font-bold';}else{dEl.textContent=`${calc.netDues} BDT`;dEl.className='text-rose-600 text-sm font-bold';}switchFinanceTab('payments');await reloadStudentFinanceTable();await reloadStudentAdjustmentsTable();document.getElementById('viewStudentFinanceModal').classList.remove('hidden');}
-function switchFinanceTab(tab){const bp=document.getElementById('btnFinPayments'),ba=document.getElementById('btnFinAdjustments'),vp=document.getElementById('financePaymentsView'),va=document.getElementById('financeAdjustmentsView');if(tab==='payments'){bp.className='px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600';ba.className='px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent';vp.classList.remove('hidden');va.classList.add('hidden');}else{ba.className='px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600';bp.className='px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent';vp.classList.add('hidden');va.classList.remove('hidden');document.getElementById('adjMonth').value=new Date().toISOString().substring(0,7);updateAdjustmentAmountCalculation();}}
-async function reloadStudentFinanceTable(){const tb=document.getElementById('studentFinanceTableBody');tb.innerHTML='<tr><td colspan="6" class="text-center py-4 text-slate-400">Loading...</td></tr>';try{const snap=await db.collection('payments').where('roll','==',selectedFinanceStudentRoll).get();financeStudentTransactions=[];snap.forEach(d=>{const data=d.data();data.id=d.id;financeStudentTransactions.push(data);});financeStudentTransactions.sort((a,b)=>b.month.localeCompare(a.month));tb.innerHTML="";if(!financeStudentTransactions.length){tb.innerHTML='<tr><td colspan="6" class="text-center py-4 text-slate-400">No records.</td></tr>';return;}financeStudentTransactions.forEach(t=>{let badge=t.status==='Partial'?'bg-amber-100 text-amber-800':t.status==='Unpaid'?'bg-rose-100 text-rose-800':'bg-green-100 text-green-800';tb.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-2">${t.paymentDate}</td><td class="px-4 py-2 font-semibold">${t.month}</td><td class="px-4 py-2">${t.feeType||'Tuition'}</td><td class="px-4 py-2 font-bold">${t.amount} BDT</td><td class="px-4 py-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${badge}">${t.status}</span></td><td class="px-4 py-2 text-center"><button onclick="openEditPaymentModal('${t.id}')" class="text-indigo-600 font-semibold">Edit</button> <button onclick="deletePaymentTransaction('${t.id}')" class="text-rose-600 font-semibold">Del</button></td></tr>`;});initIcons();}catch(e){tb.innerHTML='<tr><td colspan="6" class="text-center py-4 text-red-500">Error</td></tr>';}}
-async function reloadStudentAdjustmentsTable(){const tb=document.getElementById('studentAdjustmentsTableBody');tb.innerHTML='<tr><td colspan="4" class="text-center py-4 text-slate-400">Loading...</td></tr>';try{const snap=await db.collection('adjustments').where('roll','==',selectedFinanceStudentRoll).get();financeStudentAdjustments=[];snap.forEach(d=>{const data=d.data();data.id=d.id;financeStudentAdjustments.push(data);});financeStudentAdjustments.sort((a,b)=>b.month.localeCompare(a.month));tb.innerHTML="";if(!financeStudentAdjustments.length){tb.innerHTML='<tr><td colspan="4" class="text-center py-4 text-slate-400">No adjustments.</td></tr>';return;}financeStudentAdjustments.forEach(a=>{tb.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-2 py-1 font-semibold">${a.month}</td><td class="px-2 py-1">${a.type}</td><td class="px-2 py-1 font-bold">${a.amount} BDT</td><td class="px-2 py-1 text-center"><button onclick="deleteAdjustment('${a.id}')" class="text-rose-600 font-semibold">Del</button></td></tr>`;});initIcons();}catch(e){tb.innerHTML='<tr><td colspan="4" class="text-center py-4 text-red-500">Error</td></tr>';}}
-function closeStudentFinanceModal(){document.getElementById('viewStudentFinanceModal').classList.add('hidden');selectedFinanceStudentRoll='';}
-function openEditPaymentModal(id){const p=financeStudentTransactions.find(t=>t.id===id);if(!p)return;document.getElementById('editPaymentId').value=id;document.getElementById('editPaymentType').value=p.feeType||'Tuition Fee';document.getElementById('editPaymentMonth').value=p.month;document.getElementById('editPaymentAmount').value=p.amount;document.getElementById('editPaymentModal').classList.remove('hidden');}
-function closeEditPaymentModal(){document.getElementById('editPaymentModal').classList.add('hidden');}
-async function saveEditPayment(){const id=document.getElementById('editPaymentId').value,feeType=document.getElementById('editPaymentType').value,month=document.getElementById('editPaymentMonth').value,amount=parseFloat(document.getElementById('editPaymentAmount').value);const s=studentsCache.find(x=>x.roll===selectedFinanceStudentRoll);const fee=s?(s.monthlyFee??1500):1500;let status=feeType==='Tuition Fee'?(amount>=fee?'Paid':amount>0?'Partial':'Unpaid'):(amount>0?'Paid':'Unpaid');try{await db.collection('payments').doc(id).update({feeType,month,amount,status});alert("Updated.");closeEditPaymentModal();await reloadStudentFinanceTable();if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}}
-async function deletePaymentTransaction(id){if(confirm("Delete this payment?")){try{await db.collection('payments').doc(id).delete();alert("Deleted.");await reloadStudentFinanceTable();if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}}}
-function updateAdjustmentAmountCalculation(){const type=document.getElementById('adjType').value,amtEl=document.getElementById('adjAmount'),s=studentsCache.find(x=>x.roll===selectedFinanceStudentRoll),fee=s?(s.monthlyFee??1500):1500;const dc=document.getElementById('adjAbsentDaysContainer');if(type==='Hold'||type==='Full Waiver'){dc.classList.add('hidden');amtEl.value=fee;amtEl.disabled=true;}else if(type==='Absence Deduction'){dc.classList.remove('hidden');amtEl.disabled=false;const days=parseInt(document.getElementById('adjAbsentDays').value)||0;amtEl.value=Math.round(days*(fee/30));}else{dc.classList.add('hidden');amtEl.disabled=false;amtEl.value="";}}
-document.getElementById('applyAdjustmentForm').addEventListener('submit',async(e)=>{e.preventDefault();const s=studentsCache.find(x=>x.roll===selectedFinanceStudentRoll);if(!s)return;try{await db.collection('adjustments').doc(`${selectedFinanceStudentRoll}_${document.getElementById('adjMonth').value}`).set({roll:selectedFinanceStudentRoll,session:s.session,month:document.getElementById('adjMonth').value,type:document.getElementById('adjType').value,amount:parseFloat(document.getElementById('adjAmount').value)||0,note:document.getElementById('adjNote').value.trim(),timestamp:firebase.firestore.FieldValue.serverTimestamp()});alert("Applied!");document.getElementById('applyAdjustmentForm').reset();updateAdjustmentAmountCalculation();await reloadStudentAdjustmentsTable();if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}});
-async function deleteAdjustment(id){if(confirm("Delete exemption?")){try{await db.collection('adjustments').doc(id).delete();alert("Deleted.");await reloadStudentAdjustmentsTable();if(activeLedgerMonth&&activeLedgerBatch)queryFeeLedger();}catch(e){alert("Error: "+e.message);}}}
-
-// ===== REVENUE =====
-function syncMonthlyEarnings(){if(currentUserRole!=='admin')return;db.collection('payments').onSnapshot(snap=>{earningsCacheByMonth={};snap.forEach(d=>{const p=d.data();if(p.month)earningsCacheByMonth[p.month]=(earningsCacheByMonth[p.month]||0)+(Number(p.amount)||0);});renderEarningsSummary();});}
-function renderEarningsSummary(){const c=document.getElementById('monthlyEarningsContainer');if(!c)return;c.innerHTML="";const months=Object.keys(earningsCacheByMonth).sort((a,b)=>b.localeCompare(a));if(!months.length){c.innerHTML='<div class="text-sm text-slate-400">No payments.</div>';return;}months.slice(0,4).forEach(m=>{c.innerHTML+=`<div class="p-4 bg-slate-50 border border-slate-100 rounded-lg"><p class="text-xs text-slate-400 font-semibold uppercase">${m}</p><p class="text-lg font-bold text-indigo-600 mt-1">${earningsCacheByMonth[m].toLocaleString()} BDT</p></div>`;});}
-
-// ===== STUDENT EDIT =====
-function openEditStudentModal(roll){const s=studentsCache.find(x=>x.roll===roll);if(!s)return;document.getElementById('editStudentRoll').value=roll;document.getElementById('editStudentName').value=s.name;document.getElementById('editStudentSession').value=s.session;document.getElementById('editStudentMonthlyFee').value=s.monthlyFee??1500;document.getElementById('editStudentStartDate').value=s.startDate||'';document.getElementById('editStudentEmail').value=s.email||'';document.getElementById('editStudentModal').classList.remove('hidden');}
+// ===== STUDENT EDIT WITH RESULT PORTAL SYNC =====
+function openEditStudentModal(roll){const s=studentsCache.find(x=>x.roll===roll);if(!s)return;
+document.getElementById('editStudentRoll').value=roll;document.getElementById('editStudentName').value=s.name;document.getElementById('editStudentSession').value=s.session;
+document.getElementById('editStudentJoiningDate').value=s.joiningDate||s.startDate||'';document.getElementById('editStudentMonthlyFee').value=s.monthlyFee??1500;
+document.getElementById('editStudentStartDate').value=s.startDate||'';document.getElementById('editStudentModal').classList.remove('hidden');}
 function closeEditStudentModal(){document.getElementById('editStudentModal').classList.add('hidden');}
-async function saveEditStudent(){const roll=document.getElementById('editStudentRoll').value;try{await db.collection('students').doc(roll).update({name:document.getElementById('editStudentName').value.trim(),session:document.getElementById('editStudentSession').value.trim(),monthlyFee:parseFloat(document.getElementById('editStudentMonthlyFee').value),startDate:document.getElementById('editStudentStartDate').value,email:document.getElementById('editStudentEmail').value.trim()});alert("Updated.");closeEditStudentModal();}catch(e){alert("Error: "+e.message);}}
+async function saveEditStudent(){const roll=document.getElementById('editStudentRoll').value;const name=document.getElementById('editStudentName').value.trim();
+const session=document.getElementById('editStudentSession').value.trim();const joiningDate=document.getElementById('editStudentJoiningDate').value;
+const monthlyFee=parseFloat(document.getElementById('editStudentMonthlyFee').value);const startDate=document.getElementById('editStudentStartDate').value;
+if(!name||!session||!joiningDate||isNaN(monthlyFee)||!startDate){alert("Fill all fields.");return;}
+try{await db.collection('students').doc(roll).update({name,session,joiningDate,monthlyFee,startDate});
+await syncStudentToResultPortal(roll,name,session,joiningDate);
+alert("Updated & synced to Result Portal.");closeEditStudentModal();}catch(e){alert("Error: "+e.message);}}
 
 // ===== USER MANAGEMENT =====
-document.getElementById('createInputterForm').addEventListener('submit',async(e)=>{e.preventDefault();const msgEl=document.getElementById('inputterFormMessage');msgEl.className="text-center text-sm font-semibold mt-4 text-indigo-600";msgEl.textContent="Creating...";msgEl.classList.remove('hidden');const email=document.getElementById('inputterEmail').value.trim(),password=document.getElementById('inputterPassword').value,session=document.getElementById('inputterSessionAssign').value;if(!session){alert("Select batch.");return;}try{let app;try{app=firebase.initializeApp(firebaseConfig,"SecondaryApp");}catch(e){app=firebase.app("SecondaryApp");}const creds=await app.auth().createUserWithEmailAndPassword(email,password);await db.collection('users').doc(creds.user.uid).set({email,role:'inputter',assignedSession:session,password});await app.auth().signOut();msgEl.className="text-center text-sm font-semibold mt-4 text-green-600";msgEl.textContent="Created.";document.getElementById('createInputterForm').reset();}catch(e){msgEl.className="text-center text-sm font-semibold mt-4 text-red-500";msgEl.textContent="Error: "+e.message;}});
-function syncInputters(){if(currentUserRole!=='admin')return;db.collection('users').where('role','==','inputter').onSnapshot(snap=>{inputtersCache=[];snap.forEach(d=>{const data=d.data();data.uid=d.id;inputtersCache.push(data);});renderInputtersList();});}
-function renderInputtersList(){const c=document.getElementById('inputtersTableBody');if(!c)return;c.innerHTML="";if(!inputtersCache.length){c.innerHTML='<tr><td colspan="3" class="text-center py-4 text-slate-400">No inputters.</td></tr>';return;}inputtersCache.forEach(u=>{c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${u.email}</td><td class="px-4 py-3 text-slate-500 font-semibold">${u.assignedSession||'None'}</td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditInputterModal('${u.uid}','${u.email}','${u.assignedSession}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteInputter('${u.uid}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});const lf=document.getElementById('logInputterFilter');if(lf){lf.innerHTML='<option value="">All</option>';inputtersCache.forEach(u=>{const o=document.createElement('option');o.value=u.email;o.textContent=u.email;lf.appendChild(o);});}initIcons();}
-function openEditInputterModal(uid,email,session){document.getElementById('editInputterUid').value=uid;document.getElementById('editInputterEmail').value=email;const sel=document.getElementById('editInputterSession');sel.innerHTML='<option value="">-- Select --</option>';Array.from(sessionsCache).sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===session)o.selected=true;sel.appendChild(o);});const cached=inputtersCache.find(u=>u.uid===uid);document.getElementById('editInputterPassword').value=cached?(cached.password||''):'';document.getElementById('editInputterModal').classList.remove('hidden');}
+document.getElementById('createInputterForm').addEventListener('submit',async(e)=>{e.preventDefault();
+const msgEl=document.getElementById('inputterFormMessage');msgEl.className="text-center text-sm font-semibold mt-4 text-indigo-600";msgEl.textContent="Creating...";msgEl.classList.remove('hidden');
+const email=document.getElementById('inputterEmail').value.trim(),password=document.getElementById('inputterPassword').value,session=document.getElementById('inputterSessionAssign').value;
+if(!session){alert("Select batch.");return;}
+try{let app;try{app=firebase.initializeApp(firebaseConfig,"SecondaryApp");}catch(e){app=firebase.app("SecondaryApp");}
+const creds=await app.auth().createUserWithEmailAndPassword(email,password);
+await db.collection('users').doc(creds.user.uid).set({email,role:'inputter',assignedSession:session,password});await app.auth().signOut();
+msgEl.className="text-center text-sm font-semibold mt-4 text-green-600";msgEl.textContent="Created.";document.getElementById('createInputterForm').reset();}catch(e){msgEl.className="text-center text-sm font-semibold mt-4 text-red-500";msgEl.textContent="Error: "+e.message;}});
+
+function syncInputters(){if(currentUserRole!=='admin')return;db.collection('users').where('role','==','inputter').onSnapshot(snap=>{inputtersCache=[];
+snap.forEach(d=>{const data=d.data();data.uid=d.id;inputtersCache.push(data);});renderInputtersList();});}
+function renderInputtersList(){const c=document.getElementById('inputtersTableBody');if(!c)return;c.innerHTML="";
+if(!inputtersCache.length){c.innerHTML='<tr><td colspan="3" class="text-center py-4 text-slate-400">No inputters.</td></tr>';return;}
+inputtersCache.forEach(u=>{c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${u.email}</td><td class="px-4 py-3 text-slate-500 font-semibold">${u.assignedSession||'None'}</td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditInputterModal('${u.uid}','${u.email}','${u.assignedSession}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteInputter('${u.uid}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`;});
+const lf=document.getElementById('logInputterFilter');if(lf){lf.innerHTML='<option value="">All</option>';inputtersCache.forEach(u=>{const o=document.createElement('option');o.value=u.email;o.textContent=u.email;lf.appendChild(o);});}initIcons();}
+function openEditInputterModal(uid,email,session){document.getElementById('editInputterUid').value=uid;document.getElementById('editInputterEmail').value=email;
+const sel=document.getElementById('editInputterSession');sel.innerHTML='<option value="">-- Select --</option>';
+Array.from(sessionsCache).sort().forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;if(s===session)o.selected=true;sel.appendChild(o);});
+const cached=inputtersCache.find(u=>u.uid===uid);document.getElementById('editInputterPassword').value=cached?(cached.password||''):'';
+document.getElementById('editInputterModal').classList.remove('hidden');}
 function closeEditInputterModal(){document.getElementById('editInputterModal').classList.add('hidden');}
-async function saveEditInputter(){const uid=document.getElementById('editInputterUid').value,newSession=document.getElementById('editInputterSession').value,newPass=document.getElementById('editInputterPassword').value.trim();const cached=inputtersCache.find(u=>u.uid===uid);if(!newSession){alert("Select batch.");return;}try{if(newPass&&cached&&newPass!==cached.password){if(!cached.password){alert("No old password. Delete and recreate.");return;}let app;try{app=firebase.initializeApp(firebaseConfig,"TempApp");}catch(e){app=firebase.app("TempApp");}const creds=await app.auth().signInWithEmailAndPassword(cached.email,cached.password);await creds.user.updatePassword(newPass);await app.auth().signOut();}let update={assignedSession:newSession};if(newPass)update.password=newPass;await db.collection('users').doc(uid).update(update);alert("Updated.");closeEditInputterModal();}catch(e){alert("Error: "+e.message);}}
+async function saveEditInputter(){const uid=document.getElementById('editInputterUid').value,newSession=document.getElementById('editInputterSession').value,newPass=document.getElementById('editInputterPassword').value.trim();
+const cached=inputtersCache.find(u=>u.uid===uid);const oldPassword=cached?(cached.password||''):'';const email=cached?cached.email:'';
+if(!newSession){alert("Select batch.");return;}
+try{if(newPass&&newPass!==oldPassword){if(!oldPassword){alert("No old password. Delete and recreate.");return;}
+let app;try{app=firebase.initializeApp(firebaseConfig,"TempApp");}catch(e){app=firebase.app("TempApp");}
+const creds=await app.auth().signInWithEmailAndPassword(email,oldPassword);await creds.user.updatePassword(newPass);await app.auth().signOut();}
+let update={assignedSession:newSession};if(newPass)update.password=newPass;
+await db.collection('users').doc(uid).update(update);alert("Updated.");closeEditInputterModal();}catch(e){alert("Error: "+e.message);}}
 async function deleteInputter(uid){if(confirm("Delete inputter?")){try{await db.collection('users').doc(uid).delete();alert("Deleted.");}catch(e){alert("Error: "+e.message);}}}
 
 // ===== ACTIVITY LOGS =====
-async function queryActivityLogs(){const start=document.getElementById('logStartDate').value,end=document.getElementById('logEndDate').value,email=document.getElementById('logInputterFilter').value,c=document.getElementById('logsTableBody');if(!start||!end){alert("Select dates.");return;}c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading...</td></tr>';try{const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();let logs=[];snap.forEach(d=>{const data=d.data();if(!email||data.markedByEmail===email)logs.push(data);});logs.sort((a,b)=>{const tA=a.timestamp?a.timestamp.toDate():new Date(a.date);const tB=b.timestamp?b.timestamp.toDate():new Date(b.date);return tB-tA;});c.innerHTML="";if(!logs.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No logs.</td></tr>';return;}logs.forEach(l=>{const time=l.timestamp?l.timestamp.toDate().toLocaleString():'Legacy';let badge=l.status==='Late'?'bg-amber-100 text-amber-800':l.status==='Absent'?'bg-rose-100 text-rose-800':'bg-green-100 text-green-800';c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3">${time}</td><td class="px-4 py-3 font-semibold">${l.markedByEmail||'Admin'}</td><td class="px-4 py-3">${l.date}</td><td class="px-4 py-3 font-semibold">${l.roll} - ${l.name}</td><td class="px-4 py-3 text-slate-500">${l.session}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${l.status}</span></td></tr>`;});}catch(e){alert("Error: "+e.message);}}
+async function queryActivityLogs(){const start=document.getElementById('logStartDate').value,end=document.getElementById('logEndDate').value,email=document.getElementById('logInputterFilter').value,c=document.getElementById('logsTableBody');
+if(!start||!end){alert("Select dates.");return;}c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading...</td></tr>';
+try{const snap=await db.collection('attendance').where('date','>=',start).where('date','<=',end).get();let logs=[];
+snap.forEach(d=>{const data=d.data();if(!email||data.markedByEmail===email)logs.push(data);});
+logs.sort((a,b)=>{const tA=a.timestamp?a.timestamp.toDate():new Date(a.date);const tB=b.timestamp?b.timestamp.toDate():new Date(b.date);return tB-tA;});
+c.innerHTML="";if(!logs.length){c.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">No logs.</td></tr>';return;}
+logs.forEach(l=>{const time=l.timestamp?l.timestamp.toDate().toLocaleString():'Legacy';
+let badge=l.status==="Late"?"bg-amber-100 text-amber-800":l.status==="Absent"?"bg-rose-100 text-rose-800":"bg-green-100 text-green-800";
+c.innerHTML+=`<tr class="hover:bg-slate-50"><td class="px-4 py-3">${time}</td><td class="px-4 py-3 font-semibold">${l.markedByEmail||'Admin'}</td><td class="px-4 py-3">${l.date}</td><td class="px-4 py-3 font-semibold">${l.roll} - ${l.name}</td><td class="px-4 py-3 text-slate-500">${l.session}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${l.status}</span></td></tr>`;});}catch(e){alert("Error: "+e.message);}}
 </script>
 </body>
 </html>
