@@ -16,7 +16,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
-
 <!-- LOGIN -->
 <div id="loginSection" class="flex-grow flex items-center justify-center p-4">
 <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-slate-100">
@@ -30,7 +29,6 @@
 <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
 </div>
 </div>
-
 <!-- DASHBOARD -->
 <div id="dashboardSection" class="hidden flex-grow flex flex-col md:flex-row">
 <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col p-4 space-y-2">
@@ -52,9 +50,7 @@
 </nav>
 <button onclick="logOut()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left text-red-400 hover:bg-slate-800 mt-auto transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> <span>Sign Out</span></button>
 </aside>
-
 <main class="flex-grow p-6 overflow-y-auto max-w-7xl mx-auto w-full">
-
 <!-- MARK ATTENDANCE -->
 <section id="markTab" class="tab-content space-y-6">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -89,7 +85,6 @@
 </div>
 </div>
 </section>
-
 <!-- STUDENT DATABASE -->
 <section id="studentsTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,10 +94,12 @@
 <div><label class="block text-sm font-medium mb-1">Name</label><input type="text" id="studentName" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Roll (6 Digits)</label><input type="text" id="studentRoll" required maxlength="6" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Session / Batch</label><input type="text" id="studentSession" required placeholder="e.g., 2023-24" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
+<!-- ✅ FIX: Added Joining Date field that was missing -->
 <div class="grid grid-cols-2 gap-2">
-<div><label class="block text-sm font-medium mb-1">Monthly Fee</label><input type="number" id="studentMonthlyFee" value="1500" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
+<div><label class="block text-sm font-medium mb-1">Joining Date</label><input type="date" id="studentJoiningDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Cycle Start</label><input type="date" id="studentStartDate" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 </div>
+<div><label class="block text-sm font-medium mb-1">Monthly Fee</label><input type="number" id="studentMonthlyFee" value="1500" required class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">Email</label><input type="email" id="studentEmail" placeholder="student@example.com" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Register Student</button>
 </form>
@@ -136,7 +133,6 @@
 </tr></thead><tbody id="studentTableBody" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </section>
-
 <!-- ATTENDANCE HISTORY -->
 <section id="recordsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -176,7 +172,6 @@
 </div>
 </div>
 </section>
-
 <!-- STATISTICS -->
 <section id="statsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -210,7 +205,6 @@
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Present</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Late</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Absent</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Leave</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Rate</th></tr></thead><tbody id="statsTableBody" class="divide-y divide-slate-100"><tr><td colspan="7" class="text-center py-6 text-slate-400">Generate analysis first.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- FEE MANAGEMENT -->
 <section id="feesTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -262,13 +256,11 @@
 </div>
 </div>
 </section>
-
 <!-- PENALTY MANAGEMENT -->
 <section id="penaltyTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
 <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="alert-circle" class="text-indigo-600"></i> Penalty Management</h2>
 <p class="text-slate-500 text-sm mb-4">Configure automatic penalties. Penalties are added to monthly dues if not paid or exempted separately.</p>
-
 <!-- Batch Config -->
 <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 mb-6">
 <h3 class="text-lg font-bold mb-3 text-indigo-800">Batch-wise Penalty Configuration</h3>
@@ -279,7 +271,6 @@
 </div>
 <button onclick="savePenaltyConfig()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">Save Configuration</button>
 </div>
-
 <!-- Manual Penalty -->
 <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6">
 <h3 class="text-lg font-bold mb-3 text-slate-800">Add Manual Penalty</h3>
@@ -291,7 +282,6 @@
 <button type="submit" class="md:col-span-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Add Penalty</button>
 </form>
 </div>
-
 <!-- Student Penalty Ledger -->
 <div class="bg-white p-4 rounded-lg border border-slate-200 mb-6">
 <h3 class="text-lg font-bold mb-3 text-slate-800">Student Penalty Ledger</h3>
@@ -304,6 +294,34 @@
 <div><span class="text-sm text-slate-500">Student:</span><span id="penaltySearchStudentName" class="font-bold text-indigo-600 text-lg ml-2"></span></div>
 <div><span class="text-sm text-slate-500">Total Penalty Due:</span><span id="penaltySearchTotalDue" class="font-bold text-rose-600 text-lg ml-2"></span></div>
 </div>
+<!-- ✅ NEW: Consolidated Penalty Summary & Bulk Actions -->
+<div id="penaltyConsolidatedSummary" class="hidden mb-4">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+<div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-center">
+<p class="text-xs text-slate-400 font-semibold uppercase">Total Penalty</p>
+<p id="penConsTotalAmount" class="text-lg font-bold text-slate-800">৳0</p>
+</div>
+<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+<p class="text-xs text-emerald-500 font-semibold uppercase">Total Paid</p>
+<p id="penConsTotalPaid" class="text-lg font-bold text-emerald-600">৳0</p>
+</div>
+<div class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
+<p class="text-xs text-blue-500 font-semibold uppercase">Total Exempted</p>
+<p id="penConsTotalExempted" class="text-lg font-bold text-blue-600">৳0</p>
+</div>
+<div class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-center">
+<p class="text-xs text-rose-500 font-semibold uppercase">Net Due</p>
+<p id="penConsNetDue" class="text-lg font-bold text-rose-600">৳0</p>
+</div>
+</div>
+<div id="penaltyBulkActions" class="hidden flex flex-wrap gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+<span class="text-sm font-semibold text-amber-800 self-center mr-2">Bulk Action on ৳<span id="penBulkDueAmount">0</span> due:</span>
+<button onclick="bulkPayAllPenalties()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Pay All Due</button>
+<button onclick="bulkExemptAllPenalties()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Exempt All Due</button>
+<button onclick="bulkPartialPenalties()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1"><i data-lucide="scissors" class="w-3.5 h-3.5"></i> Partial Action</button>
+</div>
+</div>
+<!-- End Consolidated Summary -->
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
 <thead class="bg-slate-50"><tr>
 <th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th>
@@ -318,7 +336,6 @@
 <tbody id="studentPenaltyLedgerBody" class="divide-y divide-slate-100"><tr><td colspan="8" class="text-center py-6 text-slate-400">Search a roll to view penalty ledger.</td></tr></tbody>
 </table></div>
 </div>
-
 <!-- Batch Penalty Ledger -->
 <div class="bg-white p-4 rounded-lg border border-slate-200">
 <h3 class="text-lg font-bold mb-3 text-slate-800">Batch Penalty Ledger</h3>
@@ -341,7 +358,6 @@
 </div>
 </div>
 </section>
-
 <!-- EXPENSE MANAGEMENT -->
 <section id="expenseTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -362,7 +378,11 @@
 <div><label class="block text-sm font-medium mb-1">Batch</label><select id="collectionBatch" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></select></div>
 <div><label class="block text-sm font-medium mb-1">From Date</label><input type="date" id="collectionFromDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
 <div><label class="block text-sm font-medium mb-1">To Date</label><input type="date" id="collectionToDate" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"></div>
-<div class="flex items-end"><button onclick="generateCollectionReport()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Generate Report</button></div>
+<div class="flex items-end gap-2">
+<button onclick="generateCollectionReport()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Generate</button>
+<!-- ✅ NEW: Print Collection Report Button -->
+<button onclick="printCollectionReport()" id="btnPrintCollection" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 px-3 rounded-lg transition flex items-center gap-1"><i data-lucide="printer" class="w-4 h-4"></i> Print</button>
+</div>
 </div>
 <div id="collectionSummaryCards" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 hidden">
 <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center"><p class="text-xs text-emerald-600 font-semibold uppercase">Total Expected</p><p id="collectionTotalExpected" class="text-2xl font-bold text-emerald-700">৳0</p></div>
@@ -394,7 +414,6 @@
 </div>
 </div>
 </section>
-
 <!-- RESULT MANAGEMENT -->
 <section id="resultTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -430,7 +449,6 @@
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Exam</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Full Marks</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th></tr></thead><tbody id="resExamsBody" class="divide-y divide-slate-100"><tr><td colspan="5" class="text-center py-4 text-slate-400">No exams.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- ACTIVITY LOGS -->
 <section id="logsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -444,7 +462,6 @@
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Time</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Inputter</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Student</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Batch</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th></tr></thead><tbody id="logsTableBody" class="divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-6 text-slate-400">Apply filters.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- USER MANAGEMENT -->
 <section id="usersTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -464,10 +481,8 @@
 </div>
 </div>
 </section>
-
 </main>
 </div>
-
 <!-- MODALS -->
 <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
@@ -479,7 +494,6 @@
 <div class="flex justify-end gap-2"><button onclick="closeEditModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
 </div>
 </div>
-
 <div id="editInputterModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
 <h3 class="text-lg font-bold">Edit Inputter</h3>
@@ -490,7 +504,6 @@
 <div class="flex justify-end gap-2"><button onclick="closeEditInputterModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditInputter()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
 </div>
 </div>
-
 <div id="editStudentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
 <h3 class="text-lg font-bold">Edit Student</h3>
@@ -504,7 +517,6 @@
 <div class="flex justify-end gap-2"><button onclick="closeEditStudentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditStudent()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
 </div>
 </div>
-
 <div id="viewStudentFinanceModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl border border-slate-100 flex flex-col max-h-[85vh]">
 <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -547,7 +559,6 @@
 <div class="flex justify-end gap-2 border-t pt-3 mt-4"><button onclick="closeStudentFinanceModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 text-sm font-semibold">Close</button></div>
 </div>
 </div>
-
 <div id="editPaymentModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
 <h3 class="text-lg font-bold">Edit Payment</h3>
@@ -558,7 +569,6 @@
 <div class="flex justify-end gap-2"><button onclick="closeEditPaymentModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button><button onclick="saveEditPayment()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Save</button></div>
 </div>
 </div>
-
 <!-- Penalty Action Modal -->
 <div id="penaltyActionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
@@ -577,11 +587,27 @@
 </div>
 </div>
 </div>
-
+<!-- ✅ NEW: Bulk Penalty Action Modal -->
+<div id="bulkPenaltyModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+<div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
+<h3 class="text-lg font-bold" id="bulkPenaltyTitle">Bulk Penalty Action</h3>
+<p class="text-sm text-slate-600">Student: <strong id="bulkPenaltyStudentName"></strong></p>
+<p class="text-sm text-slate-600">Total Due: <strong id="bulkPenaltyTotalDue" class="text-rose-600"></strong> BDT</p>
+<input type="hidden" id="bulkPenaltyActionType">
+<div>
+<label class="block text-sm font-medium mb-1" id="bulkPenaltyAmountLabel">Amount (BDT)</label>
+<input type="number" id="bulkPenaltyAmount" class="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter amount">
+</div>
+<p class="text-xs text-slate-400" id="bulkPenaltyHint"></p>
+<div class="flex justify-end gap-2">
+<button onclick="closeBulkPenaltyModal()" class="border px-4 py-2 rounded-lg hover:bg-slate-50 font-semibold">Cancel</button>
+<button onclick="executeBulkPenaltyAction()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">Apply to All</button>
+</div>
+</div>
+</div>
 <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
 <p>Developed by: <a href="https://shad.iam.bd" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">Shahrim Ahammed Shad</a></p>
 </footer>
-
 <script>
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -595,7 +621,6 @@ appId: "1:625341651770:web:6e644bad3641532c33ce03"
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
 const resultFirebaseConfig = {
 apiKey: "AIzaSyBxxDm2MoiqMcKVknuffitT4wBPku0HKn0",
 authDomain: "result-13-ba007.firebaseapp.com",
@@ -608,12 +633,10 @@ const RESULT_ADMIN_EMAIL = "admin@coaching.local";
 const RESULT_ADMIN_PASSWORD = "752002";
 let resultApp = null, resultDb = null, resultAuth = null, resultReady = false;
 let resExamsCache = [], resResultsCache = [];
-
 const EMAILJS_PUBLIC_KEY = "7yXgdy5svbfIHI1SM";
 const EMAILJS_SERVICE_ID = "service_4kyubba";
 const EMAILJS_TEMPLATE_ID = "template_mtzibwy";
 emailjs.init(EMAILJS_PUBLIC_KEY);
-
 async function sendAttendanceEmail(student, date, status) {
 if (!student.email || student.email.trim() === "") return false;
 try {
@@ -624,7 +647,6 @@ session: student.session, date: date, status: status
 return true;
 } catch(e) { console.error("Email failed:", e); return false; }
 }
-
 let currentUser = null, currentUserRole = null, currentUserAssignedSession = null;
 let studentsCache = [], sessionsCache = [], currentlyMarkingSessionStudents = [];
 let queriedRecords = [], queriedStats = [];
@@ -634,6 +656,12 @@ let queriedPayments = [], activeLedgerMonth = '', activeLedgerBatch = '';
 let financeStudentTransactions = [], financeStudentAdjustments = [], selectedFinanceStudentRoll = '';
 let earningsCacheByMonth = {};
 let penaltyConfigCache = {};
+// ✅ NEW: Cache for current penalty search results
+let currentStudentPenalties = [];
+let currentPenaltyStudentRoll = '';
+// ✅ NEW: Cache for collection report data
+let collectionReportData = [];
+let collectionReportMeta = {};
 
 window.addEventListener('DOMContentLoaded', () => {
 initIcons(); setDefaultDates(); initResultFirebase();
@@ -648,7 +676,6 @@ if (role === 'admin') { syncInputters(); syncMonthlyEarnings(); loadAllPenaltyCo
 } else showLoginScreen();
 });
 });
-
 function initIcons() { lucide.createIcons(); }
 function setDefaultDates() {
 const today = new Date().toISOString().split('T')[0];
@@ -659,7 +686,6 @@ const cm = new Date().toISOString().substring(0, 7);
 const feeMonthInput = document.getElementById('feeMonthInput'); if (feeMonthInput) feeMonthInput.value = cm;
 const feeLedgerMonth = document.getElementById('feeLedgerMonth'); if (feeLedgerMonth) feeLedgerMonth.value = cm;
 }
-
 async function initResultFirebase() {
 const statusEl = document.getElementById('resultConnectionStatus');
 try {
@@ -674,7 +700,6 @@ await loadResultData();
 if (statusEl) { statusEl.textContent = "⚠️ Result Portal: " + e.message; statusEl.className = "p-3 bg-rose-50 border border-rose-200 rounded-lg text-sm text-rose-700 mb-4"; }
 }
 }
-
 async function loadResultData() {
 if (!resultDb) return;
 try {
@@ -688,20 +713,17 @@ renderResultExams();
 renderResultExamOptions();
 } catch(e) { console.error("Result data load error:", e); }
 }
-
 function renderResultExams() {
 const c = document.getElementById('resExamsBody');
 if (!c) return;
 if (!resExamsCache.length) { c.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400">No exams.</td></tr>'; return; }
 c.innerHTML = resExamsCache.map(e => `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${e.name}</td><td class="px-4 py-3 text-slate-500">${e.date}</td><td class="px-4 py-3 text-center font-semibold">${e.fullMarks}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${e.published ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'}">${e.published ? 'Published' : 'Draft'}</span></td><td class="px-4 py-3 text-center space-x-1"><button onclick="toggleResultExamPublish('${e.id}')" class="text-indigo-600 text-xs font-semibold">${e.published ? 'Unpublish' : 'Publish'}</button><button onclick="deleteResultExam('${e.id}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`).join("");
 }
-
 function renderResultExamOptions() {
 const sel = document.getElementById('resExamSelect');
 if (!sel) return;
 sel.innerHTML = '<option value="">-- Select --</option>' + resExamsCache.map(e => `<option value="${e.id}">${e.name} (${e.date})</option>`).join("");
 }
-
 async function saveResultExam() {
 const name = document.getElementById('resExamName').value.trim();
 const date = document.getElementById('resExamDate').value;
@@ -717,7 +739,6 @@ document.getElementById('resExamName').value = ""; document.getElementById('resF
 await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function toggleResultExamPublish(id) {
 const exam = resExamsCache.find(e => e.id === id);
 if (!exam || !resultReady) return;
@@ -726,7 +747,6 @@ await resultDb.collection('exams').doc(id).update({ published: !exam.published }
 await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function deleteResultExam(id) {
 if (!confirm("Delete exam and all results?")) return;
 if (!resultReady) return;
@@ -737,7 +757,6 @@ await Promise.all(related.map(r => resultDb.collection('results').doc(r.id).dele
 await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function saveResultEntry() {
 const examId = document.getElementById('resExamSelect').value;
 const roll = document.getElementById('resRollInput').value.trim();
@@ -757,7 +776,6 @@ document.getElementById('resRollInput').value = ""; document.getElementById('res
 await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function getUserRole(uid) {
 try {
 const userDoc = await db.collection('users').doc(uid).get();
@@ -769,14 +787,12 @@ await db.collection('users').doc(uid).set({ email: currentUser.email, role: assi
 currentUserRole = assignedRole; currentUserAssignedSession = null; return assignedRole;
 } catch(error) { return 'admin'; }
 }
-
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 document.getElementById('loginError').classList.add('hidden');
 try { await auth.signInWithEmailAndPassword(document.getElementById('loginEmail').value.trim(), document.getElementById('loginPassword').value); }
 catch(error) { const el = document.getElementById('loginError'); el.textContent = error.message; el.classList.remove('hidden'); }
 });
-
 function logOut() { auth.signOut(); if (resultAuth) resultAuth.signOut(); showLoginScreen(); }
 function showLoginScreen() { document.getElementById('loginSection').classList.remove('hidden'); document.getElementById('dashboardSection').classList.add('hidden'); currentUser = null; currentUserRole = null; }
 function setupDashboardForRole(role) {
@@ -792,7 +808,6 @@ document.querySelectorAll('aside nav button').forEach(btn => btn.classList.remov
 const activeBtn = document.getElementById(`btn-${tabId}`); if (activeBtn) activeBtn.classList.add('bg-slate-800');
 if (tabId === 'resultTab' && resultReady) loadResultData();
 }
-
 async function syncCache() {
 db.collection('students').onSnapshot(snapshot => {
 studentsCache = []; sessionsCache = new Set();
@@ -814,7 +829,6 @@ if (currentUserRole === 'inputter' && currentUserAssignedSession) {
 bc.classList.add('hidden'); const o = document.createElement('option'); o.value = currentUserAssignedSession; o.textContent = currentUserAssignedSession; o.selected = true; bf.appendChild(o); bf.disabled = true; loadStudentsForBulkMarking();
 } else { bc.classList.remove('hidden'); bf.disabled = false; sorted.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; bf.appendChild(o); }); }
 }
-
 let entryMode = 'individual';
 function toggleEntryMode(mode) {
 entryMode = mode;
@@ -824,7 +838,6 @@ document.getElementById('bulkEmailToggle').classList.toggle('hidden', mode !== '
 document.getElementById('btnModeInd').className = mode === 'individual' ? 'px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600' : 'px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent';
 document.getElementById('btnModeBulk').className = mode === 'bulk' ? 'px-4 py-2 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600' : 'px-4 py-2 font-semibold text-sm text-slate-500 border-b-2 border-transparent';
 }
-
 const singleRollInput = document.getElementById('singleRoll');
 const liveStudentName = document.getElementById('liveStudentName');
 singleRollInput.addEventListener('input', () => {
@@ -837,7 +850,6 @@ else { liveStudentName.textContent = `${m.name} (${m.session})`; liveStudentName
 } else { liveStudentName.textContent = "Roll not found!"; liveStudentName.className = "font-bold text-red-500 text-lg"; }
 } else { liveStudentName.textContent = "Type a valid 6-digit roll..."; liveStudentName.className = "font-bold text-slate-500 text-lg"; }
 });
-
 async function saveIndividualAttendance() {
 const date = document.getElementById('singleDate').value, roll = singleRollInput.value.trim(), status = document.getElementById('singleStatus').value;
 if (!date || roll.length !== 6) { alert("Provide valid date and roll."); return; }
@@ -854,7 +866,6 @@ alert(sent ? "Saved & email sent!" : "Saved!");
 singleRollInput.value = ""; liveStudentName.textContent = "Type a valid 6-digit roll..."; liveStudentName.className = "font-bold text-slate-500 text-lg";
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function addAutomaticPenalty(student, date, status) {
 const config = penaltyConfigCache[student.session];
 if (!config) return;
@@ -869,7 +880,6 @@ timestamp: firebase.firestore.FieldValue.serverTimestamp()
 });
 } catch(e) { console.error("Auto penalty failed:", e); }
 }
-
 async function loadStudentsForBulkMarking() {
 const date = document.getElementById('bulkDate').value, session = document.getElementById('bulkSessionFilter').value, c = document.getElementById('bulkMarkingTableBody');
 if (!date || !session) { c.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-slate-400">Select date and session.</td></tr>'; currentlyMarkingSessionStudents = []; return; }
@@ -883,7 +893,6 @@ const st = existing[s.roll] || "Absent";
 c.innerHTML += `<tr class="hover:bg-slate-50/50"><td class="px-6 py-4 font-semibold">${s.roll}</td><td class="px-6 py-4 font-medium">${s.name}</td><td class="px-6 py-4 text-center"><select data-roll="${s.roll}" class="bulk-status-select border rounded-lg px-3 py-1 bg-white font-medium"><option value="Present" ${st==='Present'?'selected':''}>Present</option><option value="Late" ${st==='Late'?'selected':''}>Late</option><option value="Absent" ${st==='Absent'?'selected':''}>Absent</option><option value="Leave" ${st==='Leave'?'selected':''}>🏖️ Leave</option></select></td></tr>`;
 });
 }
-
 async function saveBulkAttendance() {
 const date = document.getElementById('bulkDate').value, session = document.getElementById('bulkSessionFilter').value;
 if (!date || !session) { alert("Select date and session."); return; }
@@ -920,7 +929,6 @@ alert(`Saved! Emails: ${sent}/${emailQueue.length}`);
 document.getElementById('bulkSessionFilter').value = ""; loadStudentsForBulkMarking();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 document.getElementById('studentForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const name = document.getElementById('studentName').value.trim();
@@ -942,7 +950,6 @@ alert("Student registered & synced!");
 document.getElementById('studentForm').reset(); setDefaultDates();
 } catch(err) { alert("Error: " + err.message); }
 });
-
 function handleExcelUpload() {
 const file = document.getElementById('excelFile').files[0];
 if (!file) { alert("Select a file."); return; }
@@ -978,7 +985,6 @@ document.getElementById('excelFile').value = "";
 };
 reader.readAsArrayBuffer(file);
 }
-
 function renderStudentList() {
 const c = document.getElementById('studentTableBody'), q = document.getElementById('studentSearch').value.toLowerCase().trim();
 c.innerHTML = "";
@@ -991,7 +997,6 @@ c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold
 });
 initIcons();
 }
-
 async function deleteStudent(roll) {
 if (!confirm(`Delete student ${roll}?`)) return;
 try {
@@ -1000,14 +1005,12 @@ if (resultReady) { try { await resultDb.collection('students').doc(roll).delete(
 alert("Deleted.");
 } catch(e) { alert("Error: " + e.message); }
 }
-
 function exportStudentsToExcel() {
 if (!studentsCache.length) { alert("No data."); return; }
 const sorted = [...studentsCache].sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
 const ws = XLSX.utils.json_to_sheet(sorted.map(s => ({ "Roll": s.roll, "Name": s.name, "Session": s.session, "JoiningDate": s.joiningDate || s.startDate || "N/A", "MonthlyFee": s.monthlyFee ?? 1500, "Email": s.email || "" })));
 const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Students"); XLSX.writeFile(wb, "ICC_Students.xlsx");
 }
-
 function exportStudentsToPDF() {
 if (!studentsCache.length) { alert("No data."); return; }
 const { jsPDF } = window.jspdf; const doc = new jsPDF();
@@ -1017,7 +1020,6 @@ const sorted = [...studentsCache].sort((a, b) => parseInt(a.roll) - parseInt(b.r
 doc.autoTable({ startY: 35, head: [['Roll','Name','Session','Joining','Fee','Email']], body: sorted.map(s => [s.roll, s.name, s.session, s.joiningDate || s.startDate || 'N/A', `${s.monthlyFee ?? 1500}`, s.email || '-']), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } });
 doc.save("ICC_Students.pdf");
 }
-
 async function queryAttendanceRecords() {
 const start = document.getElementById('historyStartDate').value, end = document.getElementById('historyEndDate').value, session = document.getElementById('historySessionFilter').value, c = document.getElementById('historyTableBody');
 if (!start || !end) { alert("Select dates."); return; }
@@ -1029,7 +1031,6 @@ queriedRecords.sort((a, b) => a.date.localeCompare(b.date) || a.roll.localeCompa
 renderHistoryTable();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 function renderHistoryTable() {
 const c = document.getElementById('historyTableBody'); c.innerHTML = "";
 if (!queriedRecords.length) { c.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">No records.</td></tr>'; return; }
@@ -1040,21 +1041,18 @@ c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3">${r.date}</t
 });
 initIcons();
 }
-
 function openEditModal(id, name, roll, status) { document.getElementById('editModalDocId').value = id; document.getElementById('editModalName').value = name; document.getElementById('editModalRoll').value = roll; document.getElementById('editModalStatus').value = status; document.getElementById('editModal').classList.remove('hidden'); }
 function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); }
 async function saveEditModal() { const id = document.getElementById('editModalDocId').value, st = document.getElementById('editModalStatus').value; try { await db.collection('attendance').doc(id).update({ status: st }); alert("Updated."); const i = queriedRecords.findIndex(r => r.id === id); if (i !== -1) { queriedRecords[i].status = st; renderHistoryTable(); } closeEditModal(); } catch(e) { alert("Error: " + e.message); } }
 async function deleteAttendanceRecord(id, i) { if (!confirm("Delete?")) return; try { await db.collection('attendance').doc(id).delete(); queriedRecords.splice(i, 1); renderHistoryTable(); } catch(e) { alert("Error: " + e.message); } }
 function exportHistoryExcel() { if (!queriedRecords.length) { alert("No data."); return; } const ws = XLSX.utils.json_to_sheet(queriedRecords.map(r => ({ "Date": r.date, "Roll": r.roll, "Name": r.name, "Session": r.session, "Status": r.status }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "History"); XLSX.writeFile(wb, "Attendance_History.xlsx"); }
 function exportHistoryPDF() { if (!queriedRecords.length) { alert("No data."); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("Ideal Coaching Center", 14, 20); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text("Attendance History", 14, 28); doc.autoTable({ startY: 35, head: [['Date','Roll','Name','Session','Status']], body: queriedRecords.map(r => [r.date, r.roll, r.name, r.session, r.status === 'Leave' ? 'Leave (Approved)' : r.status]), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } }); doc.save("Attendance_History.pdf"); }
-
 const indivRollInput = document.getElementById('indivRollSearch');
 indivRollInput.addEventListener('input', () => {
 const roll = indivRollInput.value.trim(), el = document.getElementById('indivStudentMatchedName');
 if (roll.length === 6) { const m = studentsCache.find(s => s.roll === roll); if (m) { el.textContent = `${m.name} (${m.session})`; el.className = "font-bold text-green-600 text-lg"; indivSelectedStudent = m; } else { el.textContent = "Not found!"; el.className = "font-bold text-red-500 text-lg"; indivSelectedStudent = null; } }
 else { el.textContent = "Type a valid 6-digit roll..."; el.className = "font-bold text-slate-500 text-lg"; indivSelectedStudent = null; }
 });
-
 function isDateOnOrAfterJoining(recordDate, student) {
 let jd = null;
 if (student.joiningDate) { jd = new Date(student.joiningDate); }
@@ -1065,7 +1063,6 @@ const rd = new Date(recordDate);
 if (isNaN(rd.getTime())) return true;
 return rd >= jd;
 }
-
 async function queryIndividualHistory() {
 const rs = document.getElementById('indivHistoryResultSection'), tb = document.getElementById('indivHistoryTableBody');
 if (!indivSelectedStudent) { alert("Enter valid roll."); return; }
@@ -1086,7 +1083,6 @@ tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-6 py-4 font-medium"
 });
 } catch(e) { alert("Error: " + e.message); }
 }
-
 function printMonthlyAttendance() {
 if (!indivSelectedStudent) { alert("Search a student first."); return; }
 const mf = document.getElementById('indivMonthFilter').value;
@@ -1110,7 +1106,6 @@ doc.setFont("helvetica", "normal");
 doc.autoTable({ startY: 62, head: [['Date','Day','Status']], body: recs.map(r => [r.date, new Date(r.date).toLocaleDateString('en', { weekday: 'long' }), r.status === 'Leave' ? 'Leave (Approved)' : r.status]), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } });
 doc.save(`Monthly_Att_${indivSelectedStudent.roll}_${mf}.pdf`);
 }
-
 function exportIndivPDF() {
 if (!indivQueriedRecords.length || !indivSelectedStudent) { alert("No data."); return; }
 const { jsPDF } = window.jspdf; const doc = new jsPDF();
@@ -1120,7 +1115,6 @@ doc.setFontSize(10); doc.text(`Session: ${indivSelectedStudent.session}`, 14, 35
 doc.autoTable({ startY: 42, head: [['Date','Status']], body: indivQueriedRecords.map(r => [r.date, r.status === 'Leave' ? 'Leave (Approved)' : r.status]), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } });
 doc.save(`Attendance_${indivSelectedStudent.roll}.pdf`);
 }
-
 async function generateStatistics() {
 const start = document.getElementById('statsStartDate').value, end = document.getElementById('statsEndDate').value, session = document.getElementById('statsSession').value, c = document.getElementById('statsTableBody');
 if (!start || !end || !session) { alert("All filters required."); return; }
@@ -1161,7 +1155,6 @@ document.getElementById('aiBatchAdvisoryText').textContent = generateAIAdvisory(
 filterStatsTable(); calculateDashHighlights();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 function generateAIAdvisory(stats) {
 if (!stats || !stats.length) return "No data.";
 let low = 0, maxLate = -1, lateLeader = "N/A", tops = [];
@@ -1172,7 +1165,6 @@ if (maxLate > 0) txt += `${lateLeader} has most lates (${maxLate}). `;
 if (tops.length) txt += `Perfect: ${tops.slice(0, 3).join(', ')}.`;
 return txt;
 }
-
 function filterStatsTable() {
 const q = document.getElementById('statsSearch').value.toLowerCase().trim(), criteria = document.getElementById('statsCriteriaFilter').value, c = document.getElementById('statsTableBody');
 c.innerHTML = "";
@@ -1186,7 +1178,6 @@ if (s.rateNum < 60) { bar = "bg-rose-500"; tc = "text-rose-700 bg-rose-50"; } el
 c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${s.roll}</td><td class="px-4 py-3 font-medium">${s.name}</td><td class="px-4 py-3 text-center text-green-600 font-semibold">${s.present}</td><td class="px-4 py-3 text-center text-amber-600 font-semibold">${s.late}</td><td class="px-4 py-3 text-center text-rose-600 font-semibold">${s.absent}</td><td class="px-4 py-3 text-center text-purple-600 font-semibold">${s.leave}</td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-20 bg-slate-200 h-2 rounded-full overflow-hidden hidden sm:block"><div class="${bar} h-full" style="width:${Math.min(s.rateNum,100)}%"></div></div><span class="px-2 py-1 text-xs font-bold rounded-lg ${tc}">${s.rate}</span></div></td></tr>`;
 });
 }
-
 function calculateDashHighlights() {
 if (!queriedStats.length) return;
 let maxP = -1, tops = [], minP = Infinity, least = [], maxL = -1, lates = [];
@@ -1202,16 +1193,13 @@ const lap = document.getElementById('statLeastAttenderPresents'); if (lap) lap.t
 const ml = document.getElementById('statMostLate'); if (ml) ml.textContent = maxL > 0 ? lates.join(", ") : "None";
 const mlc = document.getElementById('statMostLateCount'); if (mlc) mlc.textContent = `Lates: ${maxL}`;
 }
-
 function exportStatsExcel() { if (!queriedStats.length) { alert("Run first."); return; } const sorted = [...queriedStats].sort((a, b) => a.rateNum - b.rateNum); const ws = XLSX.utils.json_to_sheet(sorted.map(s => ({ "Roll": s.roll, "Name": s.name, "Present": s.present, "Late": s.late, "Absent": s.absent, "Leave": s.leave, "Rate": s.rate }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Stats"); XLSX.writeFile(wb, `Stats_${statsCycleDetails.session}.xlsx`); }
 function exportStatsPDF() { if (!queriedStats.length) { alert("Run first."); return; } const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("Ideal Coaching Center", 14, 20); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Analytics - ${statsCycleDetails.session}`, 14, 28); doc.setFontSize(10); doc.text(`Cycle: ${statsCycleDetails.start} to ${statsCycleDetails.end}`, 14, 35); const sorted = [...queriedStats].sort((a, b) => a.rateNum - b.rateNum); doc.autoTable({ startY: 42, head: [['Roll','Name','Present','Late','Absent','Leave','Rate']], body: sorted.map(s => [s.roll, s.name, s.present, s.late, s.absent, s.leave, s.rate]), theme: 'grid', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } }); doc.save(`Stats_${statsCycleDetails.session}.pdf`); }
-
 const feeRollInput = document.getElementById('feeRollInput');
 const feeStudentMatchedName = document.getElementById('feeStudentMatchedName');
 const feeStudentDuesGuide = document.getElementById('feeStudentDuesGuide');
 const feeStudentDuesDetails = document.getElementById('feeStudentDuesDetails');
 let feeSelectedStudent = null;
-
 feeRollInput.addEventListener('input', async () => {
 const roll = feeRollInput.value.trim();
 if (roll.length === 6) {
@@ -1227,7 +1215,6 @@ else { feeStudentDuesDetails.textContent = `${bal.netDues} BDT Due`; feeStudentD
 } else { feeStudentMatchedName.textContent = "Type roll..."; feeStudentMatchedName.className = "font-bold text-slate-500 text-xs"; feeStudentDuesGuide.classList.add('hidden'); feeSelectedStudent = null; }
 });
 document.getElementById('feeMonthInput').addEventListener('change', () => { if (feeSelectedStudent) feeRollInput.dispatchEvent(new Event('input')); });
-
 document.getElementById('collectFeeForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const month = document.getElementById('feeMonthInput').value, amount = parseFloat(document.getElementById('feeAmountInput').value), date = document.getElementById('feeDateInput').value, feeType = document.getElementById('feeTypeInput').value;
@@ -1244,9 +1231,7 @@ feeStudentDuesGuide.classList.add('hidden'); setDefaultDates();
 if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger();
 } catch(e) { alert("Error: " + e.message); }
 });
-
 async function fetchStudentAdjustments(roll) { let adj = {}; try { const snap = await db.collection('adjustments').where('roll','==',roll).get(); snap.forEach(d => { const data = d.data(); adj[data.month] = data; }); } catch(e) {} return adj; }
-
 function calculateCurrentMonthBill(student, targetMonth, adjustments) {
 const fee = student.monthlyFee ?? 1500;
 const startDate = new Date(student.startDate || student.joiningDate);
@@ -1265,7 +1250,6 @@ else if (adj.type === "Partial Waiver" || adj.type === "Discount") return Math.m
 }
 return fee;
 }
-
 async function calculateStudentOutstandingBalance(roll, targetMonth) {
 const student = studentsCache.find(s => s.roll === roll);
 if (!student) return { expectedTuition: 0, totalPaid: 0, netDues: 0, currentMonthBill: 0, penaltyDue: 0 };
@@ -1301,7 +1285,6 @@ try { const snap = await db.collection('payments').where('roll','==',roll).get()
 const currentMonthBill = calculateCurrentMonthBill(student, targetMonth, adjustments);
 return { expectedTuition: expected, totalPaid, netDues: expected + penaltyDue - totalPaid, currentMonthBill, penaltyDue };
 }
-
 async function queryFeeLedger() {
 const batch = document.getElementById('feeBatchFilter').value, month = document.getElementById('feeLedgerMonth').value, c = document.getElementById('feeLedgerTableBody');
 if (!batch || !month) { alert("Select batch and month."); return; }
@@ -1359,7 +1342,6 @@ document.getElementById('feeLedgerSearch').value = '';
 renderFeeLedgerTable(queriedPayments);
 } catch(e) { alert("Error: " + e.message); }
 }
-
 function renderFeeLedgerTable(data) {
 const c = document.getElementById('feeLedgerTableBody'); c.innerHTML = "";
 if (!data.length) { c.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">No records.</td></tr>'; return; }
@@ -1374,7 +1356,6 @@ c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold
 });
 initIcons();
 }
-
 function updateLedgerSummary(data) {
 const tb = data.reduce((s, p) => s + p.currentMonthBill, 0);
 const tc = data.reduce((s, p) => s + p.totalPaid, 0);
@@ -1383,7 +1364,6 @@ const el1 = document.getElementById('ledgerTotalBilled'); if (el1) el1.textConte
 const el2 = document.getElementById('ledgerTotalCollected'); if (el2) el2.textContent = '৳' + tc.toLocaleString();
 const el3 = document.getElementById('ledgerTotalDue'); if (el3) el3.textContent = '৳' + td.toLocaleString();
 }
-
 function filterFeeLedger() {
 const q = document.getElementById('feeLedgerSearch').value.toLowerCase().trim();
 const sf = document.getElementById('feeStatusFilter').value;
@@ -1394,9 +1374,7 @@ if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.rol
 renderFeeLedgerTable(filtered);
 updateLedgerSummary(filtered);
 }
-
 function quickCollectFee(roll) { const s = studentsCache.find(x => x.roll === roll); if (s) { document.getElementById('feeRollInput').value = s.roll; document.getElementById('feeRollInput').dispatchEvent(new Event('input')); document.getElementById('feeMonthInput').value = activeLedgerMonth; document.getElementById('feeRollInput').focus(); } }
-
 async function viewStudentFinanceCard(roll) {
 selectedFinanceStudentRoll = roll;
 const s = studentsCache.find(x => x.roll === roll); if (!s) return;
@@ -1412,14 +1390,12 @@ await reloadStudentFinanceTable();
 await reloadStudentAdjustmentsTable();
 document.getElementById('viewStudentFinanceModal').classList.remove('hidden');
 }
-
 function switchFinanceTab(tab) {
 const bp = document.getElementById('btnFinPayments'), ba = document.getElementById('btnFinAdjustments');
 const vp = document.getElementById('financePaymentsView'), va = document.getElementById('financeAdjustmentsView');
 if (tab === 'payments') { bp.className = "px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600"; ba.className = "px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent"; vp.classList.remove('hidden'); va.classList.add('hidden'); }
 else { ba.className = "px-4 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600"; bp.className = "px-4 py-2 font-bold text-sm text-slate-500 border-b-2 border-transparent"; vp.classList.add('hidden'); va.classList.remove('hidden'); document.getElementById('adjMonth').value = new Date().toISOString().substring(0, 7); updateAdjustmentAmountCalculation(); }
 }
-
 async function reloadStudentFinanceTable() {
 const tb = document.getElementById('studentFinanceTableBody');
 tb.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-400">Loading...</td></tr>';
@@ -1436,7 +1412,6 @@ tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-2">${t.payment
 initIcons();
 } catch(e) { tb.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Error</td></tr>'; }
 }
-
 async function reloadStudentAdjustmentsTable() {
 const tb = document.getElementById('studentAdjustmentsTableBody');
 tb.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-slate-400">Loading...</td></tr>';
@@ -1452,24 +1427,18 @@ tb.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-2 py-1 font-semibol
 initIcons();
 } catch(e) { tb.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Error</td></tr>'; }
 }
-
 function closeStudentFinanceModal() { document.getElementById('viewStudentFinanceModal').classList.add('hidden'); selectedFinanceStudentRoll = ''; }
 function openEditPaymentModal(id) { const p = financeStudentTransactions.find(t => t.id === id); if (!p) return; document.getElementById('editPaymentId').value = id; document.getElementById('editPaymentType').value = p.feeType || 'Tuition Fee'; document.getElementById('editPaymentMonth').value = p.month; document.getElementById('editPaymentAmount').value = p.amount; document.getElementById('editPaymentModal').classList.remove('hidden'); }
 function closeEditPaymentModal() { document.getElementById('editPaymentModal').classList.add('hidden'); }
 async function saveEditPayment() { const id = document.getElementById('editPaymentId').value, feeType = document.getElementById('editPaymentType').value, month = document.getElementById('editPaymentMonth').value, amount = parseFloat(document.getElementById('editPaymentAmount').value); const s = studentsCache.find(x => x.roll === selectedFinanceStudentRoll); const fee = s ? (s.monthlyFee ?? 1500) : 1500; let status = feeType === 'Tuition Fee' ? (amount >= fee ? 'Paid' : amount > 0 ? 'Partial' : 'Unpaid') : (amount > 0 ? 'Paid' : 'Unpaid'); try { await db.collection('payments').doc(id).update({ feeType, month, amount, status }); alert("Updated."); closeEditPaymentModal(); await reloadStudentFinanceTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } }
 async function deletePaymentTransaction(id) { if (!confirm("Delete?")) return; try { await db.collection('payments').doc(id).delete(); alert("Deleted."); await reloadStudentFinanceTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } }
-
 function updateAdjustmentAmountCalculation() { const type = document.getElementById('adjType').value, amtEl = document.getElementById('adjAmount'); const s = studentsCache.find(x => x.roll === selectedFinanceStudentRoll); const fee = s ? (s.monthlyFee ?? 1500) : 1500; if (type === 'Hold' || type === 'Full Waiver') { amtEl.value = fee; amtEl.disabled = true; } else { amtEl.disabled = false; amtEl.value = ""; } }
-
 document.getElementById('applyAdjustmentForm').addEventListener('submit', async (e) => { e.preventDefault(); const month = document.getElementById('adjMonth').value, type = document.getElementById('adjType').value, amount = parseFloat(document.getElementById('adjAmount').value) || 0, note = document.getElementById('adjNote').value.trim(); const s = studentsCache.find(x => x.roll === selectedFinanceStudentRoll); if (!s) return; try { await db.collection('adjustments').doc(`${selectedFinanceStudentRoll}_${month}`).set({ roll: selectedFinanceStudentRoll, session: s.session, month, type, amount, note, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); alert("Applied!"); document.getElementById('applyAdjustmentForm').reset(); updateAdjustmentAmountCalculation(); await reloadStudentAdjustmentsTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } });
 async function deleteAdjustment(id) { if (!confirm("Delete exemption?")) return; try { await db.collection('adjustments').doc(id).delete(); alert("Deleted."); await reloadStudentAdjustmentsTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } }
-
 function syncMonthlyEarnings() { if (currentUserRole !== 'admin') return; db.collection('payments').onSnapshot(snap => { earningsCacheByMonth = {}; snap.forEach(d => { const p = d.data(); if (p.month) earningsCacheByMonth[p.month] = (earningsCacheByMonth[p.month] || 0) + (Number(p.amount) || 0); }); renderEarningsSummary(); }); }
 function renderEarningsSummary() { const c = document.getElementById('monthlyEarningsContainer'); if (!c) return; c.innerHTML = ""; const months = Object.keys(earningsCacheByMonth).sort((a, b) => b.localeCompare(a)); if (!months.length) { c.innerHTML = '<div class="text-sm text-slate-400">No payments.</div>'; return; } months.slice(0, 4).forEach(m => { c.innerHTML += `<div class="p-4 bg-slate-50 border border-slate-100 rounded-lg"><p class="text-xs text-slate-400 font-semibold uppercase">${m}</p><p class="text-lg font-bold text-indigo-600 mt-1">${earningsCacheByMonth[m].toLocaleString()} BDT</p></div>`; }); }
-
 function exportLedgerExcel() { if (!queriedPayments.length) { alert("Query first."); return; } const q = document.getElementById('feeLedgerSearch').value.toLowerCase().trim(); const sf = document.getElementById('feeStatusFilter').value; let data = queriedPayments; if (sf !== 'all') data = data.filter(p => p.status === sf); if (q) data = data.filter(p => p.name.toLowerCase().includes(q) || p.roll.includes(q)); if (!data.length) { alert("No matching records."); return; } const ws = XLSX.utils.json_to_sheet(data.map(p => ({ Roll: p.roll, Name: p.name, "Current Month Billed": p.currentMonthBill, "Total Paid (All Time)": p.totalPaid, "Accumulated Due": p.netDues, Status: p.status }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Ledger"); XLSX.writeFile(wb, `Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.xlsx`); }
 function exportLedgerPDF() { if (!queriedPayments.length) { alert("Query first."); return; } const q = document.getElementById('feeLedgerSearch').value.toLowerCase().trim(); const sf = document.getElementById('feeStatusFilter').value; let data = queriedPayments; if (sf !== 'all') data = data.filter(p => p.status === sf); if (q) data = data.filter(p => p.name.toLowerCase().includes(q) || p.roll.includes(q)); if (!data.length) { alert("No matching records."); return; } const tc = data.reduce((s, p) => s + p.totalPaid, 0), td = data.reduce((s, p) => s + Math.max(0, p.netDues), 0); const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("Ideal Coaching Center", 14, 20); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Fee Ledger - ${activeLedgerBatch}`, 14, 28); doc.setFontSize(10); doc.text(`Month: ${activeLedgerMonth}`, 14, 35); let iy = 41; if (q) { doc.text(`Search: "${q}"`, 14, iy); iy += 6; } if (sf !== 'all') { doc.text(`Filter: ${sf}`, 14, iy); iy += 6; } doc.text(`Total Collected: ${tc.toLocaleString()} BDT | Total Due: ${td.toLocaleString()} BDT`, 14, iy); doc.autoTable({ startY: iy + 6, head: [['Roll','Name','Billed (This Month)','Paid (All Time)','Due','Status']], body: data.map(p => [p.roll, p.name, p.currentMonthBill + ' BDT', p.totalPaid + ' BDT', p.netDues > 0 ? p.netDues + ' BDT' : (p.netDues < 0 ? Math.abs(p.netDues) + ' (Adv)' : '0'), p.status]), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } }); doc.save(`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.pdf`); }
-
 async function loadAllPenaltyConfigs() {
 try {
 const snap = await db.collection('penaltyConfig').get();
@@ -1477,7 +1446,6 @@ penaltyConfigCache = {};
 snap.forEach(d => { penaltyConfigCache[d.id] = d.data(); });
 } catch(e) { console.error("Error loading penalty configs:", e); }
 }
-
 async function loadPenaltyConfig() {
 const batch = document.getElementById('penaltyBatchSelect').value;
 if (!batch) return;
@@ -1494,7 +1462,6 @@ document.getElementById('penaltyPerLate').value = 0;
 }
 } catch(e) { console.error("Error loading penalty config:", e); }
 }
-
 async function savePenaltyConfig() {
 const batch = document.getElementById('penaltyBatchSelect').value;
 const penaltyPerAbsence = parseFloat(document.getElementById('penaltyPerAbsence').value) || 0;
@@ -1509,7 +1476,6 @@ penaltyConfigCache[batch] = { penaltyPerAbsence, penaltyPerLate };
 alert("Penalty configuration saved!");
 } catch(e) { alert("Error saving penalty config: " + e.message); }
 }
-
 document.getElementById('manualPenaltyForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const roll = document.getElementById('manualPenaltyRoll').value.trim();
@@ -1530,19 +1496,17 @@ document.getElementById('manualPenaltyForm').reset();
 setDefaultDates();
 } catch(e) { alert("Error: " + e.message); }
 });
-
 async function searchStudentPenalties() {
 const roll = document.getElementById('penaltySearchRoll').value.trim();
 if (roll.length !== 6) { alert("Enter a valid 6-digit roll."); return; }
 const student = studentsCache.find(s => s.roll === roll);
 if (!student) { alert("Student not found."); return; }
-
 const c = document.getElementById('studentPenaltyLedgerBody');
 c.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Loading...</td></tr>';
-
+currentPenaltyStudentRoll = roll;
 try {
 const snap = await db.collection('penalties').where('roll', '==', roll).get();
-let penalties = [];
+currentStudentPenalties = [];
 snap.forEach(d => {
 const data = d.data();
 data.id = d.id;
@@ -1551,41 +1515,59 @@ data.dueAmount = data.amount;
 data.paidAmount = 0;
 data.exemptedAmount = 0;
 }
-penalties.push(data);
+currentStudentPenalties.push(data);
 });
-penalties.sort((a, b) => b.date.localeCompare(a.date));
-
+currentStudentPenalties.sort((a, b) => b.date.localeCompare(a.date));
 document.getElementById('penaltySearchStudentName').textContent = `${student.name} (${student.roll})`;
 document.getElementById('penaltySearchResultInfo').classList.remove('hidden');
-
-renderStudentPenaltyLedger(penalties);
+renderStudentPenaltyLedger(currentStudentPenalties);
 } catch(e) {
 alert("Error: " + e.message);
 }
 }
-
 function renderStudentPenaltyLedger(penalties) {
 const c = document.getElementById('studentPenaltyLedgerBody');
 c.innerHTML = "";
+// ✅ NEW: Calculate consolidated totals
+let totalAmount = 0, totalPaid = 0, totalExempted = 0, totalDue = 0;
+penalties.forEach(p => {
+totalAmount += (p.amount || 0);
+totalPaid += (p.paidAmount || 0);
+totalExempted += (p.exemptedAmount || 0);
+totalDue += (p.dueAmount || 0);
+});
+// Show/hide consolidated summary
+const summaryEl = document.getElementById('penaltyConsolidatedSummary');
+const bulkActionsEl = document.getElementById('penaltyBulkActions');
+if (penalties.length > 0) {
+summaryEl.classList.remove('hidden');
+document.getElementById('penConsTotalAmount').textContent = '৳' + totalAmount;
+document.getElementById('penConsTotalPaid').textContent = '৳' + totalPaid;
+document.getElementById('penConsTotalExempted').textContent = '৳' + totalExempted;
+document.getElementById('penConsNetDue').textContent = '৳' + totalDue;
+if (totalDue > 0) {
+bulkActionsEl.classList.remove('hidden');
+document.getElementById('penBulkDueAmount').textContent = totalDue;
+} else {
+bulkActionsEl.classList.add('hidden');
+}
+} else {
+summaryEl.classList.add('hidden');
+}
 if (!penalties.length) {
 c.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">No penalties found for this student.</td></tr>';
 document.getElementById('penaltySearchTotalDue').textContent = '0 BDT';
 return;
 }
-
-let totalDue = 0;
 penalties.forEach(p => {
-totalDue += (p.dueAmount || 0);
 let badge = 'bg-rose-100 text-rose-800';
 if (p.status === 'Paid') badge = 'bg-green-100 text-green-800';
 else if (p.status === 'Exempted') badge = 'bg-blue-100 text-blue-800';
 else if (p.status === 'Partial' || p.status === 'Settled') badge = 'bg-amber-100 text-amber-800';
-
 const actions = (p.dueAmount > 0) ? `
 <button onclick="openPenaltyActionModal('${p.id}', 'pay', ${p.amount}, ${p.dueAmount})" class="text-green-600 text-xs font-bold mr-2">Pay</button>
 <button onclick="openPenaltyActionModal('${p.id}', 'exempt', ${p.amount}, ${p.dueAmount})" class="text-indigo-600 text-xs font-bold">Exempt</button>
 ` : '<span class="text-slate-400 text-xs">Settled</span>';
-
 c.innerHTML += `<tr class="hover:bg-slate-50">
 <td class="px-4 py-3">${p.date}</td>
 <td class="px-4 py-3 font-medium">${p.type}</td>
@@ -1600,13 +1582,11 @@ c.innerHTML += `<tr class="hover:bg-slate-50">
 document.getElementById('penaltySearchTotalDue').textContent = totalDue + ' BDT';
 initIcons();
 }
-
 function openPenaltyActionModal(docId, type, originalAmount, currentDue) {
 document.getElementById('penaltyActionDocId').value = docId;
 document.getElementById('penaltyActionType').value = type;
 document.getElementById('penaltyActionOriginalAmount').textContent = originalAmount;
 document.getElementById('penaltyActionCurrentDue').textContent = currentDue;
-
 if (type === 'pay') {
 document.getElementById('penaltyActionTitle').textContent = 'Record Penalty Payment';
 document.getElementById('penaltyActionAmountLabel').textContent = 'Payment Amount (BDT)';
@@ -1617,27 +1597,21 @@ document.getElementById('penaltyActionAmountLabel').textContent = 'Exemption Amo
 document.getElementById('penaltyActionAmount').value = '';
 document.getElementById('penaltyActionModal').classList.remove('hidden');
 }
-
 function closePenaltyActionModal() {
 document.getElementById('penaltyActionModal').classList.add('hidden');
 }
-
 async function savePenaltyAction() {
 const docId = document.getElementById('penaltyActionDocId').value;
 const type = document.getElementById('penaltyActionType').value;
 const actionAmount = parseFloat(document.getElementById('penaltyActionAmount').value);
-
 if (!actionAmount || actionAmount <= 0) { alert("Enter a valid amount."); return; }
-
 try {
 const ref = db.collection('penalties').doc(docId);
 const snap = await ref.get();
 if (!snap.exists) { alert("Record not found."); return; }
-
 const p = snap.data();
 let paid = p.paidAmount || 0;
 let exempt = p.exemptedAmount || 0;
-
 if (type === 'pay') {
 if (paid + actionAmount > p.amount) { alert("Payment exceeds original amount."); return; }
 paid += actionAmount;
@@ -1645,7 +1619,6 @@ paid += actionAmount;
 if (exempt + actionAmount > (p.amount - paid)) { alert("Exemption exceeds remaining due."); return; }
 exempt += actionAmount;
 }
-
 const due = p.amount - paid - exempt;
 let status = "Unpaid";
 if (due <= 0) {
@@ -1655,17 +1628,14 @@ else status = "Settled";
 } else {
 status = "Partial";
 }
-
 await ref.update({
 paidAmount: paid,
 exemptedAmount: exempt,
 dueAmount: due,
 status: status
 });
-
 alert("Penalty updated successfully!");
 closePenaltyActionModal();
-
 if (document.getElementById('penaltySearchRoll').value.trim().length === 6) {
 searchStudentPenalties();
 }
@@ -1674,6 +1644,146 @@ if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger();
 alert("Error: " + e.message);
 }
 }
+
+// ===== ✅ NEW: BULK PENALTY ACTIONS =====
+function bulkPayAllPenalties() {
+if (!currentStudentPenalties.length) return;
+const totalDue = currentStudentPenalties.reduce((s, p) => s + (p.dueAmount || 0), 0);
+if (totalDue <= 0) { alert("No dues to pay."); return; }
+const student = studentsCache.find(s => s.roll === currentPenaltyStudentRoll);
+document.getElementById('bulkPenaltyTitle').textContent = '💰 Pay All Penalties';
+document.getElementById('bulkPenaltyStudentName').textContent = student ? `${student.name} (${student.roll})` : currentPenaltyStudentRoll;
+document.getElementById('bulkPenaltyTotalDue').textContent = totalDue;
+document.getElementById('bulkPenaltyActionType').value = 'pay';
+document.getElementById('bulkPenaltyAmountLabel').textContent = 'Total Payment Amount (BDT)';
+document.getElementById('bulkPenaltyAmount').value = totalDue;
+document.getElementById('bulkPenaltyAmount').max = totalDue;
+document.getElementById('bulkPenaltyHint').textContent = `Enter amount up to ৳${totalDue}. Payment will be distributed across all unpaid penalties (oldest first).`;
+document.getElementById('bulkPenaltyModal').classList.remove('hidden');
+}
+
+function bulkExemptAllPenalties() {
+if (!currentStudentPenalties.length) return;
+const totalDue = currentStudentPenalties.reduce((s, p) => s + (p.dueAmount || 0), 0);
+if (totalDue <= 0) { alert("No dues to exempt."); return; }
+const student = studentsCache.find(s => s.roll === currentPenaltyStudentRoll);
+document.getElementById('bulkPenaltyTitle').textContent = '🛡️ Exempt All Penalties';
+document.getElementById('bulkPenaltyStudentName').textContent = student ? `${student.name} (${student.roll})` : currentPenaltyStudentRoll;
+document.getElementById('bulkPenaltyTotalDue').textContent = totalDue;
+document.getElementById('bulkPenaltyActionType').value = 'exempt';
+document.getElementById('bulkPenaltyAmountLabel').textContent = 'Total Exemption Amount (BDT)';
+document.getElementById('bulkPenaltyAmount').value = totalDue;
+document.getElementById('bulkPenaltyAmount').max = totalDue;
+document.getElementById('bulkPenaltyHint').textContent = `Enter amount up to ৳${totalDue}. Exemption will be distributed across all unpaid penalties (oldest first).`;
+document.getElementById('bulkPenaltyModal').classList.remove('hidden');
+}
+
+function bulkPartialPenalties() {
+if (!currentStudentPenalties.length) return;
+const totalDue = currentStudentPenalties.reduce((s, p) => s + (p.dueAmount || 0), 0);
+if (totalDue <= 0) { alert("No dues."); return; }
+const student = studentsCache.find(s => s.roll === currentPenaltyStudentRoll);
+document.getElementById('bulkPenaltyTitle').textContent = '✂️ Partial Penalty Action';
+document.getElementById('bulkPenaltyStudentName').textContent = student ? `${student.name} (${student.roll})` : currentPenaltyStudentRoll;
+document.getElementById('bulkPenaltyTotalDue').textContent = totalDue;
+document.getElementById('bulkPenaltyActionType').value = 'partial';
+document.getElementById('bulkPenaltyAmountLabel').textContent = 'Payment Amount (BDT) — rest will be exempted';
+document.getElementById('bulkPenaltyAmount').value = '';
+document.getElementById('bulkPenaltyAmount').max = totalDue;
+document.getElementById('bulkPenaltyHint').textContent = `Enter how much the student will PAY. The remaining ৳${totalDue} - payment will be EXEMPTED automatically.`;
+document.getElementById('bulkPenaltyModal').classList.remove('hidden');
+}
+
+function closeBulkPenaltyModal() {
+document.getElementById('bulkPenaltyModal').classList.add('hidden');
+}
+
+async function executeBulkPenaltyAction() {
+const actionType = document.getElementById('bulkPenaltyActionType').value;
+const amount = parseFloat(document.getElementById('bulkPenaltyAmount').value);
+const totalDue = currentStudentPenalties.reduce((s, p) => s + (p.dueAmount || 0), 0);
+if (!amount || amount <= 0) { alert("Enter a valid amount."); return; }
+if (actionType === 'partial' && amount >= totalDue) { alert("Payment must be less than total due for partial action."); return; }
+
+const unpaidPenalties = currentStudentPenalties
+.filter(p => (p.dueAmount || 0) > 0)
+.sort((a, b) => a.date.localeCompare(b.date)); // oldest first
+
+if (!unpaidPenalties.length) { alert("No unpaid penalties."); return; }
+
+try {
+const batch = db.batch();
+let remaining = amount;
+
+if (actionType === 'pay') {
+if (amount > totalDue) { alert("Amount exceeds total due."); return; }
+for (const p of unpaidPenalties) {
+if (remaining <= 0) break;
+const payThis = Math.min(remaining, p.dueAmount);
+const newPaid = (p.paidAmount || 0) + payThis;
+const newDue = p.amount - newPaid - (p.exemptedAmount || 0);
+let status = "Partial";
+if (newDue <= 0) status = newPaid >= p.amount ? "Paid" : "Settled";
+batch.update(db.collection('penalties').doc(p.id), {
+paidAmount: newPaid, dueAmount: Math.max(0, newDue), status
+});
+remaining -= payThis;
+}
+} else if (actionType === 'exempt') {
+if (amount > totalDue) { alert("Amount exceeds total due."); return; }
+for (const p of unpaidPenalties) {
+if (remaining <= 0) break;
+const exemptThis = Math.min(remaining, p.dueAmount);
+const newExempt = (p.exemptedAmount || 0) + exemptThis;
+const newDue = p.amount - (p.paidAmount || 0) - newExempt;
+let status = "Partial";
+if (newDue <= 0) status = newExempt >= p.amount ? "Exempted" : "Settled";
+batch.update(db.collection('penalties').doc(p.id), {
+exemptedAmount: newExempt, dueAmount: Math.max(0, newDue), status
+});
+remaining -= exemptThis;
+}
+} else if (actionType === 'partial') {
+// Pay the entered amount, exempt the rest
+let payRemaining = amount;
+for (const p of unpaidPenalties) {
+const due = p.dueAmount || 0;
+if (due <= 0) continue;
+let payThis = 0, exemptThis = 0;
+if (payRemaining >= due) {
+payThis = due;
+} else {
+payThis = payRemaining;
+exemptThis = due - payThis;
+}
+const newPaid = (p.paidAmount || 0) + payThis;
+const newExempt = (p.exemptedAmount || 0) + exemptThis;
+const newDue = p.amount - newPaid - newExempt;
+let status = "Unpaid";
+if (newDue <= 0) {
+if (newPaid >= p.amount) status = "Paid";
+else if (newExempt >= p.amount) status = "Exempted";
+else status = "Settled";
+} else if (newPaid > 0 || newExempt > 0) {
+status = "Partial";
+}
+batch.update(db.collection('penalties').doc(p.id), {
+paidAmount: newPaid, exemptedAmount: newExempt, dueAmount: Math.max(0, newDue), status
+});
+payRemaining -= payThis;
+}
+}
+
+await batch.commit();
+alert("Bulk penalty action completed successfully!");
+closeBulkPenaltyModal();
+searchStudentPenalties();
+if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger();
+} catch(e) {
+alert("Error: " + e.message);
+}
+}
+// ===== END BULK PENALTY ACTIONS =====
 
 async function queryPenaltyLedger() {
 const batch = document.getElementById('penaltyLedgerBatch').value;
@@ -1702,7 +1812,6 @@ let badge = 'bg-rose-100 text-rose-800';
 if (p.status === 'Paid') badge = 'bg-green-100 text-green-800';
 else if (p.status === 'Exempted') badge = 'bg-blue-100 text-blue-800';
 else if (p.status === 'Partial' || p.status === 'Settled') badge = 'bg-amber-100 text-amber-800';
-
 c.innerHTML += `<tr class="hover:bg-slate-50">
 <td class="px-4 py-3">${p.date}</td>
 <td class="px-4 py-3 font-semibold">${p.roll}</td>
@@ -1715,7 +1824,6 @@ c.innerHTML += `<tr class="hover:bg-slate-50">
 initIcons();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 document.getElementById('expenseForm').addEventListener('submit', async (e) => {
 e.preventDefault();
 const category = document.getElementById('expenseCategory').value;
@@ -1732,7 +1840,6 @@ document.getElementById('expenseForm').reset();
 setDefaultDates();
 } catch(e) { alert("Error: " + e.message); }
 });
-
 async function queryExpenseHistory() {
 const fromDate = document.getElementById('expenseFromDate').value;
 const toDate = document.getElementById('expenseToDate').value;
@@ -1755,7 +1862,6 @@ alert("Error: " + e.message);
 c.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-500">Error loading expenses.</td></tr>';
 }
 }
-
 async function deleteExpense(id) {
 if (!confirm("Delete this expense?")) return;
 try {
@@ -1764,28 +1870,24 @@ alert("Expense deleted.");
 queryExpenseHistory();
 } catch(e) { alert("Error: " + e.message); }
 }
-
 async function generateCollectionReport() {
 const batch = document.getElementById('collectionBatch').value;
 const fromDate = document.getElementById('collectionFromDate').value;
 const toDate = document.getElementById('collectionToDate').value;
 if (!batch || !fromDate || !toDate) { alert("Select batch and date range."); return; }
-
 const c = document.getElementById('collectionReportBody');
 c.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-slate-400">Loading...</td></tr>';
 document.getElementById('collectionSummaryCards').classList.add('hidden');
-
+document.getElementById('btnPrintCollection').classList.add('hidden');
 try {
 const batchStudents = studentsCache.filter(s => s.session === batch);
 if (!batchStudents.length) {
 c.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-500">No students in this batch.</td></tr>';
 return;
 }
-
 const from = new Date(fromDate);
 const to = new Date(toDate);
 if (from > to) { alert("Invalid date range."); return; }
-
 const monthsInRange = [];
 let cursor = new Date(from.getFullYear(), from.getMonth(), 1);
 const endMonth = new Date(to.getFullYear(), to.getMonth(), 1);
@@ -1800,15 +1902,12 @@ lastDay: new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0)
 });
 cursor.setMonth(cursor.getMonth() + 1);
 }
-
 const paymentSnap = await db.collection('payments').where('session', '==', batch).get();
 const allPayments = [];
 paymentSnap.forEach(d => allPayments.push(d.data()));
-
 const adjSnap = await db.collection('adjustments').where('session', '==', batch).get();
 const allAdjustments = [];
 adjSnap.forEach(d => allAdjustments.push(d.data()));
-
 const penaltySnap = await db.collection('penalties').where('session', '==', batch).get();
 const allPenalties = [];
 penaltySnap.forEach(d => {
@@ -1817,25 +1916,19 @@ if (data.date >= fromDate && data.date <= toDate) {
 allPenalties.push(data);
 }
 });
-
 let totalExpected = 0, totalCollected = 0, totalOutstanding = 0, totalPenalties = 0;
-let reportData = [];
-
+collectionReportData = [];
 for (const student of batchStudents) {
 const fee = student.monthlyFee ?? 1500;
 const cycleStart = new Date(student.startDate || student.joiningDate);
 const cycleDay = cycleStart.getDate();
-
 const studentAdjustments = allAdjustments.filter(a => a.roll === student.roll);
 const studentPayments = allPayments.filter(p => p.roll === student.roll);
 const studentPenalties = allPenalties.filter(p => p.roll === student.roll);
-
 let expectedInRange = 0;
-
 for (const monthInfo of monthsInRange) {
 const cycleDateThisMonth = new Date(monthInfo.year, monthInfo.month, cycleDay);
 if (cycleDateThisMonth > to) continue;
-
 let monthBill = 0;
 if (cycleDateThisMonth <= from) {
 monthBill = fee;
@@ -1844,7 +1937,6 @@ if (cycleDateThisMonth <= to) {
 monthBill = fee;
 }
 }
-
 const adj = studentAdjustments.find(a => a.month === monthInfo.mStr);
 if (adj && monthBill > 0) {
 if (adj.type === "Hold" || adj.type === "Full Waiver") {
@@ -1855,25 +1947,20 @@ monthBill = Math.max(0, fee - (adj.amount || 0));
 }
 expectedInRange += monthBill;
 }
-
 let studentPenaltyTotal = 0;
 studentPenalties.forEach(p => {
 studentPenaltyTotal += (p.dueAmount !== undefined ? p.dueAmount : p.amount);
 });
 totalPenalties += studentPenaltyTotal;
-
 const paidInRange = studentPayments
 .filter(p => p.paymentDate >= fromDate && p.paymentDate <= toDate)
 .reduce((sum, p) => sum + (p.amount || 0), 0);
-
 totalExpected += expectedInRange;
 totalCollected += paidInRange;
-
 const totalDue = expectedInRange + studentPenaltyTotal;
 const balance = totalDue - paidInRange;
 totalOutstanding += Math.max(0, balance);
-
-reportData.push({
+collectionReportData.push({
 roll: student.roll,
 name: student.name,
 cycleStart: student.startDate || student.joiningDate || 'N/A',
@@ -1884,16 +1971,16 @@ totalDue,
 balance
 });
 }
-
+collectionReportMeta = { batch, fromDate, toDate, totalExpected, totalCollected, totalOutstanding, totalPenalties };
 document.getElementById('collectionTotalExpected').textContent = '৳' + totalExpected.toLocaleString();
 document.getElementById('collectionTotalCollected').textContent = '৳' + totalCollected.toLocaleString();
 document.getElementById('collectionOutstanding').textContent = '৳' + totalOutstanding.toLocaleString();
 document.getElementById('collectionPenalties').textContent = '৳' + totalPenalties.toLocaleString();
 document.getElementById('collectionSummaryCards').classList.remove('hidden');
-
+document.getElementById('btnPrintCollection').classList.remove('hidden');
 c.innerHTML = "";
-reportData.sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
-reportData.forEach(r => {
+collectionReportData.sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
+collectionReportData.forEach(r => {
 let balanceClass = r.balance > 0 ? 'text-rose-600 font-bold' : r.balance < 0 ? 'text-blue-600 font-bold' : 'text-green-600 font-bold';
 let balanceText = r.balance > 0 ? `${r.balance} BDT` : r.balance < 0 ? `${Math.abs(r.balance)} (Adv)` : '0 BDT';
 c.innerHTML += `<tr class="hover:bg-slate-50">
@@ -1912,6 +1999,65 @@ alert("Error: " + e.message);
 c.innerHTML = '<tr><td colspan="7" class="text-center py-6 text-red-500">Error generating report.</td></tr>';
 }
 }
+
+// ===== ✅ NEW: PRINT COLLECTION REPORT =====
+function printCollectionReport() {
+if (!collectionReportData.length) { alert("Generate report first."); return; }
+const m = collectionReportMeta;
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF('landscape');
+
+doc.setFontSize(20); doc.setFont("helvetica", "bold");
+doc.text("Ideal Coaching Center", 14, 16);
+doc.setFontSize(11); doc.setFont("helvetica", "normal");
+doc.text(`Expected Collection Report — Batch: ${m.batch}`, 14, 24);
+doc.setFontSize(9); doc.setTextColor(100);
+doc.text(`Period: ${m.fromDate} to ${m.toDate}  |  Printed: ${new Date().toLocaleDateString('en-GB')}`, 14, 30);
+doc.setTextColor(0);
+
+// Summary box
+doc.setFontSize(9); doc.setFont("helvetica", "bold");
+const sy = 34;
+doc.text(`Expected: ৳${m.totalExpected.toLocaleString()}  |  Collected: ৳${m.totalCollected.toLocaleString()}  |  Outstanding: ৳${m.totalOutstanding.toLocaleString()}  |  Penalties: ৳${m.totalPenalties.toLocaleString()}`, 14, sy);
+
+doc.autoTable({
+startY: sy + 4,
+head: [['Roll', 'Student Name', 'Cycle Start', 'Expected', 'Penalties', 'Paid', 'Balance', '✗ Sign']],
+body: collectionReportData.map(r => {
+let balText = r.balance > 0 ? `${r.balance}` : r.balance < 0 ? `${Math.abs(r.balance)} Adv` : '0';
+return [r.roll, r.name, r.cycleStart, `${r.expectedInRange}`, r.penalties > 0 ? `${r.penalties}` : '-', `${r.paidInRange}`, balText, ''];
+}),
+headStyles: { fontSize: 8, fillColor: [79, 70, 229], textColor: [255, 255, 255] },
+bodyStyles: { fontSize: 7.5 },
+columnStyles: {
+0: { cellWidth: 18, fontStyle: 'bold' },
+1: { cellWidth: 45 },
+2: { cellWidth: 22, fontSize: 7 },
+3: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
+4: { cellWidth: 18, halign: 'center' },
+5: { cellWidth: 20, halign: 'center', textColor: [22, 163, 74] },
+6: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
+7: { cellWidth: 25, halign: 'center' }
+},
+margin: { left: 14, right: 14 },
+didParseCell: function(data) {
+if (data.section === 'body' && data.column.index === 6) {
+const val = parseInt(data.cell.text[0]);
+if (val > 0) data.cell.styles.textColor = [220, 38, 38];
+else if (val < 0) data.cell.styles.textColor = [37, 99, 235];
+else data.cell.styles.textColor = [22, 163, 74];
+}
+},
+didDrawPage: () => {
+doc.setFontSize(8); doc.setTextColor(120);
+doc.text("SD/- Shahrim Ahammed Shad <shad.iam.bd>  |  Ideal Coaching Center", 14, doc.internal.pageSize.height - 8);
+doc.text("Page " + doc.internal.getNumberOfPages(), doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 8);
+}
+});
+
+doc.save(`Collection_Report_${m.batch}_${m.fromDate}_to_${m.toDate}.pdf`);
+}
+// ===== END PRINT COLLECTION REPORT =====
 
 document.getElementById('createInputterForm').addEventListener('submit', async (e) => {
 e.preventDefault();
@@ -1932,16 +2078,13 @@ msgEl.textContent = "Created.";
 document.getElementById('createInputterForm').reset();
 } catch(e) { msgEl.className = "text-center text-sm font-semibold mt-4 text-red-500"; msgEl.textContent = "Error: " + e.message; }
 });
-
 function syncInputters() { if (currentUserRole !== 'admin') return; db.collection('users').where('role','==','inputter').onSnapshot(snap => { inputtersCache = []; snap.forEach(d => { const data = d.data(); data.uid = d.id; inputtersCache.push(data); }); renderInputtersList(); }); }
 function renderInputtersList() { const c = document.getElementById('inputtersTableBody'); if (!c) return; c.innerHTML = ""; if (!inputtersCache.length) { c.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-slate-400">No inputters.</td></tr>'; return; } inputtersCache.forEach(u => { c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${u.email}</td><td class="px-4 py-3 text-slate-500 font-semibold">${u.assignedSession || 'None'}</td><td class="px-4 py-3 text-center space-x-1"><button onclick="openEditInputterModal('${u.uid}','${u.email}','${u.assignedSession}')" class="text-indigo-600 text-xs font-semibold">Edit</button><button onclick="deleteInputter('${u.uid}')" class="text-rose-600 text-xs font-semibold">Del</button></td></tr>`; }); const lf = document.getElementById('logInputterFilter'); if (lf) { lf.innerHTML = '<option value="">All</option>'; inputtersCache.forEach(u => { const o = document.createElement('option'); o.value = u.email; o.textContent = u.email; lf.appendChild(o); }); } initIcons(); }
 function openEditInputterModal(uid, email, session) { document.getElementById('editInputterUid').value = uid; document.getElementById('editInputterEmail').value = email; const sel = document.getElementById('editInputterSession'); sel.innerHTML = '<option value="">-- Select --</option>'; Array.from(sessionsCache).sort().forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; if (s === session) o.selected = true; sel.appendChild(o); }); const cached = inputtersCache.find(u => u.uid === uid); document.getElementById('editInputterPassword').value = cached ? (cached.password || '') : ''; document.getElementById('editInputterModal').classList.remove('hidden'); }
 function closeEditInputterModal() { document.getElementById('editInputterModal').classList.add('hidden'); }
 async function saveEditInputter() { const uid = document.getElementById('editInputterUid').value, newSession = document.getElementById('editInputterSession').value, newPass = document.getElementById('editInputterPassword').value.trim(); const cached = inputtersCache.find(u => u.uid === uid); const oldPassword = cached ? (cached.password || '') : ''; const email = cached ? cached.email : ''; if (!newSession) { alert("Select batch."); return; } try { if (newPass && newPass !== oldPassword) { if (!oldPassword) { alert("No old password. Delete and recreate."); return; } let app; try { app = firebase.initializeApp(firebaseConfig, "TempApp"); } catch(e) { app = firebase.app("TempApp"); } const creds = await app.auth().signInWithEmailAndPassword(email, oldPassword); await creds.user.updatePassword(newPass); await app.auth().signOut(); } let update = { assignedSession: newSession }; if (newPass) update.password = newPass; await db.collection('users').doc(uid).update(update); alert("Updated."); closeEditInputterModal(); } catch(e) { alert("Error: " + e.message); } }
 async function deleteInputter(uid) { if (!confirm("Delete inputter?")) return; try { await db.collection('users').doc(uid).delete(); alert("Deleted."); } catch(e) { alert("Error: " + e.message); } }
-
 async function queryActivityLogs() { const start = document.getElementById('logStartDate').value, end = document.getElementById('logEndDate').value, email = document.getElementById('logInputterFilter').value, c = document.getElementById('logsTableBody'); if (!start || !end) { alert("Select dates."); return; } c.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">Loading...</td></tr>'; try { const snap = await db.collection('attendance').where('date','>=',start).where('date','<=',end).get(); let logs = []; snap.forEach(d => { const data = d.data(); if (!email || data.markedByEmail === email) logs.push(data); }); logs.sort((a, b) => { const tA = a.timestamp ? a.timestamp.toDate() : new Date(a.date); const tB = b.timestamp ? b.timestamp.toDate() : new Date(b.date); return tB - tA; }); c.innerHTML = ""; if (!logs.length) { c.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400">No logs.</td></tr>'; return; } logs.forEach(l => { const time = l.timestamp ? l.timestamp.toDate().toLocaleString() : 'Legacy'; let badge = l.status === "Late" ? "bg-amber-100 text-amber-800" : l.status === "Absent" ? "bg-rose-100 text-rose-800" : l.status === "Leave" ? "bg-purple-100 text-purple-800" : "bg-green-100 text-green-800"; const statusText = l.status === "Leave" ? "🏖️ Leave" : l.status; c.innerHTML += `<tr class="hover:bg-slate-50"><td class="px-4 py-3">${time}</td><td class="px-4 py-3 font-semibold">${l.markedByEmail || 'Admin'}</td><td class="px-4 py-3">${l.date}</td><td class="px-4 py-3 font-semibold">${l.roll} - ${l.name}</td><td class="px-4 py-3 text-slate-500">${l.session}</td><td class="px-4 py-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badge}">${statusText}</span></td></tr>`; }); } catch(e) { alert("Error: " + e.message); } }
-
 function openEditStudentModal(roll) { const s = studentsCache.find(x => x.roll === roll); if (!s) return; document.getElementById('editStudentRoll').value = roll; document.getElementById('editStudentName').value = s.name; document.getElementById('editStudentSession').value = s.session; document.getElementById('editStudentJoiningDate').value = s.joiningDate || s.startDate || ''; document.getElementById('editStudentMonthlyFee').value = s.monthlyFee ?? 1500; document.getElementById('editStudentStartDate').value = s.startDate || ''; document.getElementById('editStudentEmail').value = s.email || ''; document.getElementById('editStudentModal').classList.remove('hidden'); }
 function closeEditStudentModal() { document.getElementById('editStudentModal').classList.add('hidden'); }
 async function saveEditStudent() { const roll = document.getElementById('editStudentRoll').value; const name = document.getElementById('editStudentName').value.trim(); const session = document.getElementById('editStudentSession').value.trim(); const joiningDate = document.getElementById('editStudentJoiningDate').value; const monthlyFee = parseFloat(document.getElementById('editStudentMonthlyFee').value); const startDate = document.getElementById('editStudentStartDate').value; const email = document.getElementById('editStudentEmail').value.trim(); if (!name || !session || !joiningDate || isNaN(monthlyFee) || !startDate) { alert("Fill all fields."); return; } try { await db.collection('students').doc(roll).update({ name, session, joiningDate, monthlyFee, startDate, email }); if (resultReady) { try { await resultDb.collection('students').doc(roll).set({ roll, name, batch: session, joiningDate, updatedAt: new Date().toISOString() }); } catch(e) {} } alert("Updated & synced."); closeEditStudentModal(); } catch(e) { alert("Error: " + e.message); } }
