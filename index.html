@@ -19,13 +19,14 @@
 body * { visibility: hidden; }
 #invoicePreviewContent, #invoicePreviewContent * { visibility: visible; }
 #invoicePreviewContent {
-position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15mm;
+position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 8mm;
 background: white; color: black; font-family: 'Noto Sans Bengali', sans-serif;
+font-size: 10px;
 }
 .no-print { display: none !important; }
-@page { size: A4 portrait; margin: 0; }
+@page { size: A4 portrait; margin: 8mm; }
 }
-.invoice-box { max-width: 210mm; margin: auto; padding: 20px; border: 1px solid #e2e8f0; background: white; }
+.invoice-box { max-width: 210mm; margin: auto; padding: 12px; border: 1px solid #e2e8f0; background: white; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-['Noto_Sans_Bengali']">
@@ -664,76 +665,143 @@ background: white; color: black; font-family: 'Noto Sans Bengali', sans-serif;
 </div>
 <div class="flex-grow overflow-y-auto p-0 bg-slate-100">
 <div id="invoicePreviewContent" class="invoice-box shadow-sm">
-<div class="text-center border-b-2 border-slate-800 pb-4 mb-4">
-<h1 class="text-2xl font-extrabold text-slate-900 tracking-wide">IDEAL COACHING CENTER</h1>
-<p class="text-xs text-slate-600 mt-1">Address: Bhabanipur Bazar, Harinakundu, Jhenidah</p>
-<p class="text-xs text-slate-600">Phone: 01887130457 | Email: saharimahamed@hotmail.com</p>
-<p class="text-xs text-slate-600">Website: https://idealcoachingcenter.pro.bd/</p>
-<h2 class="text-lg font-bold text-indigo-700 mt-3 uppercase tracking-wider">Fee Invoice / Money Receipt</h2>
-</div>
-<div class="grid grid-cols-2 gap-6 mb-6 text-sm">
-<div class="space-y-1">
-<p><span class="font-semibold text-slate-500">Invoice No:</span> <span id="invNumber" class="font-bold text-slate-900"></span></p>
-<p><span class="font-semibold text-slate-500">Payment ID:</span> <span id="invPaymentId"></span></p>
-<p><span class="font-semibold text-slate-500">Invoice Date:</span> <span id="invDate"></span></p>
-<p><span class="font-semibold text-slate-500">Payment Date:</span> <span id="invPaymentDate"></span></p>
-</div>
-<div class="space-y-1 text-right">
-<p><span class="font-semibold text-slate-500">Student Name:</span> <span id="invStudentName" class="font-bold text-slate-900"></span></p>
-<p><span class="font-semibold text-slate-500">Roll:</span> <span id="invRoll"></span> | <span class="font-semibold text-slate-500">Batch:</span> <span id="invBatch"></span></p>
-<p><span class="font-semibold text-slate-500">Session:</span> <span id="invSession"></span></p>
-<p><span class="font-semibold text-slate-500">Guardian:</span> <span id="invGuardian"></span> <span id="invGuardianPhone"></span></p>
-</div>
-</div>
-<table class="min-w-full border border-slate-300 mb-6 text-sm">
-<thead class="bg-slate-100">
-<tr>
-<th class="border border-slate-300 px-3 py-2 text-left font-semibold">SL</th>
-<th class="border border-slate-300 px-3 py-2 text-left font-semibold">Description</th>
-<th class="border border-slate-300 px-3 py-2 text-left font-semibold">Billing Month</th>
-<th class="border border-slate-300 px-3 py-2 text-right font-semibold">Amount (BDT)</th>
-</tr>
-</thead>
-<tbody id="invItemsBody" class="divide-y divide-slate-200"></tbody>
-<tfoot class="bg-slate-50 font-semibold">
-<tr><td colspan="3" class="border border-slate-300 px-3 py-2 text-right">Subtotal</td><td class="border border-slate-300 px-3 py-2 text-right" id="invSubtotal">৳0</td></tr>
-<tr><td colspan="3" class="border border-slate-300 px-3 py-2 text-right text-green-700">Discount / Waiver</td><td class="border border-slate-300 px-3 py-2 text-right text-green-700" id="invDiscount">-৳0</td></tr>
-<tr><td colspan="3" class="border border-slate-300 px-3 py-2 text-right text-rose-700">Penalty</td><td class="border border-slate-300 px-3 py-2 text-right text-rose-700" id="invPenalty">+৳0</td></tr>
-<tr class="text-base"><td colspan="3" class="border border-slate-300 px-3 py-3 text-right font-extrabold">Total Payable</td><td class="border border-slate-300 px-3 py-3 text-right font-extrabold" id="invTotalPayable">৳0</td></tr>
-</tfoot>
-</table>
-<div class="grid grid-cols-2 gap-6 mb-8">
-<div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm space-y-2">
-<h4 class="font-bold text-slate-700 mb-2">Payment Summary</h4>
-<div class="flex justify-between"><span>Previous Due:</span><span id="invPrevDue" class="font-semibold">৳0</span></div>
-<div class="flex justify-between"><span>Current Charges:</span><span id="invCurrentCharges" class="font-semibold">৳0</span></div>
-<div class="flex justify-between border-t border-slate-300 pt-2 mt-2"><span class="font-bold">Paid Today:</span><span id="invPaidToday" class="font-bold text-indigo-700">৳0</span></div>
-<div class="flex justify-between pt-1">
-<span class="font-bold" id="invBalanceLabel">Remaining Due:</span>
-<span class="font-bold text-rose-600" id="invBalanceAmount">৳0</span>
-</div>
-</div>
-<div class="flex flex-col justify-between">
-<div class="text-sm space-y-2">
-<p><span class="font-semibold text-slate-500">Payment Method:</span> <span id="invMethod" class="font-bold"></span></p>
-<p id="invTransIdRow" class="hidden"><span class="font-semibold text-slate-500">Transaction ID:</span> <span id="invTransId"></span></p>
-<p><span class="font-semibold text-slate-500">Collected By:</span> <span id="invCollectedBy"></span></p>
-</div>
-<div class="mt-4 flex items-center gap-3">
-<div id="invStatusBadge" class="px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider"></div>
-<img id="invQrCode" src="" alt="QR Verification" class="w-20 h-20 border border-slate-300 rounded">
-</div>
-</div>
-</div>
-<div class="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-slate-300 text-center text-xs text-slate-600">
-<div><div class="border-t border-slate-400 pt-2 mt-12 font-semibold">Guardian / Student Signature</div></div>
-<div><div class="border-t border-slate-400 pt-2 mt-12 font-semibold">Collected By</div></div>
-<div><div class="border-t border-slate-400 pt-2 mt-12 font-semibold">Authorized Signature</div></div>
-</div>
-<div class="mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-500 space-y-1">
-<p class="font-semibold text-slate-700">Thank you for choosing Ideal Coaching Center.</p>
-<p>This is a computer-generated receipt. Invoice generated on: <span id="invGenTime"></span></p>
-</div>
+  <!-- STUDENT PART -->
+  <div id="studentInvoicePart">
+    <div class="text-center border-b-2 border-slate-800 pb-3 mb-3">
+      <h1 class="text-xl font-extrabold text-slate-900 tracking-wide">IDEAL COACHING CENTER</h1>
+      <p class="text-[10px] text-slate-600 mt-1">Address: Bhabanipur Bazar, Harinakundu, Jhenidah</p>
+      <p class="text-[10px] text-slate-600">Phone: 01887130457 | Email: saharimahamed@hotmail.com</p>
+      <p class="text-[10px] text-slate-600">Website: https://idealcoachingcenter.pro.bd/</p>
+      <h2 class="text-base font-bold text-indigo-700 mt-2 uppercase tracking-wider">Fee Invoice / Money Receipt</h2>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-4 text-xs">
+      <div class="space-y-1">
+        <p><span class="font-semibold text-slate-500">Invoice No:</span> <span id="invNumber" class="font-bold text-slate-900"></span></p>
+        <p><span class="font-semibold text-slate-500">Payment ID:</span> <span id="invPaymentId"></span></p>
+        <p><span class="font-semibold text-slate-500">Invoice Date:</span> <span id="invDate"></span></p>
+        <p><span class="font-semibold text-slate-500">Payment Date:</span> <span id="invPaymentDate"></span></p>
+      </div>
+      <div class="space-y-1 text-right">
+        <p><span class="font-semibold text-slate-500">Student Name:</span> <span id="invStudentName" class="font-bold text-slate-900"></span></p>
+        <p><span class="font-semibold text-slate-500">Roll:</span> <span id="invRoll"></span> | <span class="font-semibold text-slate-500">Batch:</span> <span id="invBatch"></span></p>
+        <p><span class="font-semibold text-slate-500">Session:</span> <span id="invSession"></span></p>
+        <p><span class="font-semibold text-slate-500">Guardian:</span> <span id="invGuardian"></span> <span id="invGuardianPhone"></span></p>
+      </div>
+    </div>
+    <table class="min-w-full border border-slate-300 mb-4 text-xs">
+      <thead class="bg-slate-100">
+        <tr>
+          <th class="border border-slate-300 px-2 py-1.5 text-left font-semibold">SL</th>
+          <th class="border border-slate-300 px-2 py-1.5 text-left font-semibold">Description</th>
+          <th class="border border-slate-300 px-2 py-1.5 text-left font-semibold">Billing Month</th>
+          <th class="border border-slate-300 px-2 py-1.5 text-right font-semibold">Amount (BDT)</th>
+        </tr>
+      </thead>
+      <tbody id="invItemsBody" class="divide-y divide-slate-200"></tbody>
+      <tfoot class="bg-slate-50 font-semibold">
+        <tr><td colspan="3" class="border border-slate-300 px-2 py-1.5 text-right">Subtotal</td><td class="border border-slate-300 px-2 py-1.5 text-right" id="invSubtotal">৳0</td></tr>
+        <tr><td colspan="3" class="border border-slate-300 px-2 py-1.5 text-right text-green-700">Discount / Waiver</td><td class="border border-slate-300 px-2 py-1.5 text-right text-green-700" id="invDiscount">-৳0</td></tr>
+        <tr><td colspan="3" class="border border-slate-300 px-2 py-1.5 text-right text-rose-700">Penalty</td><td class="border border-slate-300 px-2 py-1.5 text-right text-rose-700" id="invPenalty">+৳0</td></tr>
+        <tr class="text-sm"><td colspan="3" class="border border-slate-300 px-2 py-2 text-right font-extrabold">Total Payable</td><td class="border border-slate-300 px-2 py-2 text-right font-extrabold" id="invTotalPayable">৳0</td></tr>
+      </tfoot>
+    </table>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+        <h4 class="font-bold text-slate-700 mb-1.5">Payment Summary</h4>
+        <div class="flex justify-between"><span>Previous Due:</span><span id="invPrevDue" class="font-semibold">৳0</span></div>
+        <div class="flex justify-between"><span>Current Charges:</span><span id="invCurrentCharges" class="font-semibold">৳0</span></div>
+        <div class="flex justify-between border-t border-slate-300 pt-1.5 mt-1.5"><span class="font-bold">Paid Today:</span><span id="invPaidToday" class="font-bold text-indigo-700">৳0</span></div>
+        <div class="flex justify-between pt-1">
+          <span class="font-bold" id="invBalanceLabel">Remaining Due:</span>
+          <span class="font-bold text-rose-600" id="invBalanceAmount">৳0</span>
+        </div>
+      </div>
+      <div class="flex flex-col justify-between">
+        <div class="text-xs space-y-1.5">
+          <p><span class="font-semibold text-slate-500">Payment Method:</span> <span id="invMethod" class="font-bold"></span></p>
+          <p id="invTransIdRow" class="hidden"><span class="font-semibold text-slate-500">Transaction ID:</span> <span id="invTransId"></span></p>
+          <p><span class="font-semibold text-slate-500">Collected By:</span> <span id="invCollectedBy"></span></p>
+        </div>
+        <div class="mt-2 flex items-center gap-2">
+          <div id="invStatusBadge" class="px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider"></div>
+          <img id="invQrCode" src="" alt="QR Verification" class="w-16 h-16 border border-slate-300 rounded">
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-6 mt-6 pt-4 border-t border-slate-300 text-center text-[10px] text-slate-600">
+      <div><div class="border-t border-slate-400 pt-2 mt-8 font-semibold">Guardian / Student Signature</div></div>
+      <div><div class="border-t border-slate-400 pt-2 mt-8 font-semibold">Collected By</div></div>
+      <div><div class="border-t border-slate-400 pt-2 mt-8 font-semibold">Authorized Signature</div></div>
+    </div>
+    <div class="mt-3 pt-2 border-t border-slate-200 text-center text-[10px] text-slate-500 space-y-1">
+      <p class="font-semibold text-slate-700">Thank you for choosing Ideal Coaching Center.</p>
+      <p>This is a computer-generated receipt. Invoice generated on: <span id="invGenTime"></span></p>
+    </div>
+  </div>
+
+  <!-- CUT LINE -->
+  <div class="my-3 border-t-2 border-dashed border-slate-400 relative">
+    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-slate-500 text-[10px] font-bold tracking-widest">✂ CUT HERE FOR ADMIN COPY ✂</span>
+  </div>
+
+  <!-- ADMIN PART -->
+  <div id="adminInvoicePart" class="text-xs">
+    <div class="flex justify-between items-center border-b border-slate-300 pb-2 mb-2">
+      <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Admin Copy / Internal Record</h3>
+      <span class="text-[10px] text-slate-500 font-semibold">IDEAL COACHING CENTER</span>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-2">
+      <div class="space-y-1">
+        <p><span class="font-semibold text-slate-500">Invoice No:</span> <span id="adminInvNumber" class="font-bold text-slate-900"></span></p>
+        <p><span class="font-semibold text-slate-500">Payment ID:</span> <span id="adminPaymentId" class="text-[10px] break-all"></span></p>
+        <p><span class="font-semibold text-slate-500">Date:</span> <span id="adminDate"></span></p>
+      </div>
+      <div class="space-y-1 text-right">
+        <p><span class="font-semibold text-slate-500">Student:</span> <span id="adminStudentName" class="font-bold"></span></p>
+        <p><span class="font-semibold text-slate-500">Roll:</span> <span id="adminRoll"></span> | <span class="font-semibold text-slate-500">Batch:</span> <span id="adminBatch"></span></p>
+        <p><span class="font-semibold text-slate-500">Amount:</span> <span id="adminAmount" class="font-bold text-indigo-700"></span></p>
+      </div>
+    </div>
+    <div class="grid grid-cols-4 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 mb-2">
+      <div>
+        <p class="text-[10px] text-slate-500 font-semibold">Payment Method</p>
+        <p id="adminMethod" class="font-bold text-slate-800 text-[11px]"></p>
+      </div>
+      <div>
+        <p class="text-[10px] text-slate-500 font-semibold">Transaction ID</p>
+        <p id="adminTransId" class="font-bold text-slate-800 text-[10px] break-all"></p>
+      </div>
+      <div>
+        <p class="text-[10px] text-slate-500 font-semibold">Collected By</p>
+        <p id="adminCollectedBy" class="font-bold text-slate-800 text-[10px] break-all"></p>
+      </div>
+      <div>
+        <p class="text-[10px] text-slate-500 font-semibold">Next Payment</p>
+        <p id="adminNextPayment" class="font-bold text-amber-700 text-[11px]"></p>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 mb-2">
+      <div class="bg-emerald-50 border border-emerald-200 rounded p-2 text-center">
+        <p class="text-[10px] text-emerald-600 font-semibold uppercase">Total Paid</p>
+        <p id="adminTotalPaid" class="text-sm font-bold text-emerald-700">৳0</p>
+      </div>
+      <div class="bg-rose-50 border border-rose-200 rounded p-2 text-center">
+        <p class="text-[10px] text-rose-600 font-semibold uppercase">Due</p>
+        <p id="adminDue" class="text-sm font-bold text-rose-700">৳0</p>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded p-2 text-center">
+        <p class="text-[10px] text-blue-600 font-semibold uppercase">Advance</p>
+        <p id="adminAdvance" class="text-sm font-bold text-blue-700">৳0</p>
+      </div>
+    </div>
+    <div class="flex justify-between items-end">
+      <div class="text-[10px] text-slate-500">
+        <p>Internal tracking & verification copy.</p>
+        <p>Keep for office records.</p>
+      </div>
+      <img id="adminQrCode" src="" alt="QR Verification" class="w-14 h-14 border border-slate-300 rounded">
+    </div>
+  </div>
 </div>
 </div>
 <div class="border-t p-4 flex justify-end gap-3 no-print bg-slate-50 rounded-b-xl">
@@ -1887,7 +1955,6 @@ const pageWidth = doc.internal.pageSize.getWidth();
 const pageHeight = doc.internal.pageSize.getHeight();
 const margin = 15;
 let y = 15;
-
 // ===== HEADER =====
 doc.setFillColor(79, 70, 229);
 doc.rect(0, 0, pageWidth, 32, 'F');
@@ -1899,10 +1966,8 @@ doc.setFontSize(9);
 doc.setFont("helvetica", "normal");
 doc.text("Bhabanipur Bazar, Harinakundu, Jhenidah | Phone: 01887130457", pageWidth/2, 20, { align: "center" });
 doc.text("Email: saharimahamed@hotmail.com | Website: idealcoachingcenter.pro.bd", pageWidth/2, 25, { align: "center" });
-
 y = 40;
 doc.setTextColor(0, 0, 0);
-
 // ===== TITLE =====
 doc.setFillColor(241, 245, 249);
 doc.rect(margin, y, pageWidth - margin*2, 14, 'F');
@@ -1913,16 +1978,13 @@ doc.setFont("helvetica", "bold");
 doc.setFontSize(14);
 doc.setTextColor(79, 70, 229);
 doc.text("PAYMENT COLLECTION SHEET", pageWidth/2, y + 9, { align: "center" });
-
 y += 20;
-
 // ===== INFO BOX =====
 doc.setDrawColor(200, 200, 200);
 doc.setLineWidth(0.3);
 doc.setFont("helvetica", "normal");
 doc.setFontSize(10);
 doc.setTextColor(30, 41, 59);
-
 // Info grid
 const col1 = margin + 5;
 const col2 = pageWidth/2 + 5;
@@ -1930,33 +1992,27 @@ doc.setFont("helvetica", "bold");
 doc.text("Batch / Session:", col1, y);
 doc.setFont("helvetica", "normal");
 doc.text(batch, col1 + 32, y);
-
 doc.setFont("helvetica", "bold");
 doc.text("Collection Period:", col2, y);
 doc.setFont("helvetica", "normal");
 const fromFormatted = new Date(fromDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 const toFormatted = new Date(toDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 doc.text(`${fromFormatted} to ${toFormatted}`, col2 + 38, y);
-
 y += 6;
 doc.setFont("helvetica", "bold");
 doc.text("Generated On:", col1, y);
 doc.setFont("helvetica", "normal");
 doc.text(new Date().toLocaleString('en-GB'), col1 + 32, y);
-
 doc.setFont("helvetica", "bold");
 doc.text("Total Students:", col2, y);
 doc.setFont("helvetica", "normal");
 doc.text(collectionReportData.length.toString(), col2 + 38, y);
-
 y += 10;
-
 // ===== SUMMARY BOX =====
 const totalExpected = collectionReportData.reduce((s, r) => s + r.expectedInRange, 0);
 const totalCollected = collectionReportData.reduce((s, r) => s + r.paidInRange, 0);
 const totalOutstanding = collectionReportData.reduce((s, r) => s + Math.max(0, r.balance), 0);
 const totalPenalties = collectionReportData.reduce((s, r) => s + (r.penalties || 0), 0);
-
 const boxWidth = (pageWidth - margin*2 - 10) / 4;
 const boxes = [
 { label: "Total Expected", value: totalExpected, color: [16, 185, 129], bg: [236, 253, 245] },
@@ -1964,7 +2020,6 @@ const boxes = [
 { label: "Outstanding", value: totalOutstanding, color: [225, 29, 72], bg: [255, 241, 242] },
 { label: "Penalties", value: totalPenalties, color: [217, 119, 6], bg: [255, 251, 235] }
 ];
-
 boxes.forEach((box, i) => {
 const bx = margin + i * (boxWidth + 3.33);
 doc.setFillColor(box.bg[0], box.bg[1], box.bg[2]);
@@ -1980,9 +2035,7 @@ doc.setFont("helvetica", "bold");
 doc.setFontSize(11);
 doc.text(`BDT ${box.value.toLocaleString()}`, bx + boxWidth/2, y + 12, { align: "center" });
 });
-
 y += 22;
-
 // ===== TABLE =====
 const sorted = [...collectionReportData].sort((a, b) => parseInt(a.roll) - parseInt(b.roll));
 const tableBody = sorted.map((r, idx) => {
@@ -1998,7 +2051,6 @@ balanceText,
 '' // signature column
 ];
 });
-
 doc.autoTable({
 startY: y,
 head: [['SL', 'Roll', 'Student Name', 'Expected', 'Penalty', 'Paid', 'Balance', 'Guardian Sign']],
@@ -2056,30 +2108,25 @@ data.cell.styles.textColor = [79, 70, 229];
 }
 }
 });
-
 // ===== FOOTER SIGNATURE SECTION =====
 let finalY = doc.lastAutoTable.finalY + 15;
 if (finalY > pageHeight - 50) {
 doc.addPage();
 finalY = 20;
 }
-
 doc.setDrawColor(200, 200, 200);
 doc.setLineWidth(0.3);
 doc.rect(margin, finalY, pageWidth - margin*2, 35, 'S');
-
 doc.setFont("helvetica", "bold");
 doc.setFontSize(9);
 doc.setTextColor(30, 41, 59);
 doc.text("VERIFICATION & SIGNATURES", margin + 3, finalY + 5);
-
 const sigY = finalY + 22;
 const sigCols = [
 { label: "Prepared By", x: margin + 15 },
 { label: "Checked By", x: pageWidth/2 },
 { label: "Authorized Signature", x: pageWidth - margin - 25 }
 ];
-
 sigCols.forEach(col => {
 doc.setDrawColor(100, 116, 139);
 doc.line(col.x - 15, sigY, col.x + 25, sigY);
@@ -2088,7 +2135,6 @@ doc.setFontSize(8);
 doc.setTextColor(71, 85, 105);
 doc.text(col.label, col.x + 5, sigY + 4, { align: "center" });
 });
-
 // ===== NOTE =====
 finalY += 42;
 doc.setFontSize(7.5);
@@ -2096,7 +2142,6 @@ doc.setFont("helvetica", "italic");
 doc.setTextColor(100, 116, 139);
 doc.text("Note: This is an official collection sheet. Please collect payments and obtain guardian signatures accordingly.", margin, finalY);
 doc.text("Any discrepancy should be reported to the administration immediately.", margin, finalY + 4);
-
 const fileName = `Collection_Form_${batch}_${fromDate}_to_${toDate}.pdf`.replace(/ /g, '_');
 doc.save(fileName);
 }
@@ -2203,7 +2248,7 @@ document.getElementById('invTransId').textContent = pay.transactionId;
 document.getElementById('invTransIdRow').classList.add('hidden');
 }
 const tbody = document.getElementById('invItemsBody');
-tbody.innerHTML = `<tr><td class="border border-slate-300 px-3 py-2">1</td><td class="border border-slate-300 px-3 py-2">${pay.feeType || 'Tuition Fee'}</td><td class="border border-slate-300 px-3 py-2">${pay.month}</td><td class="border border-slate-300 px-3 py-2 text-right">${pay.amount.toLocaleString()} BDT</td></tr>`;
+tbody.innerHTML = `<tr><td class="border border-slate-300 px-2 py-1.5">1</td><td class="border border-slate-300 px-2 py-1.5">${pay.feeType || 'Tuition Fee'}</td><td class="border border-slate-300 px-2 py-1.5">${pay.month}</td><td class="border border-slate-300 px-2 py-1.5 text-right">${pay.amount.toLocaleString()} BDT</td></tr>`;
 document.getElementById('invSubtotal').textContent = `৳${pay.amount.toLocaleString()}`;
 document.getElementById('invDiscount').textContent = `-৳${discountAmount.toLocaleString()}`;
 document.getElementById('invPenalty').textContent = `+৳${calc.penaltyDue.toLocaleString()}`;
@@ -2221,13 +2266,45 @@ document.getElementById('invBalanceAmount').textContent = `৳${balance.toLocale
 document.getElementById('invBalanceAmount').className = "font-bold text-rose-600";
 }
 const badge = document.getElementById('invStatusBadge');
-if (pay.status === 'Paid') { badge.className = "px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider bg-green-100 text-green-800"; badge.textContent = "PAID"; }
-else if (pay.status === 'Partial') { badge.className = "px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider bg-amber-100 text-amber-800"; badge.textContent = "PARTIAL"; }
-else if (balance < 0) { badge.className = "px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider bg-blue-100 text-blue-800"; badge.textContent = "ADVANCE"; }
-else { badge.className = "px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider bg-rose-100 text-rose-800"; badge.textContent = "UNPAID"; }
+if (pay.status === 'Paid') { badge.className = "px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-green-100 text-green-800"; badge.textContent = "PAID"; }
+else if (pay.status === 'Partial') { badge.className = "px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-amber-100 text-amber-800"; badge.textContent = "PARTIAL"; }
+else if (balance < 0) { badge.className = "px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-blue-100 text-blue-800"; badge.textContent = "ADVANCE"; }
+else { badge.className = "px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider bg-rose-100 text-rose-800"; badge.textContent = "UNPAID"; }
 const invNoDisplay = invoiceNo || 'TEMP-' + paymentId;
 document.getElementById('invQrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://iccresult.pro.bd/invoice/${encodeURIComponent(invNoDisplay)}`;
 document.getElementById('invGenTime').textContent = new Date().toLocaleString('en-GB');
+
+// Populate Admin Part
+document.getElementById('adminInvNumber').textContent = invoiceNo || 'PENDING';
+document.getElementById('adminPaymentId').textContent = paymentId;
+document.getElementById('adminDate').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+document.getElementById('adminStudentName').textContent = student.name;
+document.getElementById('adminRoll').textContent = pay.roll;
+document.getElementById('adminBatch').textContent = student.session;
+document.getElementById('adminAmount').textContent = `৳${pay.amount.toLocaleString()}`;
+document.getElementById('adminMethod').textContent = pay.paymentMethod || 'Cash';
+document.getElementById('adminTransId').textContent = pay.transactionId || 'N/A';
+document.getElementById('adminCollectedBy').textContent = pay.receivedByEmail || 'Admin';
+document.getElementById('adminQrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://iccresult.pro.bd/invoice/${encodeURIComponent(invNoDisplay)}`;
+
+// Calculate Total Paid, Due, Advance
+const totalPaid = calc.totalPaid;
+const netDue = calc.netDues;
+const advance = netDue < 0 ? Math.abs(netDue) : 0;
+const due = netDue > 0 ? netDue : 0;
+
+document.getElementById('adminTotalPaid').textContent = `৳${totalPaid.toLocaleString()}`;
+document.getElementById('adminDue').textContent = `৳${due.toLocaleString()}`;
+document.getElementById('adminAdvance').textContent = `৳${advance.toLocaleString()}`;
+
+// Calculate Next Payment Date
+const startDate = new Date(student.startDate || student.joiningDate);
+const cycleDay = startDate.getDate();
+const today = new Date();
+const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, cycleDay);
+const nextPaymentDate = nextMonth.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+document.getElementById('adminNextPayment').textContent = nextPaymentDate;
+
 currentInvoiceData = { invoiceNo: invNoDisplay, studentName: student.name, roll: pay.roll, amount: pay.amount, date: pay.paymentDate, method: pay.paymentMethod, status: pay.status };
 document.getElementById('invoicePreviewModal').classList.remove('hidden');
 lucide.createIcons();
