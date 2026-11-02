@@ -14,6 +14,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* --- EXISTING PRINT STYLES --- */
 @media print {
@@ -27,231 +28,419 @@ font-size: 10px;
 .no-print { display: none !important; }
 @page { size: A4 portrait; margin: 8mm; }
 }
-
 /* --- ATTENDANCE REPORT PRINT STYLES (PROFESSIONAL B&W) --- */
 @media print {
-    @page { 
-        size: A4 portrait; 
-        margin: 15mm 12mm;
-    }
-    
-    /* Hide everything except report */
-    body * { 
-        visibility: hidden !important;
-    }
-    
-    #attendanceReportPreview, 
-    #attendanceReportPreview * { 
-        visibility: visible !important;
-    }
-    
-    #attendanceReportPreview {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-        color: #000 !important;
-        font-family: 'Noto Sans Bengali', Arial, sans-serif !important;
-        font-size: 11px !important;
-        box-shadow: none !important;
-        border: none !important;
-        min-height: auto !important;
-    }
-    
-    /* Hide sidebar and main UI */
-    aside, 
-    .no-print, 
-    #dashboardSection > main > section:not(#attendanceReportTab),
-    footer { 
-        display: none !important; 
-    }
-    
-    /* Report Header */
-    .report-header {
-        text-align: center !important;
-        border-bottom: 2px solid #000 !important;
-        padding-bottom: 12px !important;
-        margin-bottom: 20px !important;
-        page-break-after: avoid !important;
-    }
-    
-    .report-header h1 {
-        font-size: 22px !important;
-        font-weight: 900 !important;
-        margin: 0 0 8px 0 !important;
-        letter-spacing: 1px !important;
-        color: #000 !important;
-    }
-    
-    .report-header h2 {
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        margin: 12px 0 6px 0 !important;
-        padding-top: 8px !important;
-        border-top: 1px solid #333 !important;
-        color: #000 !important;
-        text-transform: uppercase !important;
-    }
-    
-    .report-header p {
-        font-size: 11px !important;
-        margin: 3px 0 !important;
-        color: #333 !important;
-    }
-    
-    /* Report Meta Info */
-    .report-meta {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr !important;
-        gap: 10px !important;
-        margin-bottom: 18px !important;
-        padding: 10px !important;
-        background: #f5f5f5 !important;
-        border: 1px solid #000 !important;
-        font-size: 10px !important;
-        page-break-after: avoid !important;
-    }
-    
-    .report-meta div {
-        font-weight: 600 !important;
-    }
-    
-    .report-meta strong {
-        color: #000 !important;
-    }
-    
-    /* Summary Box */
-    .report-summary {
-        margin: 15px 0 !important;
-        padding: 12px !important;
-        background: #f9f9f9 !important;
-        border: 1px solid #000 !important;
-        font-size: 11px !important;
-        page-break-after: avoid !important;
-    }
-    
-    .report-summary strong {
-        font-weight: 700 !important;
-        color: #000 !important;
-    }
-    
-    /* Tables */
-    .report-table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        font-size: 10px !important;
-        margin: 15px 0 !important;
-        page-break-inside: auto !important;
-    }
-    
-    .report-table thead {
-        display: table-header-group !important;
-    }
-    
-    .report-table th {
-        background: #000 !important;
-        color: #fff !important;
-        font-weight: 700 !important;
-        padding: 8px 6px !important;
-        text-align: left !important;
-        border: 1px solid #000 !important;
-        text-transform: uppercase !important;
-        font-size: 9px !important;
-        letter-spacing: 0.5px !important;
-    }
-    
-    .report-table td {
-        padding: 6px !important;
-        border: 1px solid #333 !important;
-        color: #000 !important;
-        background: #fff !important;
-    }
-    
-    .report-table tbody tr {
-        page-break-inside: avoid !important;
-    }
-    
-    .report-table tbody tr:nth-child(even) {
-        background: #f9f9f9 !important;
-    }
-    
-    /* Signatures Section */
-    .report-signatures {
-        margin-top: 50px !important;
-        page-break-inside: avoid !important;
-    }
-    
-    .report-signatures-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 30px !important;
-        margin-top: 40px !important;
-    }
-    
-    .report-sig-box {
-        text-align: center !important;
-    }
-    
-    .report-sig-line {
-        border-top: 1px solid #000 !important;
-        margin-top: 50px !important;
-        padding-top: 8px !important;
-        font-weight: 600 !important;
-        font-size: 10px !important;
-        color: #000 !important;
-    }
-    
-    .report-footer {
-        margin-top: 30px !important;
-        padding-top: 15px !important;
-        border-top: 1px solid #333 !important;
-        text-align: center !important;
-        font-size: 9px !important;
-        color: #333 !important;
-        page-break-before: avoid !important;
-    }
-    
-    .report-footer p {
-        margin: 3px 0 !important;
-    }
-    
-    /* Date field */
-    .report-date-field {
-        margin-top: 15px !important;
-        text-align: center !important;
-        font-size: 10px !important;
-    }
-    
-    /* No data message */
-    .no-data-message {
-        text-align: center !important;
-        padding: 40px !important;
-        color: #666 !important;
-        border: 2px dashed #999 !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-    }
+@page { size: A4 portrait; margin: 15mm 12mm; }
+body * { visibility: hidden !important; }
+#attendanceReportPreview, #attendanceReportPreview * { visibility: visible !important; }
+#attendanceReportPreview { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; color: #000 !important; font-family: 'Noto Sans Bengali', Arial, sans-serif !important; font-size: 11px !important; box-shadow: none !important; border: none !important; min-height: auto !important; }
+aside, .no-print, #dashboardSection > main > section:not(#attendanceReportTab), footer { display: none !important; }
+.report-header { text-align: center !important; border-bottom: 2px solid #000 !important; padding-bottom: 12px !important; margin-bottom: 20px !important; page-break-after: avoid !important; }
+.report-header h1 { font-size: 22px !important; font-weight: 900 !important; margin: 0 0 8px 0 !important; letter-spacing: 1px !important; color: #000 !important; }
+.report-header h2 { font-size: 16px !important; font-weight: 700 !important; margin: 12px 0 6px 0 !important; padding-top: 8px !important; border-top: 1px solid #333 !important; color: #000 !important; text-transform: uppercase !important; }
+.report-header p { font-size: 11px !important; margin: 3px 0 !important; color: #333 !important; }
+.report-meta { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px !important; margin-bottom: 18px !important; padding: 10px !important; background: #f5f5f5 !important; border: 1px solid #000 !important; font-size: 10px !important; page-break-after: avoid !important; }
+.report-meta div { font-weight: 600 !important; }
+.report-meta strong { color: #000 !important; }
+.report-summary { margin: 15px 0 !important; padding: 12px !important; background: #f9f9f9 !important; border: 1px solid #000 !important; font-size: 11px !important; page-break-after: avoid !important; }
+.report-summary strong { font-weight: 700 !important; color: #000 !important; }
+.report-table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; margin: 15px 0 !important; page-break-inside: auto !important; }
+.report-table thead { display: table-header-group !important; }
+.report-table th { background: #000 !important; color: #fff !important; font-weight: 700 !important; padding: 8px 6px !important; text-align: left !important; border: 1px solid #000 !important; text-transform: uppercase !important; font-size: 9px !important; letter-spacing: 0.5px !important; }
+.report-table td { padding: 6px !important; border: 1px solid #333 !important; color: #000 !important; background: #fff !important; }
+.report-table tbody tr { page-break-inside: avoid !important; }
+.report-table tbody tr:nth-child(even) { background: #f9f9f9 !important; }
+.report-signatures { margin-top: 50px !important; page-break-inside: avoid !important; }
+.report-signatures-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 30px !important; margin-top: 40px !important; }
+.report-sig-box { text-align: center !important; }
+.report-sig-line { border-top: 1px solid #000 !important; margin-top: 50px !important; padding-top: 8px !important; font-weight: 600 !important; font-size: 10px !important; color: #000 !important; }
+.report-footer { margin-top: 30px !important; padding-top: 15px !important; border-top: 1px solid #333 !important; text-align: center !important; font-size: 9px !important; color: #333 !important; page-break-before: avoid !important; }
+.report-footer p { margin: 3px 0 !important; }
+.report-date-field { margin-top: 15px !important; text-align: center !important; font-size: 10px !important; }
+.no-data-message { text-align: center !important; padding: 40px !important; color: #666 !important; border: 2px dashed #999 !important; font-size: 12px !important; font-weight: 600 !important; }
+}
+
+/* --- NEW: TOP HEADER BAR --- */
+.top-header {
+background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+color: white;
+padding: 12px 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+position: sticky;
+top: 0;
+z-index: 40;
+}
+.top-header .brand {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.top-header .brand-icon {
+width: 40px;
+height: 40px;
+background: linear-gradient(135deg, #6366f1, #8b5cf6);
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 900;
+font-size: 18px;
+}
+.top-header .brand-text h1 {
+font-size: 16px;
+font-weight: 800;
+margin: 0;
+letter-spacing: 0.5px;
+}
+.top-header .brand-text p {
+font-size: 11px;
+color: #94a3b8;
+margin: 0;
+}
+.top-header-actions {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.user-chip {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 6px 12px;
+background: rgba(255,255,255,0.08);
+border-radius: 20px;
+font-size: 12px;
+}
+.user-chip .avatar {
+width: 28px;
+height: 28px;
+border-radius: 50%;
+background: linear-gradient(135deg, #6366f1, #8b5cf6);
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 700;
+font-size: 12px;
+}
+.notif-btn {
+position: relative;
+background: rgba(255,255,255,0.08);
+border: none;
+color: white;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.2s;
+}
+.notif-btn:hover {
+background: rgba(255,255,255,0.15);
+transform: scale(1.05);
+}
+.notif-btn .badge {
+position: absolute;
+top: -2px;
+right: -2px;
+background: #ef4444;
+color: white;
+font-size: 10px;
+font-weight: 700;
+min-width: 18px;
+height: 18px;
+border-radius: 9px;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 0 4px;
+border: 2px solid #1e293b;
+}
+.notif-btn .badge.hidden-badge { display: none; }
+
+/* --- NOTIFICATION DROPDOWN --- */
+.notif-dropdown {
+position: fixed;
+top: 65px;
+right: 20px;
+width: 380px;
+max-width: calc(100vw - 40px);
+max-height: 520px;
+background: white;
+border-radius: 12px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+z-index: 100;
+display: none;
+flex-direction: column;
+overflow: hidden;
+border: 1px solid #e2e8f0;
+}
+.notif-dropdown.open { display: flex; }
+.notif-header {
+padding: 14px 16px;
+border-bottom: 1px solid #e2e8f0;
+display: flex;
+align-items: center;
+justify-content: space-between;
+background: #f8fafc;
+}
+.notif-header h3 {
+font-size: 14px;
+font-weight: 700;
+color: #0f172a;
+margin: 0;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+.notif-header-actions {
+display: flex;
+gap: 6px;
+}
+.notif-header-actions button {
+background: none;
+border: none;
+color: #6366f1;
+font-size: 11px;
+font-weight: 600;
+cursor: pointer;
+padding: 4px 8px;
+border-radius: 6px;
+}
+.notif-header-actions button:hover { background: #eef2ff; }
+.notif-list {
+overflow-y: auto;
+flex-grow: 1;
+}
+.notif-item {
+padding: 12px 16px;
+border-bottom: 1px solid #f1f5f9;
+display: flex;
+gap: 10px;
+cursor: pointer;
+transition: background 0.15s;
+position: relative;
+}
+.notif-item:hover { background: #f8fafc; }
+.notif-item.unread { background: #eff6ff; }
+.notif-item.unread::before {
+content: '';
+position: absolute;
+left: 6px;
+top: 50%;
+transform: translateY(-50%);
+width: 6px;
+height: 6px;
+background: #6366f1;
+border-radius: 50%;
+}
+.notif-icon {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+}
+.notif-icon.fee { background: #dcfce7; color: #16a34a; }
+.notif-icon.penalty { background: #fee2e2; color: #dc2626; }
+.notif-icon.attendance { background: #dbeafe; color: #2563eb; }
+.notif-icon.student { background: #fef3c7; color: #d97706; }
+.notif-icon.result { background: #ede9fe; color: #7c3aed; }
+.notif-icon.info { background: #e0e7ff; color: #4f46e5; }
+.notif-content { flex-grow: 1; min-width: 0; }
+.notif-title {
+font-size: 13px;
+font-weight: 600;
+color: #0f172a;
+margin: 0 0 2px 0;
+}
+.notif-msg {
+font-size: 12px;
+color: #475569;
+margin: 0 0 4px 0;
+line-height: 1.4;
+}
+.notif-meta {
+font-size: 10px;
+color: #94a3b8;
+display: flex;
+gap: 8px;
+align-items: center;
+}
+.notif-delete {
+background: none;
+border: none;
+color: #cbd5e1;
+cursor: pointer;
+padding: 2px;
+border-radius: 4px;
+flex-shrink: 0;
+align-self: flex-start;
+}
+.notif-delete:hover { color: #ef4444; background: #fef2f2; }
+.notif-empty {
+padding: 40px 20px;
+text-align: center;
+color: #94a3b8;
+font-size: 13px;
+}
+.notif-empty i { margin: 0 auto 8px; display: block; opacity: 0.5; }
+
+/* --- DASHBOARD CARDS --- */
+.dash-card {
+background: white;
+border-radius: 14px;
+padding: 18px;
+border: 1px solid #e2e8f0;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+}
+.dash-card:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+border-color: #cbd5e1;
+}
+.dash-card .card-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+.dash-card .card-icon {
+width: 42px;
+height: 42px;
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.dash-card .card-label {
+font-size: 11px;
+font-weight: 600;
+color: #64748b;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin: 0;
+}
+.dash-card .card-value {
+font-size: 24px;
+font-weight: 800;
+color: #0f172a;
+margin: 4px 0;
+line-height: 1.1;
+}
+.dash-card .card-sub {
+font-size: 11px;
+color: #64748b;
+margin: 0;
+display: flex;
+align-items: center;
+gap: 4px;
+}
+.dash-card .card-sub .up { color: #16a34a; font-weight: 700; }
+.dash-card .card-sub .down { color: #dc2626; font-weight: 700; }
+.dash-card.trend::after {
+content: '';
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+height: 3px;
+background: linear-gradient(90deg, var(--trend-color, #6366f1), transparent);
+}
+
+.chart-container {
+background: white;
+border-radius: 14px;
+padding: 18px;
+border: 1px solid #e2e8f0;
+}
+.chart-container h3 {
+font-size: 14px;
+font-weight: 700;
+color: #0f172a;
+margin: 0 0 4px 0;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.chart-container p.chart-sub {
+font-size: 11px;
+color: #64748b;
+margin: 0 0 14px 0;
+}
+.chart-wrap {
+position: relative;
+height: 240px;
+}
+.chart-wrap canvas { max-height: 100%; }
+
+.dash-section-title {
+font-size: 16px;
+font-weight: 800;
+color: #0f172a;
+margin: 0 0 14px 0;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.dash-section-title .bar {
+width: 4px;
+height: 18px;
+background: linear-gradient(180deg, #6366f1, #8b5cf6);
+border-radius: 2px;
+}
+
+.recent-activity-item {
+display: flex;
+gap: 12px;
+padding: 10px 0;
+border-bottom: 1px solid #f1f5f9;
+}
+.recent-activity-item:last-child { border-bottom: none; }
+.recent-activity-item .ra-icon {
+width: 34px;
+height: 34px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+}
+.recent-activity-item .ra-text {
+font-size: 12px;
+color: #334155;
+line-height: 1.4;
+}
+.recent-activity-item .ra-text strong { color: #0f172a; }
+.recent-activity-item .ra-time {
+font-size: 10px;
+color: #94a3b8;
+margin-top: 2px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+.top-header { padding: 10px 12px; }
+.top-header .brand-text h1 { font-size: 13px; }
+.top-header .brand-text p { font-size: 10px; }
+.top-header .brand-icon { width: 34px; height: 34px; font-size: 15px; }
+.user-chip { display: none; }
+.notif-dropdown { right: 10px; width: calc(100vw - 20px); top: 58px; }
+.dash-card .card-value { font-size: 20px; }
 }
 
 /* --- SCREEN STYLES --- */
 .invoice-box { max-width: 210mm; margin: auto; padding: 12px; border: 1px solid #e2e8f0; background: white; }
 .hold-stripe { background: repeating-linear-gradient(45deg, #fef3c7, #fef3c7 10px, #fde68a 10px, #fde68a 20px); }
-
-/* Report Preview Screen Styles */
-#attendanceReportPreview {
-    background: white;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    padding: 40px;
-    margin: 20px auto;
-    max-width: 210mm;
-    min-height: 297mm;
-    font-family: 'Noto Sans Bengali', Arial, sans-serif;
-    color: #000;
-    border: 1px solid #cbd5e1;
-}
+#attendanceReportPreview { background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 40px; margin: 20px auto; max-width: 210mm; min-height: 297mm; font-family: 'Noto Sans Bengali', Arial, sans-serif; color: #000; border: 1px solid #cbd5e1; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-['Noto_Sans_Bengali']">
@@ -268,21 +457,66 @@ font-size: 10px;
 <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
 </div>
 </div>
+
+<!-- NOTIFICATION DROPDOWN (outside dashboard so it's always accessible) -->
+<div id="notifDropdown" class="notif-dropdown">
+<div class="notif-header">
+<h3><i data-lucide="bell" class="w-4 h-4"></i> Notifications</h3>
+<div class="notif-header-actions">
+<button onclick="markAllNotificationsRead()">Mark all read</button>
+<button onclick="clearAllNotifications()" style="color:#ef4444">Clear all</button>
+</div>
+</div>
+<div id="notifList" class="notif-list">
+<div class="notif-empty">
+<i data-lucide="bell-off" class="w-10 h-10"></i>
+<p>No notifications yet</p>
+</div>
+</div>
+</div>
+
 <!-- DASHBOARD -->
-<div id="dashboardSection" class="hidden flex-grow flex flex-col md:flex-row">
-<aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col p-4 space-y-2">
-<div class="py-4 px-2 border-b border-slate-800 mb-4">
-<h3 class="text-lg font-bold tracking-wider text-indigo-400">Ideal Coaching Center</h3>
+<div id="dashboardSection" class="hidden flex-grow flex flex-col">
+<!-- NEW: TOP HEADER BAR -->
+<div class="top-header no-print">
+<div class="brand">
+<div class="brand-icon">IC</div>
+<div class="brand-text">
+<h1>Ideal Coaching Center</h1>
+<p>Management System</p>
+</div>
+</div>
+<div class="top-header-actions">
+<div class="user-chip">
+<div class="avatar" id="userAvatar">A</div>
+<div>
+<div id="userEmailTop" class="font-semibold text-xs">Admin</div>
+<div id="userRoleTop" class="text-[10px] text-slate-400 uppercase">Administrator</div>
+</div>
+</div>
+<button id="notifBtn" class="notif-btn" onclick="toggleNotifications(event)" title="Notifications">
+<i data-lucide="bell" class="w-5 h-5"></i>
+<span id="notifBadge" class="badge hidden-badge">0</span>
+</button>
+<button onclick="logOut()" class="notif-btn" title="Sign Out" style="background:rgba(239,68,68,0.15);color:#fca5a5">
+<i data-lucide="log-out" class="w-5 h-5"></i>
+</button>
+</div>
+</div>
+
+<div class="flex flex-grow overflow-hidden">
+<aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col p-4 space-y-2 overflow-y-auto flex-shrink-0">
+<div class="py-4 px-2 border-b border-slate-800 mb-4 hidden md:block">
+<h3 class="text-lg font-bold tracking-wider text-indigo-400">Navigation</h3>
 <p id="userRoleBadge" class="text-xs bg-slate-800 text-slate-300 inline-block px-2 py-0.5 rounded-full mt-1 font-semibold uppercase"></p>
 </div>
 <nav class="space-y-1 flex-grow">
+<!-- NEW: Dashboard Button (first) -->
+<button onclick="switchTab('dashboardTab')" id="btn-dashboardTab" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium bg-slate-800"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span>Dashboard</span></button>
 <button onclick="switchTab('markTab')" id="btn-markTab" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium"><i data-lucide="check-square" class="w-5 h-5"></i> <span>Mark Attendance</span></button>
 <button onclick="switchTab('studentsTab')" id="btn-studentsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="users" class="w-5 h-5"></i> <span>Student Database</span></button>
 <button onclick="switchTab('recordsTab')" id="btn-recordsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="calendar" class="w-5 h-5"></i> <span>Attendance History</span></button>
-
-<!-- NEW: Attendance Reports Button -->
 <button onclick="switchTab('attendanceReportTab')" id="btn-attendanceReportTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="file-search" class="w-5 h-5"></i> <span>Attendance Reports</span></button>
-
 <button onclick="switchTab('statsTab')" id="btn-statsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="bar-chart-3" class="w-5 h-5"></i> <span>Statistics & Reports</span></button>
 <button onclick="switchTab('feesTab')" id="btn-feesTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="dollar-sign" class="w-5 h-5"></i> <span>Fee Management</span></button>
 <button onclick="switchTab('penaltyTab')" id="btn-penaltyTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="alert-circle" class="w-5 h-5"></i> <span>Penalty Management</span></button>
@@ -293,11 +527,144 @@ font-size: 10px;
 <button onclick="switchTab('logsTab')" id="btn-logsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="clipboard-list" class="w-5 h-5"></i> <span>Activity Logs</span></button>
 <button onclick="switchTab('usersTab')" id="btn-usersTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="user-plus" class="w-5 h-5"></i> <span>Add Inputter</span></button>
 </nav>
-<button onclick="logOut()" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left text-red-400 hover:bg-slate-800 mt-auto transition font-medium"><i data-lucide="log-out" class="w-5 h-5"></i> <span>Sign Out</span></button>
 </aside>
-<main class="flex-grow p-6 overflow-y-auto max-w-7xl mx-auto w-full">
+
+<main class="flex-grow p-4 md:p-6 overflow-y-auto max-w-7xl mx-auto w-full">
+
+<!-- ============ NEW: DASHBOARD TAB ============ -->
+<section id="dashboardTab" class="tab-content space-y-6">
+<!-- Welcome Banner -->
+<div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+<div class="absolute bottom-0 right-20 w-40 h-40 bg-white/5 rounded-full -mb-20"></div>
+<div class="relative">
+<h2 class="text-2xl md:text-3xl font-extrabold mb-1">Welcome back, <span id="dashWelcomeName">Admin</span> 👋</h2>
+<p class="text-indigo-100 text-sm md:text-base">Here's what's happening at Ideal Coaching Center today — <span id="dashTodayDate"></span></p>
+</div>
+</div>
+
+<!-- Primary Stats Row -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+<div class="dash-card trend" style="--trend-color:#6366f1">
+<div class="card-header">
+<div class="card-icon bg-indigo-100 text-indigo-600"><i data-lucide="users" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Total Students</p>
+<p class="card-value" id="dashTotalStudents">0</p>
+<p class="card-sub"><span id="dashActiveStudents">0</span> active • <span id="dashTotalBatches">0</span> batches</p>
+</div>
+<div class="dash-card trend" style="--trend-color:#10b981">
+<div class="card-header">
+<div class="card-icon bg-emerald-100 text-emerald-600"><i data-lucide="user-check" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Today's Attendance</p>
+<p class="card-value" id="dashTodayAttendance">0</p>
+<p class="card-sub"><span id="dashPresentToday" class="up">0</span> present • <span id="dashAbsentToday" class="down">0</span> absent</p>
+</div>
+<div class="dash-card trend" style="--trend-color:#f59e0b">
+<div class="card-header">
+<div class="card-icon bg-amber-100 text-amber-600"><i data-lucide="clock" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Late Today</p>
+<p class="card-value" id="dashLateToday">0</p>
+<p class="card-sub">Leave: <span id="dashLeaveToday">0</span></p>
+</div>
+<div class="dash-card trend" style="--trend-color:#06b6d4">
+<div class="card-header">
+<div class="card-icon bg-cyan-100 text-cyan-600"><i data-lucide="calendar-days" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Total Batches</p>
+<p class="card-value" id="dashBatchCount">0</p>
+<p class="card-sub">Active sessions</p>
+</div>
+</div>
+
+<!-- Financial Stats Row -->
+<h3 class="dash-section-title"><span class="bar"></span> Financial Overview</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+<div class="dash-card trend" style="--trend-color:#16a34a">
+<div class="card-header">
+<div class="card-icon bg-green-100 text-green-600"><i data-lucide="banknote" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Today's Collection</p>
+<p class="card-value text-green-700" id="dashTodayCollection">৳0</p>
+<p class="card-sub"><span id="dashTodayTxn">0</span> transactions</p>
+</div>
+<div class="dash-card trend" style="--trend-color:#6366f1">
+<div class="card-header">
+<div class="card-icon bg-indigo-100 text-indigo-600"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">This Month</p>
+<p class="card-value" id="dashMonthCollection">৳0</p>
+<p class="card-sub">Total collected</p>
+</div>
+<div class="dash-card trend" style="--trend-color:#ef4444">
+<div class="card-header">
+<div class="card-icon bg-rose-100 text-rose-600"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Outstanding Fees</p>
+<p class="card-value text-rose-700" id="dashOutstanding">৳0</p>
+<p class="card-sub"><span id="dashDueStudents">0</span> students with dues</p>
+</div>
+<div class="dash-card trend" style="--trend-color:#f97316">
+<div class="card-header">
+<div class="card-icon bg-orange-100 text-orange-600"><i data-lucide="gavel" class="w-5 h-5"></i></div>
+</div>
+<p class="card-label">Penalties</p>
+<p class="card-value" id="dashPenalties">৳0</p>
+<p class="card-sub"><span id="dashPendingPenalties">৳0</span> pending</p>
+</div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+<div class="chart-container lg:col-span-2">
+<h3><i data-lucide="trending-up" class="w-4 h-4 text-indigo-600"></i> Fee Collection Trend</h3>
+<p class="chart-sub">Last 7 days collection overview</p>
+<div class="chart-wrap"><canvas id="chartFeeTrend"></canvas></div>
+</div>
+<div class="chart-container">
+<h3><i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> Today's Attendance</h3>
+<p class="chart-sub">Status distribution</p>
+<div class="chart-wrap"><canvas id="chartAttendancePie"></canvas></div>
+</div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="chart-container">
+<h3><i data-lucide="layers" class="w-4 h-4 text-purple-600"></i> Batch Distribution</h3>
+<p class="chart-sub">Students per batch</p>
+<div class="chart-wrap"><canvas id="chartBatchDist"></canvas></div>
+</div>
+<div class="chart-container">
+<h3><i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-600"></i> Monthly Collection</h3>
+<p class="chart-sub">Last 6 months</p>
+<div class="chart-wrap"><canvas id="chartMonthlyCollection"></canvas></div>
+</div>
+</div>
+
+<!-- Recent Activity & Upcoming -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+<div class="chart-container lg:col-span-2">
+<h3><i data-lucide="activity" class="w-4 h-4 text-indigo-600"></i> Recent Activity</h3>
+<p class="chart-sub">Latest updates from the system</p>
+<div id="dashRecentActivity" class="max-h-[320px] overflow-y-auto">
+<div class="text-center py-8 text-slate-400 text-sm">Loading activity...</div>
+</div>
+</div>
+<div class="chart-container">
+<h3><i data-lucide="calendar-check" class="w-4 h-4 text-rose-600"></i> Upcoming Exams</h3>
+<p class="chart-sub">Scheduled assessments</p>
+<div id="dashUpcomingExams" class="max-h-[320px] overflow-y-auto">
+<div class="text-center py-8 text-slate-400 text-sm">Loading exams...</div>
+</div>
+</div>
+</div>
+</section>
+
 <!-- MARK ATTENDANCE -->
-<section id="markTab" class="tab-content space-y-6">
+<section id="markTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
 <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="check-square" class="text-indigo-600"></i> Mark Attendance</h2>
 <div class="flex space-x-4 mb-6 border-b border-slate-100 pb-4">
@@ -334,6 +701,7 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 <!-- STUDENT DATABASE -->
 <section id="studentsTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -432,6 +800,7 @@ font-size: 10px;
 </tr></thead><tbody id="studentTableBody" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </section>
+
 <!-- ATTENDANCE HISTORY -->
 <section id="recordsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -472,75 +841,67 @@ font-size: 10px;
 </div>
 </section>
 
-<!-- NEW: ATTENDANCE REPORTS TAB -->
+<!-- ATTENDANCE REPORTS TAB -->
 <section id="attendanceReportTab" class="tab-content space-y-6 hidden">
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 no-print">
-        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-800"><i data-lucide="file-search" class="text-indigo-600"></i> Attendance Reports & Print</h2>
-        
-        <!-- Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Report Type</label>
-                <select id="arReportType" onchange="toggleARFilters()" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="individual">Individual Student</option>
-                    <option value="batch">Batch-wise</option>
-                    <option value="date-wise">Date-wise (All Batches)</option>
-                    <option value="range">Date Range</option>
-                    <option value="monthly">Monthly Summary</option>
-                </select>
-            </div>
-            <div id="arStudentFilter">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Student Roll (6 Digits)</label>
-                <input type="text" id="arStudentRoll" maxlength="6" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
-            </div>
-            <div id="arBatchFilter">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Batch / Session</label>
-                <select id="arBatchSelect" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">All Batches</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <div id="arDateFilter">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Specific Date</label>
-                <input type="date" id="arDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div id="arStartFilter" class="hidden">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Start Date</label>
-                <input type="date" id="arStartDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div id="arEndFilter" class="hidden">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">End Date</label>
-                <input type="date" id="arEndDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div id="arMonthFilter" class="hidden">
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Month & Year</label>
-                <input type="month" id="arMonth" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Status Filter</label>
-                <select id="arStatusFilter" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="">All Statuses</option>
-                    <option value="Present">Present</option>
-                    <option value="Late">Late</option>
-                    <option value="Absent">Absent</option>
-                    <option value="Leave">Leave</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap gap-3 justify-end">
-            <button onclick="resetARFilters()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">Reset</button>
-            <button onclick="generateAttendanceReport()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i> Generate Report</button>
-            <button onclick="printAttendanceReport()" class="px-6 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Print / Save PDF</button>
-        </div>
-    </div>
-
-    <!-- Report Preview Area -->
-    <div id="attendanceReportPreview" class="hidden">
-        <!-- Content injected by JS -->
-    </div>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 no-print">
+<h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-800"><i data-lucide="file-search" class="text-indigo-600"></i> Attendance Reports & Print</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+<div>
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Report Type</label>
+<select id="arReportType" onchange="toggleARFilters()" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+<option value="individual">Individual Student</option>
+<option value="batch">Batch-wise</option>
+<option value="date-wise">Date-wise (All Batches)</option>
+<option value="range">Date Range</option>
+<option value="monthly">Monthly Summary</option>
+</select>
+</div>
+<div id="arStudentFilter">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Student Roll (6 Digits)</label>
+<input type="text" id="arStudentRoll" maxlength="6" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 102030">
+</div>
+<div id="arBatchFilter">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Batch / Session</label>
+<select id="arBatchSelect" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+<option value="">All Batches</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+<div id="arDateFilter">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Specific Date</label>
+<input type="date" id="arDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
+<div id="arStartFilter" class="hidden">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Start Date</label>
+<input type="date" id="arStartDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
+<div id="arEndFilter" class="hidden">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">End Date</label>
+<input type="date" id="arEndDate" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
+<div id="arMonthFilter" class="hidden">
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Month & Year</label>
+<input type="month" id="arMonth" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Status Filter</label>
+<select id="arStatusFilter" class="w-full border px-3 py-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+<option value="">All Statuses</option>
+<option value="Present">Present</option>
+<option value="Late">Late</option>
+<option value="Absent">Absent</option>
+<option value="Leave">Leave</option>
+</select>
+</div>
+</div>
+<div class="flex flex-wrap gap-3 justify-end">
+<button onclick="resetARFilters()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">Reset</button>
+<button onclick="generateAttendanceReport()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i> Generate Report</button>
+<button onclick="printAttendanceReport()" class="px-6 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-semibold transition shadow-sm flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Print / Save PDF</button>
+</div>
+</div>
+<div id="attendanceReportPreview" class="hidden"></div>
 </section>
 
 <!-- STATISTICS -->
@@ -576,6 +937,7 @@ font-size: 10px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Present</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Late</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Absent</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Leave</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Rate</th></tr></thead><tbody id="statsTableBody" class="divide-y divide-slate-100"><tr><td colspan="7" class="text-center py-6 text-slate-400">Generate analysis first.</td></tr></tbody></table></div>
 </div>
 </section>
+
 <!-- FEE MANAGEMENT -->
 <section id="feesTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -646,6 +1008,7 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 <!-- PENALTY MANAGEMENT -->
 <section id="penaltyTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -730,6 +1093,7 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 <!-- EXPENSE MANAGEMENT -->
 <section id="expenseTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -792,6 +1156,7 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 <!-- INVOICE HISTORY -->
 <section id="invoiceHistoryTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -816,12 +1181,11 @@ font-size: 10px;
 </table></div>
 </div>
 </section>
-<!-- FEE COLLECTION REPORT (NEW TAB) -->
+
+<!-- FEE COLLECTION REPORT -->
 <section id="collectionReportTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
 <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="receipt" class="text-indigo-600"></i> Fee Collection Report</h2>
-<p class="text-slate-500 text-sm mb-4"></p>
-<!-- Filters -->
 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
 <div>
 <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">From Date</label>
@@ -852,36 +1216,18 @@ font-size: 10px;
 <button onclick="queryCollectedFees()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition text-sm">🔍 Generate Report</button>
 </div>
 </div>
-<!-- Summary Cards -->
 <div id="crSummaryCards" class="hidden grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-<div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
-<p class="text-xs text-emerald-600 font-semibold uppercase">Total Collected</p>
-<p id="crTotalCollected" class="text-xl font-bold text-emerald-700">৳0</p>
+<div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center"><p class="text-xs text-emerald-600 font-semibold uppercase">Total Collected</p><p id="crTotalCollected" class="text-xl font-bold text-emerald-700">৳0</p></div>
+<div class="p-4 bg-indigo-50 border border-indigo-200 rounded-lg text-center"><p class="text-xs text-indigo-600 font-semibold uppercase">Transactions</p><p id="crTotalTxn" class="text-xl font-bold text-indigo-700">0</p></div>
+<div class="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center"><p class="text-xs text-blue-600 font-semibold uppercase">Unique Students</p><p id="crUniqueStudents" class="text-xl font-bold text-blue-700">0</p></div>
+<div class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center"><p class="text-xs text-amber-600 font-semibold uppercase">Avg / Transaction</p><p id="crAvgTxn" class="text-xl font-bold text-amber-700">৳0</p></div>
+<div class="p-4 bg-purple-50 border border-purple-200 rounded-lg text-center"><p class="text-xs text-purple-600 font-semibold uppercase">Top Method</p><p id="crTopMethod" class="text-sm font-bold text-purple-700">-</p></div>
 </div>
-<div class="p-4 bg-indigo-50 border border-indigo-200 rounded-lg text-center">
-<p class="text-xs text-indigo-600 font-semibold uppercase">Transactions</p>
-<p id="crTotalTxn" class="text-xl font-bold text-indigo-700">0</p>
-</div>
-<div class="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
-<p class="text-xs text-blue-600 font-semibold uppercase">Unique Students</p>
-<p id="crUniqueStudents" class="text-xl font-bold text-blue-700">0</p>
-</div>
-<div class="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
-<p class="text-xs text-amber-600 font-semibold uppercase">Avg / Transaction</p>
-<p id="crAvgTxn" class="text-xl font-bold text-amber-700">৳0</p>
-</div>
-<div class="p-4 bg-purple-50 border border-purple-200 rounded-lg text-center">
-<p class="text-xs text-purple-600 font-semibold uppercase">Top Method</p>
-<p id="crTopMethod" class="text-sm font-bold text-purple-700">-</p>
-</div>
-</div>
-<!-- Action Buttons -->
 <div class="flex flex-wrap gap-2 justify-end mb-4">
 <button onclick="printCollectedFees()" class="bg-slate-700 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5"><i data-lucide="printer" class="w-4 h-4"></i> Print</button>
 <button onclick="exportCollectedFeesPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4"></i> PDF</button>
 <button onclick="exportCollectedFeesExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg font-semibold transition flex items-center gap-1.5"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel</button>
 </div>
-<!-- Table -->
 <div class="overflow-x-auto">
 <table class="min-w-full bg-white divide-y divide-slate-100 text-sm">
 <thead class="bg-slate-50">
@@ -914,6 +1260,7 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 <!-- RESULT MANAGEMENT -->
 <section id="resultTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -949,6 +1296,7 @@ font-size: 10px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Exam</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Full Marks</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th></tr></thead><tbody id="resExamsBody" class="divide-y divide-slate-100"><tr><td colspan="5" class="text-center py-4 text-slate-400">No exams.</td></tr></tbody></table></div>
 </div>
 </section>
+
 <!-- ACTIVITY LOGS -->
 <section id="logsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -962,6 +1310,7 @@ font-size: 10px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Time</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Inputter</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Student</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Batch</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th></tr></thead><tbody id="logsTableBody" class="divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-6 text-slate-400">Apply filters.</td></tr></tbody></table></div>
 </div>
 </section>
+
 <!-- USER MANAGEMENT -->
 <section id="usersTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -981,9 +1330,12 @@ font-size: 10px;
 </div>
 </div>
 </section>
+
 </main>
 </div>
-<!-- MODALS -->
+</div>
+
+<!-- MODALS (unchanged) -->
 <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
 <h3 class="text-lg font-bold">Edit Attendance</h3>
@@ -1010,14 +1362,8 @@ font-size: 10px;
 <div><label class="block text-sm font-medium mb-1">Name</label><input type="text" id="editStudentName" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div><label class="block text-sm font-medium mb-1">Session</label><input type="text" id="editStudentSession" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-sm font-medium mb-1">📅 Joining Date</label>
-<input type="date" id="editStudentJoiningDate" required class="w-full border px-3 py-2 rounded-lg">
-</div>
-<div>
-<label class="block text-sm font-medium mb-1">💰 Cycle Start</label>
-<input type="date" id="editStudentStartDate" required class="w-full border px-3 py-2 rounded-lg">
-</div>
+<div><label class="block text-sm font-medium mb-1">📅 Joining Date</label><input type="date" id="editStudentJoiningDate" required class="w-full border px-3 py-2 rounded-lg"></div>
+<div><label class="block text-sm font-medium mb-1">💰 Cycle Start</label><input type="date" id="editStudentStartDate" required class="w-full border px-3 py-2 rounded-lg"></div>
 </div>
 <div><label class="block text-sm font-medium mb-1">Monthly Fee</label><input type="number" id="editStudentMonthlyFee" required class="w-full border px-3 py-2 rounded-lg"></div>
 <div class="grid grid-cols-2 gap-2">
@@ -1036,19 +1382,10 @@ font-size: 10px;
 </div>
 <div id="editHoldFieldsContainer" class="hidden space-y-2 pt-2 border-t border-amber-300">
 <div class="grid grid-cols-2 gap-2">
-<div>
-<label class="block text-xs font-medium mb-1">Hold From</label>
-<input type="date" id="editStudentHoldFrom" class="w-full border px-2 py-1.5 rounded-lg text-sm">
+<div><label class="block text-xs font-medium mb-1">Hold From</label><input type="date" id="editStudentHoldFrom" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
+<div><label class="block text-xs font-medium mb-1">Hold To</label><input type="date" id="editStudentHoldTo" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
 </div>
-<div>
-<label class="block text-xs font-medium mb-1">Hold To</label>
-<input type="date" id="editStudentHoldTo" class="w-full border px-2 py-1.5 rounded-lg text-sm">
-</div>
-</div>
-<div>
-<label class="block text-xs font-medium mb-1">Reason</label>
-<input type="text" id="editStudentHoldReason" class="w-full border px-2 py-1.5 rounded-lg text-sm">
-</div>
+<div><label class="block text-xs font-medium mb-1">Reason</label><input type="text" id="editStudentHoldReason" class="w-full border px-2 py-1.5 rounded-lg text-sm"></div>
 </div>
 </div>
 <input type="hidden" id="editStudentRoll">
@@ -1246,40 +1583,16 @@ font-size: 10px;
 </div>
 </div>
 <div class="grid grid-cols-4 gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200 mb-2">
-<div>
-<p class="text-[10px] text-slate-500 font-semibold">Payment Method</p>
-<p id="adminMethod" class="font-bold text-slate-800 text-[11px]"></p>
-</div>
-<div>
-<p class="text-[10px] text-slate-500 font-semibold">Transaction ID</p>
-<p id="adminTransId" class="font-bold text-slate-800 text-[10px] break-all"></p>
-</div>
-<div>
-<p class="text-[10px] text-slate-500 font-semibold">This Payment</p>
-<p id="adminThisPayment" class="font-bold text-indigo-700 text-[11px]">৳0</p>
-</div>
-<div>
-<p class="text-[10px] text-slate-500 font-semibold">Next Payment</p>
-<p id="adminNextPayment" class="font-bold text-amber-700 text-[11px]"></p>
-</div>
+<div><p class="text-[10px] text-slate-500 font-semibold">Payment Method</p><p id="adminMethod" class="font-bold text-slate-800 text-[11px]"></p></div>
+<div><p class="text-[10px] text-slate-500 font-semibold">Transaction ID</p><p id="adminTransId" class="font-bold text-slate-800 text-[10px] break-all"></p></div>
+<div><p class="text-[10px] text-slate-500 font-semibold">This Payment</p><p id="adminThisPayment" class="font-bold text-indigo-700 text-[11px]">৳0</p></div>
+<div><p class="text-[10px] text-slate-500 font-semibold">Next Payment</p><p id="adminNextPayment" class="font-bold text-amber-700 text-[11px]"></p></div>
 </div>
 <div class="grid grid-cols-4 gap-2 mb-2">
-<div class="bg-indigo-50 border border-indigo-200 rounded p-2 text-center">
-<p class="text-[10px] text-indigo-600 font-semibold uppercase">This Payment</p>
-<p id="adminThisPayment2" class="text-sm font-bold text-indigo-700">৳0</p>
-</div>
-<div class="bg-emerald-50 border border-emerald-200 rounded p-2 text-center">
-<p class="text-[10px] text-emerald-600 font-semibold uppercase">Total Paid</p>
-<p id="adminTotalPaid" class="text-sm font-bold text-emerald-700">৳0</p>
-</div>
-<div class="bg-rose-50 border border-rose-200 rounded p-2 text-center">
-<p class="text-[10px] text-rose-600 font-semibold uppercase">Due</p>
-<p id="adminDue" class="text-sm font-bold text-rose-700">৳0</p>
-</div>
-<div class="bg-blue-50 border border-blue-200 rounded p-2 text-center">
-<p class="text-[10px] text-blue-600 font-semibold uppercase">Advance</p>
-<p id="adminAdvance" class="text-sm font-bold text-blue-700">৳0</p>
-</div>
+<div class="bg-indigo-50 border border-indigo-200 rounded p-2 text-center"><p class="text-[10px] text-indigo-600 font-semibold uppercase">This Payment</p><p id="adminThisPayment2" class="text-sm font-bold text-indigo-700">৳0</p></div>
+<div class="bg-emerald-50 border border-emerald-200 rounded p-2 text-center"><p class="text-[10px] text-emerald-600 font-semibold uppercase">Total Paid</p><p id="adminTotalPaid" class="text-sm font-bold text-emerald-700">৳0</p></div>
+<div class="bg-rose-50 border border-rose-200 rounded p-2 text-center"><p class="text-[10px] text-rose-600 font-semibold uppercase">Due</p><p id="adminDue" class="text-sm font-bold text-rose-700">৳0</p></div>
+<div class="bg-blue-50 border border-blue-200 rounded p-2 text-center"><p class="text-[10px] text-blue-600 font-semibold uppercase">Advance</p><p id="adminAdvance" class="text-sm font-bold text-blue-700">৳0</p></div>
 </div>
 <div class="flex justify-between items-end">
 <div class="text-[10px] text-slate-500">
@@ -1301,6 +1614,7 @@ font-size: 10px;
 <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
 <p>Developed by: <a href="https://shahrimahammedshad.github.io/attendance-with-button/" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">Shahrim Ahammed Shad</a></p>
 </footer>
+
 <script>
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -1355,13 +1669,17 @@ let currentInvoiceData = null;
 let collectionReportData = [];
 let collectionReportMeta = { batch: '', fromDate: '', toDate: '' };
 let queriedExpenses = [];
-// ===== FEE COLLECTION REPORT VARIABLES =====
 let collectedFeesData = [];
 let collectedFeesMeta = { fromDate: '', toDate: '', batch: '', method: '' };
-
-// ===== ATTENDANCE REPORT VARIABLES =====
 let arReportData = [];
 let arReportMeta = {};
+
+// ===== NEW: DASHBOARD & NOTIFICATION STATE =====
+let dashboardListeners = [];
+let dashboardCharts = {};
+let notificationsCache = [];
+let notifListener = null;
+const DASHBOARD_TODAY = new Date().toISOString().split('T')[0];
 
 // ===== HOLD STATUS HELPERS =====
 function isStudentOnHold(student, checkDate = null) {
@@ -1427,6 +1745,7 @@ const container = document.getElementById('editHoldFieldsContainer');
 if (status === 'Hold') container.classList.remove('hidden');
 else container.classList.add('hidden');
 }
+
 window.addEventListener('DOMContentLoaded', () => {
 initIcons(); setDefaultDates(); initResultFirebase();
 auth.onAuthStateChanged(async (user) => {
@@ -1437,9 +1756,34 @@ currentUserRole = role;
 setupDashboardForRole(role);
 await syncCache();
 if (role === 'admin') { syncInputters(); syncMonthlyEarnings(); loadAllPenaltyConfigs(); }
-} else showLoginScreen();
+// Start dashboard + notifications
+initDashboard();
+startNotificationsListener();
+updateUserHeader();
+} else {
+showLoginScreen();
+cleanupDashboard();
+stopNotificationsListener();
+}
 });
 });
+
+function updateUserHeader() {
+if (!currentUser) return;
+const email = currentUser.email || '';
+const initial = (email[0] || 'A').toUpperCase();
+const avatar = document.getElementById('userAvatar');
+if (avatar) avatar.textContent = initial;
+const emailTop = document.getElementById('userEmailTop');
+if (emailTop) emailTop.textContent = email.split('@')[0];
+const roleTop = document.getElementById('userRoleTop');
+if (roleTop) roleTop.textContent = currentUserRole === 'admin' ? 'Administrator' : 'Inputter';
+const welcome = document.getElementById('dashWelcomeName');
+if (welcome) welcome.textContent = email.split('@')[0];
+const todayDate = document.getElementById('dashTodayDate');
+if (todayDate) todayDate.textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
 function initIcons() { lucide.createIcons(); }
 function setDefaultDates() {
 const today = new Date().toISOString().split('T')[0];
@@ -1471,6 +1815,7 @@ const [examSnap, resultSnap] = await Promise.all([resultDb.collection('exams').g
 resExamsCache = examSnap.docs.map(d => d.data()).sort((a,b) => new Date(b.date) - new Date(a.date));
 resResultsCache = resultSnap.docs.map(d => d.data());
 renderResultExams(); renderResultExamOptions();
+updateDashUpcomingExams();
 } catch(e) { console.error("Result data load error:", e); }
 }
 function renderResultExams() {
@@ -1489,12 +1834,16 @@ if (!resultReady) { alert("Result Portal not connected."); return; }
 const id = `${date}-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
 try {
 await resultDb.collection('exams').doc(id).set({ id, name, date, fullMarks, published, updatedAt: new Date().toISOString() });
-alert("Exam saved!"); document.getElementById('resExamName').value = ""; document.getElementById('resFullMarks').value = ""; await loadResultData();
+alert("Exam saved!");
+createNotification('result', `New Exam Created: ${name}`, `Exam scheduled for ${date} with ${fullMarks} full marks.`, { examId: id, examName: name, date });
+document.getElementById('resExamName').value = ""; document.getElementById('resFullMarks').value = ""; await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
 async function toggleResultExamPublish(id) {
 const exam = resExamsCache.find(e => e.id === id); if (!exam || !resultReady) return;
-try { await resultDb.collection('exams').doc(id).update({ published: !exam.published }); await loadResultData(); } catch(e) { alert("Error: " + e.message); }
+try { await resultDb.collection('exams').doc(id).update({ published: !exam.published });
+if (!exam.published) createNotification('result', `Results Published: ${exam.name}`, `Results for ${exam.name} are now visible to students.`, { examId: id });
+await loadResultData(); } catch(e) { alert("Error: " + e.message); }
 }
 async function deleteResultExam(id) {
 if (!confirm("Delete exam and all results?")) return; if (!resultReady) return;
@@ -1513,7 +1862,11 @@ const exam = resExamsCache.find(e => e.id === examId); if (!exam) { alert("Exam 
 if (status !== 'expelled' && (!Number.isFinite(obtained) || obtained < 0 || obtained > exam.fullMarks)) { alert(`Marks must be 0-${exam.fullMarks}.`); return; }
 try {
 await resultDb.collection('results').doc(`${examId}_${roll}`).set({ id: `${examId}_${roll}`, examId, roll, obtained: status === 'expelled' ? 0 : obtained, status, updatedAt: new Date().toISOString() });
-alert("Result saved!"); document.getElementById('resRollInput').value = ""; document.getElementById('resObtainedMarks').value = ""; await loadResultData();
+const student = studentsCache.find(s => s.roll.toString() === roll);
+const studentName = student ? student.name : `Roll ${roll}`;
+alert("Result saved!");
+createNotification('result', `Result Saved: ${studentName}`, `${obtained}/${exam.fullMarks} in ${exam.name}`, { roll, examId });
+document.getElementById('resRollInput').value = ""; document.getElementById('resObtainedMarks').value = ""; await loadResultData();
 } catch(e) { alert("Error: " + e.message); }
 }
 async function getUserRole(uid) {
@@ -1538,7 +1891,7 @@ function setupDashboardForRole(role) {
 document.getElementById('loginSection').classList.add('hidden'); document.getElementById('dashboardSection').classList.remove('hidden');
 document.getElementById('userRoleBadge').textContent = role;
 document.querySelectorAll('.admin-only').forEach(el => role === 'admin' ? el.classList.remove('hidden') : el.classList.add('hidden'));
-switchTab('markTab');
+switchTab('dashboardTab'); // CHANGED: Dashboard is default
 }
 function switchTab(tabId) {
 document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -1546,12 +1899,15 @@ document.getElementById(tabId).classList.remove('hidden');
 document.querySelectorAll('aside nav button').forEach(btn => btn.classList.remove('bg-slate-800'));
 const activeBtn = document.getElementById(`btn-${tabId}`); if (activeBtn) activeBtn.classList.add('bg-slate-800');
 if (tabId === 'resultTab' && resultReady) loadResultData();
+if (tabId === 'dashboardTab') refreshDashboard();
 }
 async function syncCache() {
 db.collection('students').onSnapshot(snapshot => {
 studentsCache = []; sessionsCache = new Set();
 snapshot.forEach(doc => { const s = doc.data(); studentsCache.push(s); if (s.session) sessionsCache.add(s.session); });
 updateDropdowns(); renderStudentList();
+updateDashStudentStats();
+updateDashBatchChart();
 });
 }
 function updateDropdowns() {
@@ -1561,14 +1917,11 @@ const el = document.getElementById(id); if (!el) return;
 el.innerHTML = id.includes('history') ? '<option value="">All Sessions</option>' : '<option value="">-- Select Batch --</option>';
 sorted.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; el.appendChild(o); });
 });
-
-// Update AR Batch Dropdown
 const arBatch = document.getElementById('arBatchSelect');
 if(arBatch) {
-    arBatch.innerHTML = '<option value="">All Batches</option>';
-    sorted.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; arBatch.appendChild(o); });
+arBatch.innerHTML = '<option value="">All Batches</option>';
+sorted.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; arBatch.appendChild(o); });
 }
-
 const bf = document.getElementById('bulkSessionFilter'), bc = document.getElementById('bulkSessionFilterContainer');
 if (!bf || !bc) return;
 bf.innerHTML = '<option value="">-- Choose Session --</option>';
@@ -1608,15 +1961,17 @@ if (!date || roll.length !== 6) { alert("Provide valid date and roll."); return;
 const m = studentsCache.find(s => s.roll.toString() === roll.toString()); if (!m) { alert("Roll not found."); return; }
 if (currentUserRole === 'inputter' && currentUserAssignedSession && m.session !== currentUserAssignedSession) { alert("Access Blocked."); return; }
 if (isStudentOnHold(m, date)) {
-if (!confirm(`⚠️ Student "${m.name}" is currently ON HOLD on ${date}.
-Attendance for held students is normally not recorded.
-Do you still want to mark attendance?`)) return;
+if (!confirm(`⚠️ Student "${m.name}" is currently ON HOLD on ${date}.\nAttendance for held students is normally not recorded.\nDo you still want to mark attendance?`)) return;
 }
 try {
 await db.collection('attendance').doc(`${date}_${roll}`).set({ date, roll, name: m.name, session: m.session, status, markedBy: currentUser.uid, markedByEmail: currentUser.email, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
 if ((status === "Absent" || status === "Late") && status !== "Leave") await addAutomaticPenalty(m, date, status);
 const sent = await sendAttendanceEmail(m, date, status);
 alert(sent ? "Saved & email sent!" : "Saved!");
+// Notification for attendance (only for notable statuses to avoid spam)
+if (status === 'Absent' || status === 'Late') {
+createNotification('attendance', `${m.name} marked ${status}`, `${m.name} (${m.session}) was marked ${status.toLowerCase()} on ${date}.`, { roll: m.roll, date, status });
+}
 singleRollInput.value = ""; liveStudentName.textContent = "Type a valid 6-digit roll..."; liveStudentName.className = "font-bold text-slate-500 text-lg";
 } catch(e) { alert("Error: " + e.message); }
 }
@@ -1628,6 +1983,7 @@ if (penaltyAmount <= 0) return;
 const penaltyType = status === "Absent" ? "Automatic Absence Penalty" : "Automatic Late Penalty";
 try {
 await db.collection('penalties').doc(`${date}_${student.roll}_${status}_${Date.now()}`).set({ date, roll: student.roll, name: student.name, session: student.session, type: penaltyType, amount: penaltyAmount, paidAmount: 0, exemptedAmount: 0, dueAmount: penaltyAmount, status: "Unpaid", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+createNotification('penalty', `Auto Penalty: ${student.name}`, `৳${penaltyAmount} ${status.toLowerCase()} penalty added for ${date}.`, { roll: student.roll, amount: penaltyAmount, date });
 } catch(e) { console.error("Auto penalty failed:", e); }
 }
 async function loadStudentsForBulkMarking() {
@@ -1659,17 +2015,22 @@ if (!date || !session) { alert("Select date and session."); return; }
 const selects = document.querySelectorAll('.bulk-status-select'); if (!selects.length) { alert("No students."); return; }
 const shouldEmail = document.getElementById('bulkSendEmails').checked;
 const batch = db.batch(); const emailQueue = [];
+let presentCount = 0, lateCount = 0, absentCount = 0, leaveCount = 0;
 selects.forEach(sel => {
 const roll = sel.getAttribute('data-roll'), status = sel.value, s = currentlyMarkingSessionStudents.find(x => x.roll.toString() === roll.toString());
 if (s) {
 batch.set(db.collection('attendance').doc(`${date}_${roll}`), { date, roll, name: s.name, session: s.session, status, markedBy: currentUser.uid, markedByEmail: currentUser.email, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
 if (shouldEmail && s.email && status !== 'Leave') emailQueue.push({ student: s, status });
+if (status === 'Present') presentCount++;
+else if (status === 'Late') { lateCount++; }
+else if (status === 'Absent') absentCount++;
+else if (status === 'Leave') leaveCount++;
 if ((status === "Absent" || status === "Late") && status !== "Leave") {
 const config = penaltyConfigCache[s.session];
 if (config) {
 const penaltyAmount = status === "Absent" ? (config.penaltyPerAbsence || 0) : (config.penaltyPerLate || 0);
 if (penaltyAmount > 0) {
-batch.set(db.collection('penalties').doc(`${date}_${roll}_${status}_${Date.now()}`), { date, roll, name: s.name, session: s.session, type: status === "Absent" ? "Automatic Absence Penalty" : "Automatic Late Penalty", amount: penaltyAmount, paidAmount: 0, exemptedAmount: 0, dueAmount: penaltyAmount, status: "Unpaid", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+batch.set(db.collection('penalties').doc(`${date}_${roll}_${status}_${Date.now()}`), { date, roll: s.roll, name: s.name, session: s.session, type: status === "Absent" ? "Automatic Absence Penalty" : "Automatic Late Penalty", amount: penaltyAmount, paidAmount: 0, exemptedAmount: 0, dueAmount: penaltyAmount, status: "Unpaid", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
 }
 }
 }
@@ -1681,6 +2042,8 @@ await batch.commit();
 let sent = 0;
 for (const item of emailQueue) { if (await sendAttendanceEmail(item.student, date, item.status)) sent++; await new Promise(r => setTimeout(r, 400)); }
 alert(`Saved! Emails: ${sent}/${emailQueue.length}`);
+// Single summarized notification for bulk attendance
+createNotification('attendance', `Batch Attendance: ${session}`, `Date: ${date} — Present: ${presentCount}, Late: ${lateCount}, Absent: ${absentCount}, Leave: ${leaveCount}`, { session, date, present: presentCount, late: lateCount, absent: absentCount, leave: leaveCount });
 document.getElementById('bulkSessionFilter').value = ""; loadStudentsForBulkMarking();
 } catch(e) { alert("Error: " + e.message); }
 }
@@ -1705,7 +2068,9 @@ const checkDoc = await db.collection('students').doc(roll).get();
 if (checkDoc.exists) { alert("Roll exists!"); return; }
 await db.collection('students').doc(roll).set({ roll, name, session, monthlyFee, joiningDate, startDate, guardianName, guardianPhone, email, status, holdFromDate, holdToDate, holdReason });
 if (resultReady) { try { await resultDb.collection('students').doc(roll).set({ roll, name, batch: session, updatedAt: new Date().toISOString() }); } catch(e) {} }
-alert("Student registered & synced!"); document.getElementById('studentForm').reset(); setDefaultDates();
+alert("Student registered & synced!");
+createNotification('student', `New Student Admitted: ${name}`, `Roll: ${roll} | Batch: ${session} | Fee: ৳${monthlyFee}`, { roll, session });
+document.getElementById('studentForm').reset(); setDefaultDates();
 document.getElementById('studentStatus').value = 'Active';
 toggleHoldFields();
 } catch(err) { alert("Error: " + err.message); }
@@ -1738,7 +2103,9 @@ if (resultBatch) resultBatch.set(resultDb.collection('students').doc(roll), { ro
 added++;
 } else failed++;
 });
-try { await batch.commit(); if (resultBatch) await resultBatch.commit(); alert(`Uploaded: ${added}, Skipped: ${failed}.`); document.getElementById('excelFile').value = ""; } catch(e) { alert("Error: " + e.message); }
+try { await batch.commit(); if (resultBatch) await resultBatch.commit(); alert(`Uploaded: ${added}, Skipped: ${failed}.`);
+if (added > 0) createNotification('student', `Bulk Student Upload`, `${added} students added successfully via Excel.`, { count: added });
+document.getElementById('excelFile').value = ""; } catch(e) { alert("Error: " + e.message); }
 };
 reader.readAsArrayBuffer(file);
 }
@@ -1974,9 +2341,7 @@ const transactionId = document.getElementById('feeTransactionId').value.trim();
 const collectedBy = document.getElementById('feeCollectedBy').value;
 if (!feeSelectedStudent) { alert("Match a student first."); return; }
 if (feeType === 'Tuition Fee' && isMonthInHoldPeriod(feeSelectedStudent, month)) {
-if (!confirm(`⚠️ Student "${feeSelectedStudent.name}" is ON HOLD for ${month}.
-Normally no tuition fee applies during hold period.
-Do you still want to record this payment?`)) return;
+if (!confirm(`⚠️ Student "${feeSelectedStudent.name}" is ON HOLD for ${month}.\nNormally no tuition fee applies during hold period.\nDo you still want to record this payment?`)) return;
 }
 let status = "Paid";
 if (feeType === "Tuition Fee") { const fee = feeSelectedStudent.monthlyFee ?? 1500; status = amount >= fee ? "Paid" : amount > 0 ? "Partial" : "Unpaid"; }
@@ -2005,6 +2370,8 @@ session: feeSelectedStudent.session, month, amount, status, feeType, paymentDate
 receivedByEmail: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
 alert("Payment Saved & Invoice Generated!");
+// Fee collection notification
+createNotification('fee', `Fee Received: ৳${amount.toLocaleString()}`, `${feeSelectedStudent.name} (${feeSelectedStudent.session}) paid ${feeType} for ${month} via ${paymentMethod}.`, { roll: feeSelectedStudent.roll, amount, feeType, month, invoiceNo });
 document.getElementById('collectFeeForm').reset(); setDefaultDates();
 document.getElementById('feePaymentMethod').value = 'Cash';
 document.getElementById('feeCollectedBy').value = 'Shahrim Ahammed Shad';
@@ -2250,7 +2617,7 @@ async function deletePaymentTransaction(id) { if (!confirm("Delete?")) return; t
 function updateAdjustmentAmountCalculation() { const type = document.getElementById('adjType').value, amtEl = document.getElementById('adjAmount'); const s = studentsCache.find(x => x.roll.toString() === selectedFinanceStudentRoll); const fee = s ? (s.monthlyFee ?? 1500) : 1500; if (type === 'Hold' || type === 'Full Waiver') { amtEl.value = fee; amtEl.disabled = true; } else { amtEl.disabled = false; amtEl.value = ""; } }
 document.getElementById('applyAdjustmentForm').addEventListener('submit', async (e) => { e.preventDefault(); const month = document.getElementById('adjMonth').value, type = document.getElementById('adjType').value, amount = parseFloat(document.getElementById('adjAmount').value) || 0, note = document.getElementById('adjNote').value.trim(); const s = studentsCache.find(x => x.roll.toString() === selectedFinanceStudentRoll); if (!s) return; try { await db.collection('adjustments').doc(`${selectedFinanceStudentRoll}_${month}`).set({ roll: selectedFinanceStudentRoll, session: s.session, month, type, amount, note, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); alert("Applied!"); document.getElementById('applyAdjustmentForm').reset(); updateAdjustmentAmountCalculation(); await reloadStudentAdjustmentsTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } });
 async function deleteAdjustment(id) { if (!confirm("Delete exemption?")) return; try { await db.collection('adjustments').doc(id).delete(); alert("Deleted."); await reloadStudentAdjustmentsTable(); if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger(); } catch(e) { alert("Error: " + e.message); } }
-function syncMonthlyEarnings() { if (currentUserRole !== 'admin') return; db.collection('payments').onSnapshot(snap => { earningsCacheByMonth = {}; snap.forEach(d => { const p = d.data(); if (p.month) earningsCacheByMonth[p.month] = (earningsCacheByMonth[p.month] || 0) + (Number(p.amount) || 0); }); renderEarningsSummary(); }); }
+function syncMonthlyEarnings() { if (currentUserRole !== 'admin') return; db.collection('payments').onSnapshot(snap => { earningsCacheByMonth = {}; snap.forEach(d => { const p = d.data(); if (p.month) earningsCacheByMonth[p.month] = (earningsCacheByMonth[p.month] || 0) + (Number(p.amount) || 0); }); renderEarningsSummary(); updateDashFinancialStats(); }); }
 function renderEarningsSummary() { const c = document.getElementById('monthlyEarningsContainer'); if (!c) return; c.innerHTML = ""; const months = Object.keys(earningsCacheByMonth).sort((a, b) => b.localeCompare(a)); if (!months.length) { c.innerHTML = '<div class="text-sm text-slate-400">No payments.</div>'; return; } months.slice(0, 4).forEach(m => { c.innerHTML += `<div class="p-4 bg-slate-50 border border-slate-100 rounded-lg"><p class="text-xs text-slate-400 font-semibold uppercase">${m}</p><p class="text-lg font-bold text-indigo-600 mt-1">${earningsCacheByMonth[m].toLocaleString()} BDT</p></div>` }); }
 function exportLedgerExcel() { if (!queriedPayments.length) { alert("Query first."); return; } const q = document.getElementById('feeLedgerSearch').value.toLowerCase().trim(); const sf = document.getElementById('feeStatusFilter').value; let data = queriedPayments; if (sf === 'Hold') data = data.filter(p => p.status === 'Hold'); else if (sf !== 'all') data = data.filter(p => p.status === sf); if (q) data = data.filter(p => p.name.toLowerCase().includes(q) || p.roll.toString().includes(q)); if (!data.length) { alert("No matching records."); return; } const ws = XLSX.utils.json_to_sheet(data.map(p => ({ Roll: p.roll, Name: p.name, "Current Month Billed": p.currentMonthBill, "Total Paid (All Time)": p.totalPaid, "Accumulated Due": p.netDues, Status: p.status }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Ledger"); XLSX.writeFile(wb, `Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.xlsx`); }
 function exportLedgerPDF() { if (!queriedPayments.length) { alert("Query first."); return; } const q = document.getElementById('feeLedgerSearch').value.toLowerCase().trim(); const sf = document.getElementById('feeStatusFilter').value; let data = queriedPayments; if (sf === 'Hold') data = data.filter(p => p.status === 'Hold'); else if (sf !== 'all') data = data.filter(p => p.status === sf); if (q) data = data.filter(p => p.name.toLowerCase().includes(q) || p.roll.toString().includes(q)); if (!data.length) { alert("No matching records."); return; } const tc = data.reduce((s, p) => s + p.totalPaid, 0), td = data.reduce((s, p) => s + Math.max(0, p.netDues), 0); const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.text("Ideal Coaching Center", 14, 20); doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.text(`Fee Ledger - ${activeLedgerBatch}`, 14, 28); doc.setFontSize(10); doc.text(`Month: ${activeLedgerMonth}`, 14, 35); let iy = 41; if (q) { doc.text(`Search: "${q}"`, 14, iy); iy += 6; } if (sf !== 'all') { doc.text(`Filter: ${sf}`, 14, iy); iy += 6; } doc.text(`Total Collected: ${tc.toLocaleString()} BDT | Total Due: ${td.toLocaleString()} BDT`, 14, iy); doc.autoTable({ startY: iy + 6, head: [['Roll','Name','Billed (This Month)','Paid (All Time)','Due','Status']], body: data.map(p => [p.roll, p.name, p.currentMonthBill + ' BDT', p.totalPaid + ' BDT', p.netDues > 0 ? p.netDues + ' BDT' : (p.netDues < 0 ? Math.abs(p.netDues) + ' (Adv)' : '0'), p.status]), theme: 'striped', didDrawPage: () => { doc.setFontSize(9); doc.setTextColor(100); doc.text("SD/- Shahrim Ahammed Shad<shad.iam.bd>", 14, doc.internal.pageSize.height - 10); } }); doc.save(`Fee_Ledger_${activeLedgerBatch}_${activeLedgerMonth}.pdf`); }
@@ -2290,7 +2657,9 @@ if (roll.length !== 6) { alert("Invalid roll."); return; }
 const student = studentsCache.find(s => s.roll.toString() === roll.toString()); if (!student) { alert("Student not found."); return; }
 try {
 await db.collection('penalties').doc(`${date}_${roll}_Manual_${Date.now()}`).set({ date, roll, name: student.name, session: student.session, type: "Manual Penalty", reason, amount, paidAmount: 0, exemptedAmount: 0, dueAmount: amount, status: "Unpaid", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-alert("Manual penalty added!"); document.getElementById('manualPenaltyForm').reset();
+alert("Manual penalty added!");
+createNotification('penalty', `New Penalty: ${student.name}`, `৳${amount} penalty added — ${reason}`, { roll: student.roll, amount, reason, date });
+document.getElementById('manualPenaltyForm').reset();
 const expenseDateEl = document.getElementById('expenseDate');
 if (expenseDateEl) expenseDateEl.value = new Date().toISOString().split('T')[0];
 } catch(e) { alert("Error: " + e.message); }
@@ -2366,7 +2735,15 @@ else { if (exempt + actionAmount > (p.amount - paid)) { alert("Exemption exceeds
 const due = p.amount - paid - exempt; let status = "Unpaid";
 if (due <= 0) { if (paid >= p.amount) status = "Paid"; else if (exempt >= p.amount) status = "Exempted"; else status = "Settled"; } else { status = "Partial"; }
 await ref.update({ paidAmount: paid, exemptedAmount: exempt, dueAmount: due, status: status });
-alert("Penalty updated successfully!"); closePenaltyActionModal();
+alert("Penalty updated successfully!");
+const student = studentsCache.find(s => s.roll.toString() === p.roll.toString());
+const studentName = student ? student.name : `Roll ${p.roll}`;
+if (type === 'pay') {
+createNotification('penalty', `Penalty Paid: ${studentName}`, `৳${actionAmount} penalty payment recorded.`, { roll: p.roll, amount: actionAmount });
+} else {
+createNotification('penalty', `Penalty Exempted: ${studentName}`, `৳${actionAmount} penalty exempted.`, { roll: p.roll, amount: actionAmount });
+}
+closePenaltyActionModal();
 if (document.getElementById('penaltySearchRoll').value.trim().length === 6) searchStudentPenalties();
 if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger();
 } catch(e) { alert("Error: " + e.message); }
@@ -2474,6 +2851,9 @@ payRemaining -= payThis;
 }
 await batch.commit();
 alert("Bulk penalty action completed successfully!");
+const student = studentsCache.find(s => s.roll.toString() === currentPenaltyStudentRoll);
+const studentName = student ? student.name : `Roll ${currentPenaltyStudentRoll}`;
+createNotification('penalty', `Bulk Penalty ${actionType}: ${studentName}`, `৳${amount} ${actionType === 'pay' ? 'paid' : actionType === 'exempt' ? 'exempted' : 'processed'} for all penalties.`, { roll: currentPenaltyStudentRoll, amount });
 closeBulkPenaltyModal();
 searchStudentPenalties();
 if (activeLedgerMonth && activeLedgerBatch) queryFeeLedger();
@@ -3069,7 +3449,6 @@ doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
 doc.text("Thank you for choosing Ideal Coaching Center. This is a computer-generated receipt.", 105, 280, { align: "center" });
 doc.save(`Invoice_${currentInvoiceData.invoiceNo}.pdf`);
 }
-// ===== FEE COLLECTION REPORT FUNCTIONS =====
 async function queryCollectedFees() {
 const fromDate = document.getElementById('crFromDate').value;
 const toDate = document.getElementById('crToDate').value;
@@ -3082,7 +3461,6 @@ tbody.innerHTML = '<tr><td colspan="12" class="text-center py-6 text-slate-400">
 document.getElementById('crSummaryCards').classList.add('hidden');
 document.getElementById('crTableFoot').classList.add('hidden');
 try {
-// Query 'invoices' collection to ensure invoiceNo is available
 const snap = await db.collection('invoices')
 .where('paymentDate', '>=', fromDate)
 .where('paymentDate', '<=', toDate)
@@ -3398,385 +3776,812 @@ doc.text(col.label, col.x + 5, sigY + 4, { align: "center" });
 const fileName = "Fee_Collection_" + collectedFeesMeta.fromDate + "_to_" + collectedFeesMeta.toDate + ".pdf".replace(/ /g, '_');
 doc.save(fileName);
 }
-
-// ==========================================
-// NEW: ATTENDANCE REPORT FUNCTIONS
-// ==========================================
-
 function toggleARFilters() {
-    const type = document.getElementById('arReportType').value;
-    const studentFilter = document.getElementById('arStudentFilter');
-    const batchFilter = document.getElementById('arBatchFilter');
-    const dateFilter = document.getElementById('arDateFilter');
-    const startFilter = document.getElementById('arStartFilter');
-    const endFilter = document.getElementById('arEndFilter');
-    const monthFilter = document.getElementById('arMonthFilter');
-
-    // Reset visibility
-    [studentFilter, batchFilter, dateFilter, startFilter, endFilter, monthFilter].forEach(el => el.classList.add('hidden'));
-
-    if (type === 'individual') {
-        studentFilter.classList.remove('hidden');
-        dateFilter.classList.remove('hidden');
-        startFilter.classList.remove('hidden');
-        endFilter.classList.remove('hidden');
-        monthFilter.classList.remove('hidden');
-    } else if (type === 'batch') {
-        batchFilter.classList.remove('hidden');
-        dateFilter.classList.remove('hidden');
-        startFilter.classList.remove('hidden');
-        endFilter.classList.remove('hidden');
-        monthFilter.classList.remove('hidden');
-    } else if (type === 'date-wise') {
-        dateFilter.classList.remove('hidden');
-        batchFilter.classList.remove('hidden');
-    } else if (type === 'range') {
-        startFilter.classList.remove('hidden');
-        endFilter.classList.remove('hidden');
-        batchFilter.classList.remove('hidden');
-    } else if (type === 'monthly') {
-        monthFilter.classList.remove('hidden');
-        batchFilter.classList.remove('hidden');
-    }
+const type = document.getElementById('arReportType').value;
+const studentFilter = document.getElementById('arStudentFilter');
+const batchFilter = document.getElementById('arBatchFilter');
+const dateFilter = document.getElementById('arDateFilter');
+const startFilter = document.getElementById('arStartFilter');
+const endFilter = document.getElementById('arEndFilter');
+const monthFilter = document.getElementById('arMonthFilter');
+[studentFilter, batchFilter, dateFilter, startFilter, endFilter, monthFilter].forEach(el => el.classList.add('hidden'));
+if (type === 'individual') {
+studentFilter.classList.remove('hidden');
+dateFilter.classList.remove('hidden');
+startFilter.classList.remove('hidden');
+endFilter.classList.remove('hidden');
+monthFilter.classList.remove('hidden');
+} else if (type === 'batch') {
+batchFilter.classList.remove('hidden');
+dateFilter.classList.remove('hidden');
+startFilter.classList.remove('hidden');
+endFilter.classList.remove('hidden');
+monthFilter.classList.remove('hidden');
+} else if (type === 'date-wise') {
+dateFilter.classList.remove('hidden');
+batchFilter.classList.remove('hidden');
+} else if (type === 'range') {
+startFilter.classList.remove('hidden');
+endFilter.classList.remove('hidden');
+batchFilter.classList.remove('hidden');
+} else if (type === 'monthly') {
+monthFilter.classList.remove('hidden');
+batchFilter.classList.remove('hidden');
 }
-
+}
 function resetARFilters() {
-    document.getElementById('arReportType').value = 'individual';
-    document.getElementById('arStudentRoll').value = '';
-    document.getElementById('arBatchSelect').value = '';
-    document.getElementById('arDate').value = '';
-    document.getElementById('arStartDate').value = '';
-    document.getElementById('arEndDate').value = '';
-    document.getElementById('arMonth').value = '';
-    document.getElementById('arStatusFilter').value = '';
-    toggleARFilters();
-    document.getElementById('attendanceReportPreview').classList.add('hidden');
+document.getElementById('arReportType').value = 'individual';
+document.getElementById('arStudentRoll').value = '';
+document.getElementById('arBatchSelect').value = '';
+document.getElementById('arDate').value = '';
+document.getElementById('arStartDate').value = '';
+document.getElementById('arEndDate').value = '';
+document.getElementById('arMonth').value = '';
+document.getElementById('arStatusFilter').value = '';
+toggleARFilters();
+document.getElementById('attendanceReportPreview').classList.add('hidden');
 }
-
 async function generateAttendanceReport() {
-    const type = document.getElementById('arReportType').value;
-    const roll = document.getElementById('arStudentRoll').value.trim();
-    const batch = document.getElementById('arBatchSelect').value;
-    const date = document.getElementById('arDate').value;
-    const startDate = document.getElementById('arStartDate').value;
-    const endDate = document.getElementById('arEndDate').value;
-    const month = document.getElementById('arMonth').value;
-    const status = document.getElementById('arStatusFilter').value;
-
-    const preview = document.getElementById('attendanceReportPreview');
-    preview.innerHTML = '<div class="text-center py-10 text-slate-500">Generating Report...</div>';
-    preview.classList.remove('hidden');
-
-    try {
-        let query = db.collection('attendance');
-        
-        // Basic constraints for Firestore
-        if (date) query = query.where('date', '==', date);
-        else if (startDate && endDate) query = query.where('date', '>=', startDate).where('date', '<=', endDate);
-        
-        // Note: Firestore doesn't allow multiple inequalities on different fields easily without composite indexes.
-        // We will fetch and filter client-side for complex combos to be safe and accurate.
-        // If 'date' is set, we can use equality. If range, we use range.
-        
-        const snap = await query.get();
-        let records = [];
-        snap.forEach(d => records.push(d.data()));
-
-        // Client-side filtering
-        if (type === 'individual' && roll) {
-            records = records.filter(r => r.roll.toString() === roll);
-        }
-        if (type !== 'individual' && batch) {
-            records = records.filter(r => r.session === batch);
-        }
-        if (date) {
-            records = records.filter(r => r.date === date);
-        }
-        if (startDate && endDate) {
-            records = records.filter(r => r.date >= startDate && r.date <= endDate);
-        }
-        if (month) {
-            records = records.filter(r => r.date.startsWith(month));
-        }
-        if (status) {
-            records = records.filter(r => r.status === status);
-        }
-
-        // Enrich with student data
-        records = records.map(r => {
-            const student = studentsCache.find(s => s.roll.toString() === r.roll.toString());
-            return {
-                ...r,
-                studentName: student ? student.name : r.name,
-                studentSession: student ? student.session : r.session
-            };
-        });
-
-        // Sort
-        records.sort((a, b) => a.date.localeCompare(b.date) || a.roll.localeCompare(b.roll));
-
-        arReportData = records;
-        arReportMeta = { type, roll, batch, date, startDate, endDate, month, status };
-
-        renderAttendanceReportPreview();
-        lucide.createIcons();
-
-    } catch (e) {
-        console.error(e);
-        preview.innerHTML = `<div class="text-center py-10 text-red-500">Error generating report: ${e.message}</div>`;
-    }
+const type = document.getElementById('arReportType').value;
+const roll = document.getElementById('arStudentRoll').value.trim();
+const batch = document.getElementById('arBatchSelect').value;
+const date = document.getElementById('arDate').value;
+const startDate = document.getElementById('arStartDate').value;
+const endDate = document.getElementById('arEndDate').value;
+const month = document.getElementById('arMonth').value;
+const status = document.getElementById('arStatusFilter').value;
+const preview = document.getElementById('attendanceReportPreview');
+preview.innerHTML = '<div class="text-center py-10 text-slate-500">Generating Report...</div>';
+preview.classList.remove('hidden');
+try {
+let query = db.collection('attendance');
+if (date) query = query.where('date', '==', date);
+else if (startDate && endDate) query = query.where('date', '>=', startDate).where('date', '<=', endDate);
+const snap = await query.get();
+let records = [];
+snap.forEach(d => records.push(d.data()));
+if (type === 'individual' && roll) {
+records = records.filter(r => r.roll.toString() === roll);
 }
-
+if (type !== 'individual' && batch) {
+records = records.filter(r => r.session === batch);
+}
+if (date) {
+records = records.filter(r => r.date === date);
+}
+if (startDate && endDate) {
+records = records.filter(r => r.date >= startDate && r.date <= endDate);
+}
+if (month) {
+records = records.filter(r => r.date.startsWith(month));
+}
+if (status) {
+records = records.filter(r => r.status === status);
+}
+records = records.map(r => {
+const student = studentsCache.find(s => s.roll.toString() === r.roll.toString());
+return {
+...r,
+studentName: student ? student.name : r.name,
+studentSession: student ? student.session : r.session
+};
+});
+records.sort((a, b) => a.date.localeCompare(b.date) || a.roll.localeCompare(b.roll));
+arReportData = records;
+arReportMeta = { type, roll, batch, date, startDate, endDate, month, status };
+renderAttendanceReportPreview();
+lucide.createIcons();
+} catch (e) {
+console.error(e);
+preview.innerHTML = `<div class="text-center py-10 text-red-500">Error generating report: ${e.message}</div>`;
+}
+}
 function renderAttendanceReportPreview() {
-    const preview = document.getElementById('attendanceReportPreview');
-    const { type, roll, batch, date, startDate, endDate, month, status } = arReportMeta;
-    const records = arReportData;
-
-    let title = "ATTENDANCE REPORT";
-    let subtitle = "";
-    
-    if (type === 'individual') {
-        const student = studentsCache.find(s => s.roll.toString() === roll);
-        title = `INDIVIDUAL ATTENDANCE REPORT`;
-        subtitle = student ? `${student.name} (${student.roll}) - ${student.session}` : `Roll: ${roll}`;
-    } else if (type === 'batch') {
-        title = `BATCH ATTENDANCE REPORT`;
-        subtitle = `Batch: ${batch || 'All'}`;
-    } else if (type === 'date-wise') {
-        title = `DATE-WISE ATTENDANCE REPORT`;
-        subtitle = `Date: ${date}`;
-    } else if (type === 'range') {
-        title = `ATTENDANCE REPORT (DATE RANGE)`;
-        subtitle = `${startDate} to ${endDate}`;
-    } else if (type === 'monthly') {
-        title = `MONTHLY ATTENDANCE REPORT`;
-        subtitle = `Month: ${month}`;
-    }
-
-    let periodText = "All Time";
-    if (date) periodText = date;
-    else if (startDate && endDate) periodText = `${startDate} to ${endDate}`;
-    else if (month) periodText = month;
-
-    let html = `
-        <div class="report-header">
-            <h1>IDEAL COACHING CENTER</h1>
-            <p>Address: Bhabanipur Bazar, Harinakundu, Jhenaidah</p>
-            <h2>${title}</h2>
-            <p style="font-size: 12px; margin: 5px 0;">${subtitle}</p>
-        </div>
-        <div class="report-meta">
-            <div><strong>Period:</strong> ${periodText}</div>
-            <div><strong>Status Filter:</strong> ${status || 'All'}</div>
-            <div><strong>Generated:</strong> ${new Date().toLocaleString()}</div>
-        </div>
-    `;
-
-    if (records.length === 0) {
-        html += `<div class="no-data-message">No records found for the selected criteria.</div>`;
-    } else {
-        if (type === 'individual') {
-            html += renderIndividualReport(records);
-        } else {
-            html += renderBatchOrDateReport(records, type);
-        }
-    }
-
-    // Signatures - Only 3 signatures, no Class Teacher
-    html += `
-        <div class="report-signatures">
-            <div class="report-signatures-grid">
-                <div class="report-sig-box">
-                    <div class="report-sig-line">Prepared By</div>
-                </div>
-                <div class="report-sig-box">
-                    <div class="report-sig-line">Attendance Checked By</div>
-                </div>
-                <div class="report-sig-box">
-                    <div class="report-sig-line">Authorized Signature</div>
-                </div>
-            </div>
-        </div>
-        <div class="report-footer">
-            <div class="report-date-field">
-                <p><strong>Date:</strong> ____________________</p>
-            </div>
-            <p style="margin-top: 15px;">SD/- Shahrim Ahammed Shad &lt;shad.iam.bd&gt;</p>
-        </div>
-    `;
-
-    preview.innerHTML = html;
+const preview = document.getElementById('attendanceReportPreview');
+const { type, roll, batch, date, startDate, endDate, month, status } = arReportMeta;
+const records = arReportData;
+let title = "ATTENDANCE REPORT";
+let subtitle = "";
+if (type === 'individual') {
+const student = studentsCache.find(s => s.roll.toString() === roll);
+title = `INDIVIDUAL ATTENDANCE REPORT`;
+subtitle = student ? `${student.name} (${student.roll}) - ${student.session}` : `Roll: ${roll}`;
+} else if (type === 'batch') {
+title = `BATCH ATTENDANCE REPORT`;
+subtitle = `Batch: ${batch || 'All'}`;
+} else if (type === 'date-wise') {
+title = `DATE-WISE ATTENDANCE REPORT`;
+subtitle = `Date: ${date}`;
+} else if (type === 'range') {
+title = `ATTENDANCE REPORT (DATE RANGE)`;
+subtitle = `${startDate} to ${endDate}`;
+} else if (type === 'monthly') {
+title = `MONTHLY ATTENDANCE REPORT`;
+subtitle = `Month: ${month}`;
 }
-
+let periodText = "All Time";
+if (date) periodText = date;
+else if (startDate && endDate) periodText = `${startDate} to ${endDate}`;
+else if (month) periodText = month;
+let html = `
+<div class="report-header">
+<h1>IDEAL COACHING CENTER</h1>
+<p>Address: Bhabanipur Bazar, Harinakundu, Jhenaidah</p>
+<h2>${title}</h2>
+<p style="font-size: 12px; margin: 5px 0;">${subtitle}</p>
+</div>
+<div class="report-meta">
+<div><strong>Period:</strong> ${periodText}</div>
+<div><strong>Status Filter:</strong> ${status || 'All'}</div>
+<div><strong>Generated:</strong> ${new Date().toLocaleString()}</div>
+</div>
+`;
+if (records.length === 0) {
+html += `<div class="no-data-message">No records found for the selected criteria.</div>`;
+} else {
+if (type === 'individual') {
+html += renderIndividualReport(records);
+} else {
+html += renderBatchOrDateReport(records, type);
+}
+}
+html += `
+<div class="report-signatures">
+<div class="report-signatures-grid">
+<div class="report-sig-box"><div class="report-sig-line">Prepared By</div></div>
+<div class="report-sig-box"><div class="report-sig-line">Attendance Checked By</div></div>
+<div class="report-sig-box"><div class="report-sig-line">Authorized Signature</div></div>
+</div>
+</div>
+<div class="report-footer">
+<div class="report-date-field"><p><strong>Date:</strong> ____________________</p></div>
+<p style="margin-top: 15px;">SD/- Shahrim Ahammed Shad &lt;shad.iam.bd&gt;</p>
+</div>
+`;
+preview.innerHTML = html;
+}
 function renderIndividualReport(records) {
-    if (!records.length) return "";
-    const student = studentsCache.find(s => s.roll.toString() === records[0].roll.toString());
-    
-    const totalClasses = new Set(records.map(r => r.date)).size;
-    const present = records.filter(r => r.status === 'Present').length;
-    const late = records.filter(r => r.status === 'Late').length;
-    const absent = records.filter(r => r.status === 'Absent').length;
-    const leave = records.filter(r => r.status === 'Leave').length;
-    const effective = totalClasses - leave;
-    const rate = effective > 0 ? (((present + late) / effective) * 100).toFixed(2) : 0;
-
-    let html = `
-        <div class="report-summary">
-            <strong>Summary:</strong> Total Classes: ${totalClasses} | Present: ${present} | Late: ${late} | Absent: ${absent} | Leave: ${leave} | <strong>Attendance Rate: ${rate}%</strong>
-        </div>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">SL</th>
-                    <th style="width: 20%;">Date</th>
-                    <th style="width: 15%;">Day</th>
-                    <th style="width: 20%;">Status</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    records.forEach((r, i) => {
-        const day = new Date(r.date).toLocaleDateString('en-US', { weekday: 'long' });
-        html += `
-            <tr>
-                <td style="text-align: center;">${i + 1}</td>
-                <td>${r.date}</td>
-                <td>${day}</td>
-                <td style="font-weight: bold;">${r.status}</td>
-                <td>${r.status === 'Leave' ? 'Approved Leave' : ''}</td>
-            </tr>
-        `;
-    });
-    
-    html += `</tbody></table>`;
-    return html;
+if (!records.length) return "";
+const student = studentsCache.find(s => s.roll.toString() === records[0].roll.toString());
+const totalClasses = new Set(records.map(r => r.date)).size;
+const present = records.filter(r => r.status === 'Present').length;
+const late = records.filter(r => r.status === 'Late').length;
+const absent = records.filter(r => r.status === 'Absent').length;
+const leave = records.filter(r => r.status === 'Leave').length;
+const effective = totalClasses - leave;
+const rate = effective > 0 ? (((present + late) / effective) * 100).toFixed(2) : 0;
+let html = `
+<div class="report-summary">
+<strong>Summary:</strong> Total Classes: ${totalClasses} | Present: ${present} | Late: ${late} | Absent: ${absent} | Leave: ${leave} | <strong>Attendance Rate: ${rate}%</strong>
+</div>
+<table class="report-table">
+<thead><tr>
+<th style="width: 5%;">SL</th><th style="width: 20%;">Date</th><th style="width: 15%;">Day</th><th style="width: 20%;">Status</th><th>Remarks</th>
+</tr></thead><tbody>`;
+records.forEach((r, i) => {
+const day = new Date(r.date).toLocaleDateString('en-US', { weekday: 'long' });
+html += `<tr><td style="text-align: center;">${i + 1}</td><td>${r.date}</td><td>${day}</td><td style="font-weight: bold;">${r.status}</td><td>${r.status === 'Leave' ? 'Approved Leave' : ''}</td></tr>`;
+});
+html += `</tbody></table>`;
+return html;
 }
-
 function renderBatchOrDateReport(records, type) {
-    // Group by student
-    const studentMap = {};
-    records.forEach(r => {
-        if (!studentMap[r.roll]) {
-            studentMap[r.roll] = {
-                roll: r.roll,
-                name: r.studentName,
-                session: r.studentSession,
-                present: 0, late: 0, absent: 0, leave: 0, total: 0, dates: new Set()
-            };
-        }
-        const s = studentMap[r.roll];
-        s.dates.add(r.date);
-        s.total++; // Total records
-        if (r.status === 'Present') s.present++;
-        else if (r.status === 'Late') s.late++;
-        else if (r.status === 'Absent') s.absent++;
-        else if (r.status === 'Leave') s.leave++;
-    });
-
-    let students = Object.values(studentMap);
-    
-    // Calculate rate for sorting
-    students.forEach(s => {
-        if (type === 'date-wise' && arReportMeta.date) {
-            // Single day: sort by status priority
-            const rec = records.find(r => r.roll === s.roll && r.date === arReportMeta.date);
-            const status = rec ? rec.status : 'Absent';
-            if (status === 'Present') s.rateNum = 4;
-            else if (status === 'Late') s.rateNum = 3;
-            else if (status === 'Leave') s.rateNum = 2;
-            else s.rateNum = 1;
-        } else {
-            const effective = s.total - s.leave;
-            s.rateNum = effective > 0 ? ((s.present + s.late) / effective) * 100 : 0;
-        }
-    });
-
-    // Sort by rate descending (highest percentage first), then by roll ascending as a tie-breaker
-    students.sort((a, b) => {
-        if (b.rateNum !== a.rateNum) {
-            return b.rateNum - a.rateNum;
-        }
-        return a.roll.localeCompare(b.roll);
-    });
-    
-    // Calculate total unique classes in this report set
-    const allDates = new Set(records.map(r => r.date));
-    const totalClassesInRange = allDates.size;
-
-    let html = `
-        <div class="report-summary" style="display: flex; justify-content: space-between;">
-            <div><strong>Total Students:</strong> ${students.length}</div>
-            <div><strong>Total Classes (Logged):</strong> ${totalClassesInRange}</div>
-        </div>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">SL</th>
-                    <th style="width: 10%;">Roll</th>
-                    <th>Name</th>
-    `;
-
-    if (type === 'date-wise' && arReportMeta.date) {
-        // Single day view
-        html += `<th style="width: 20%; text-align: center;">Status</th>`;
-    } else {
-        // Aggregate view
-        html += `
-            <th style="text-align: center;">P</th>
-            <th style="text-align: center;">L</th>
-            <th style="text-align: center;">A</th>
-            <th style="text-align: center;">Lv</th>
-            <th style="text-align: center;">Total</th>
-            <th style="width: 15%; text-align: center;">%</th>
-        `;
-    }
-    html += `</tr></thead><tbody>`;
-
-    students.forEach((s, i) => {
-        html += `<tr>`;
-        html += `<td style="text-align: center;">${i + 1}</td>`;
-        html += `<td style="text-align: center; font-weight: bold;">${s.roll}</td>`;
-        html += `<td>${s.name}</td>`;
-
-        if (type === 'date-wise' && arReportMeta.date) {
-            // Find the specific record for this date
-            const rec = records.find(r => r.roll === s.roll && r.date === arReportMeta.date);
-            const status = rec ? rec.status : 'Absent (No Record)';
-            html += `<td style="text-align: center; font-weight: bold;">${status}</td>`;
-        } else {
-            const effective = s.total - s.leave;
-            const rate = effective > 0 ? (((s.present + s.late) / effective) * 100).toFixed(1) : 0;
-            html += `<td style="text-align: center;">${s.present}</td>`;
-            html += `<td style="text-align: center;">${s.late}</td>`;
-            html += `<td style="text-align: center;">${s.absent}</td>`;
-            html += `<td style="text-align: center;">${s.leave}</td>`;
-            html += `<td style="text-align: center; font-weight: bold;">${s.total}</td>`;
-            html += `<td style="text-align: center; font-weight: bold;">${rate}%</td>`;
-        }
-        html += `</tr>`;
-    });
-
-    html += `</tbody></table>`;
-
-    return html;
+const studentMap = {};
+records.forEach(r => {
+if (!studentMap[r.roll]) {
+studentMap[r.roll] = {
+roll: r.roll, name: r.studentName, session: r.studentSession,
+present: 0, late: 0, absent: 0, leave: 0, total: 0, dates: new Set()
+};
 }
-
+const s = studentMap[r.roll];
+s.dates.add(r.date);
+s.total++;
+if (r.status === 'Present') s.present++;
+else if (r.status === 'Late') s.late++;
+else if (r.status === 'Absent') s.absent++;
+else if (r.status === 'Leave') s.leave++;
+});
+let students = Object.values(studentMap);
+students.forEach(s => {
+if (type === 'date-wise' && arReportMeta.date) {
+const rec = records.find(r => r.roll === s.roll && r.date === arReportMeta.date);
+const status = rec ? rec.status : 'Absent';
+if (status === 'Present') s.rateNum = 4;
+else if (status === 'Late') s.rateNum = 3;
+else if (status === 'Leave') s.rateNum = 2;
+else s.rateNum = 1;
+} else {
+const effective = s.total - s.leave;
+s.rateNum = effective > 0 ? ((s.present + s.late) / effective) * 100 : 0;
+}
+});
+students.sort((a, b) => {
+if (b.rateNum !== a.rateNum) return b.rateNum - a.rateNum;
+return a.roll.localeCompare(b.roll);
+});
+const allDates = new Set(records.map(r => r.date));
+const totalClassesInRange = allDates.size;
+let html = `
+<div class="report-summary" style="display: flex; justify-content: space-between;">
+<div><strong>Total Students:</strong> ${students.length}</div>
+<div><strong>Total Classes (Logged):</strong> ${totalClassesInRange}</div>
+</div>
+<table class="report-table"><thead><tr>
+<th style="width: 5%;">SL</th><th style="width: 10%;">Roll</th><th>Name</th>`;
+if (type === 'date-wise' && arReportMeta.date) {
+html += `<th style="width: 20%; text-align: center;">Status</th>`;
+} else {
+html += `<th style="text-align: center;">P</th><th style="text-align: center;">L</th><th style="text-align: center;">A</th><th style="text-align: center;">Lv</th><th style="text-align: center;">Total</th><th style="width: 15%; text-align: center;">%</th>`;
+}
+html += `</tr></thead><tbody>`;
+students.forEach((s, i) => {
+html += `<tr><td style="text-align: center;">${i + 1}</td><td style="text-align: center; font-weight: bold;">${s.roll}</td><td>${s.name}</td>`;
+if (type === 'date-wise' && arReportMeta.date) {
+const rec = records.find(r => r.roll === s.roll && r.date === arReportMeta.date);
+const status = rec ? rec.status : 'Absent (No Record)';
+html += `<td style="text-align: center; font-weight: bold;">${status}</td>`;
+} else {
+const effective = s.total - s.leave;
+const rate = effective > 0 ? (((s.present + s.late) / effective) * 100).toFixed(1) : 0;
+html += `<td style="text-align: center;">${s.present}</td><td style="text-align: center;">${s.late}</td><td style="text-align: center;">${s.absent}</td><td style="text-align: center;">${s.leave}</td><td style="text-align: center; font-weight: bold;">${s.total}</td><td style="text-align: center; font-weight: bold;">${rate}%</td>`;
+}
+html += `</tr>`;
+});
+html += `</tbody></table>`;
+return html;
+}
 function printAttendanceReport() {
-    const preview = document.getElementById('attendanceReportPreview');
-    if (preview.classList.contains('hidden') || !preview.innerHTML.trim()) {
-        alert("Please generate a report first.");
-        return;
-    }
-    window.print();
+const preview = document.getElementById('attendanceReportPreview');
+if (preview.classList.contains('hidden') || !preview.innerHTML.trim()) {
+alert("Please generate a report first.");
+return;
 }
-
-// Initialize AR Filters on load
+window.print();
+}
 window.addEventListener('DOMContentLoaded', () => {
-    toggleARFilters();
+toggleARFilters();
 });
 
+// ================================================================
+// NEW: DASHBOARD FUNCTIONS
+// ================================================================
+function initDashboard() {
+// Setup listeners for dashboard data
+const listeners = [];
+
+// Students listener (already exists in syncCache, but we need separate for dashboard)
+listeners.push(db.collection('students').onSnapshot(() => {
+updateDashStudentStats();
+updateDashBatchChart();
+}));
+
+// Today's attendance listener
+const today = new Date().toISOString().split('T')[0];
+listeners.push(db.collection('attendance').where('date', '==', today).onSnapshot(snap => {
+let p=0, l=0, a=0, lv=0;
+snap.forEach(d => {
+const data = d.data();
+if (data.status === 'Present') p++;
+else if (data.status === 'Late') l++;
+else if (data.status === 'Absent') a++;
+else if (data.status === 'Leave') lv++;
+});
+const el1 = document.getElementById('dashTodayAttendance'); if (el1) el1.textContent = p + l + a + lv;
+const el2 = document.getElementById('dashPresentToday'); if (el2) el2.textContent = p;
+const el3 = document.getElementById('dashAbsentToday'); if (el3) el3.textContent = a;
+const el4 = document.getElementById('dashLateToday'); if (el4) el4.textContent = l;
+const el5 = document.getElementById('dashLeaveToday'); if (el5) el5.textContent = lv;
+updateDashAttendanceChart(p, l, a, lv);
+}));
+
+// Payments listener for today's collection + month collection
+listeners.push(db.collection('payments').onSnapshot(snap => {
+const today = new Date().toISOString().split('T')[0];
+const currentMonth = new Date().toISOString().substring(0, 7);
+let todayTotal = 0, todayTxn = 0, monthTotal = 0;
+snap.forEach(d => {
+const p = d.data();
+const amt = Number(p.amount) || 0;
+if (p.paymentDate === today) { todayTotal += amt; todayTxn++; }
+if (p.month === currentMonth) monthTotal += amt;
+});
+const el1 = document.getElementById('dashTodayCollection'); if (el1) el1.textContent = '৳' + todayTotal.toLocaleString();
+const el2 = document.getElementById('dashTodayTxn'); if (el2) el2.textContent = todayTxn;
+const el3 = document.getElementById('dashMonthCollection'); if (el3) el3.textContent = '৳' + monthTotal.toLocaleString();
+updateDashFeeTrendChart();
+updateDashMonthlyCollectionChart();
+}));
+
+// Penalties listener
+listeners.push(db.collection('penalties').onSnapshot(snap => {
+let total = 0, pending = 0;
+snap.forEach(d => {
+const p = d.data();
+const amt = Number(p.amount) || 0;
+const due = Number(p.dueAmount !== undefined ? p.dueAmount : amt);
+total += amt;
+pending += Math.max(0, due);
+});
+const el1 = document.getElementById('dashPenalties'); if (el1) el1.textContent = '৳' + total.toLocaleString();
+const el2 = document.getElementById('dashPendingPenalties'); if (el2) el2.textContent = '৳' + pending.toLocaleString();
+}));
+
+dashboardListeners = listeners;
+
+// Initial load of outstanding fees (computed)
+computeOutstandingFees();
+
+// Recent activity
+loadRecentActivity();
+
+// Initialize charts
+initDashboardCharts();
+}
+
+async function computeOutstandingFees() {
+// Compute outstanding fees for current month
+try {
+const currentMonth = new Date().toISOString().substring(0, 7);
+let totalOutstanding = 0;
+let dueStudents = 0;
+// Simple approximation: for each student, compute net dues for current month
+for (const s of studentsCache) {
+if ((s.status || 'Active') === 'Hold' && isMonthInHoldPeriod(s, currentMonth)) continue;
+try {
+const bal = await calculateStudentOutstandingBalance(s.roll.toString(), currentMonth);
+if (bal.netDues > 0) {
+totalOutstanding += bal.netDues;
+dueStudents++;
+}
+} catch(e) {}
+}
+const el1 = document.getElementById('dashOutstanding'); if (el1) el1.textContent = '৳' + totalOutstanding.toLocaleString();
+const el2 = document.getElementById('dashDueStudents'); if (el2) el2.textContent = dueStudents;
+} catch(e) { console.error('Outstanding compute error:', e); }
+}
+
+function updateDashStudentStats() {
+const total = studentsCache.length;
+const active = studentsCache.filter(s => (s.status || 'Active') === 'Active').length;
+const batches = new Set(studentsCache.map(s => s.session)).size;
+const el1 = document.getElementById('dashTotalStudents'); if (el1) el1.textContent = total;
+const el2 = document.getElementById('dashActiveStudents'); if (el2) el2.textContent = active;
+const el3 = document.getElementById('dashTotalBatches'); if (el3) el3.textContent = batches;
+const el4 = document.getElementById('dashBatchCount'); if (el4) el4.textContent = batches;
+}
+
+function cleanupDashboard() {
+dashboardListeners.forEach(unsub => { try { unsub(); } catch(e) {} });
+dashboardListeners = [];
+Object.values(dashboardCharts).forEach(c => { try { c.destroy(); } catch(e) {} });
+dashboardCharts = {};
+}
+
+function refreshDashboard() {
+updateDashStudentStats();
+computeOutstandingFees();
+loadRecentActivity();
+updateDashUpcomingExams();
+// Trigger chart refresh
+setTimeout(() => {
+updateDashFeeTrendChart();
+updateDashMonthlyCollectionChart();
+updateDashBatchChart();
+}, 100);
+}
+
+function initDashboardCharts() {
+// Fee Trend (last 7 days) - bar chart
+const ctx1 = document.getElementById('chartFeeTrend');
+if (ctx1) {
+dashboardCharts.feeTrend = new Chart(ctx1, {
+type: 'bar',
+data: { labels: [], datasets: [{ label: 'Collection (BDT)', data: [], backgroundColor: 'rgba(99, 102, 241, 0.8)', borderRadius: 6 }] },
+options: {
+responsive: true, maintainAspectRatio: false,
+plugins: { legend: { display: false } },
+scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+}
+});
+}
+// Attendance Pie
+const ctx2 = document.getElementById('chartAttendancePie');
+if (ctx2) {
+dashboardCharts.attendancePie = new Chart(ctx2, {
+type: 'doughnut',
+data: { labels: ['Present','Late','Absent','Leave'], datasets: [{ data: [0,0,0,0], backgroundColor: ['#10b981','#f59e0b','#ef4444','#8b5cf6'], borderWidth: 0 }] },
+options: {
+responsive: true, maintainAspectRatio: false, cutout: '65%',
+plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+}
+});
+}
+// Batch Distribution
+const ctx3 = document.getElementById('chartBatchDist');
+if (ctx3) {
+dashboardCharts.batchDist = new Chart(ctx3, {
+type: 'bar',
+data: { labels: [], datasets: [{ label: 'Students', data: [], backgroundColor: 'rgba(139, 92, 246, 0.8)', borderRadius: 6 }] },
+options: {
+responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+plugins: { legend: { display: false } },
+scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+}
+});
+}
+// Monthly Collection
+const ctx4 = document.getElementById('chartMonthlyCollection');
+if (ctx4) {
+dashboardCharts.monthlyCollection = new Chart(ctx4, {
+type: 'line',
+data: { labels: [], datasets: [{ label: 'Collection (BDT)', data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#6366f1' }] },
+options: {
+responsive: true, maintainAspectRatio: false,
+plugins: { legend: { display: false } },
+scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+}
+});
+}
+}
+
+async function updateDashFeeTrendChart() {
+if (!dashboardCharts.feeTrend) return;
+try {
+const today = new Date();
+const labels = [], data = [];
+for (let i = 6; i >= 0; i--) {
+const d = new Date(today);
+d.setDate(d.getDate() - i);
+const dateStr = d.toISOString().split('T')[0];
+labels.push(d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
+// Query payments for this date
+const snap = await db.collection('payments').where('paymentDate', '==', dateStr).get();
+let total = 0;
+snap.forEach(doc => { total += Number(doc.data().amount) || 0; });
+data.push(total);
+}
+dashboardCharts.feeTrend.data.labels = labels;
+dashboardCharts.feeTrend.data.datasets[0].data = data;
+dashboardCharts.feeTrend.update();
+} catch(e) { console.error('Fee trend chart error:', e); }
+}
+
+function updateDashAttendanceChart(p, l, a, lv) {
+if (!dashboardCharts.attendancePie) return;
+dashboardCharts.attendancePie.data.datasets[0].data = [p, l, a, lv];
+dashboardCharts.attendancePie.update();
+}
+
+function updateDashBatchChart() {
+if (!dashboardCharts.batchDist) return;
+const batchCount = {};
+studentsCache.forEach(s => {
+const b = s.session || 'Unknown';
+batchCount[b] = (batchCount[b] || 0) + 1;
+});
+const sorted = Object.entries(batchCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+dashboardCharts.batchDist.data.labels = sorted.map(x => x[0]);
+dashboardCharts.batchDist.data.datasets[0].data = sorted.map(x => x[1]);
+dashboardCharts.batchDist.update();
+}
+
+async function updateDashMonthlyCollectionChart() {
+if (!dashboardCharts.monthlyCollection) return;
+try {
+const labels = [], data = [];
+const today = new Date();
+for (let i = 5; i >= 0; i--) {
+const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+labels.push(d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }));
+const snap = await db.collection('payments').where('month', '==', monthStr).get();
+let total = 0;
+snap.forEach(doc => { total += Number(doc.data().amount) || 0; });
+data.push(total);
+}
+dashboardCharts.monthlyCollection.data.labels = labels;
+dashboardCharts.monthlyCollection.data.datasets[0].data = data;
+dashboardCharts.monthlyCollection.update();
+} catch(e) { console.error('Monthly chart error:', e); }
+}
+
+async function loadRecentActivity() {
+const container = document.getElementById('dashRecentActivity');
+if (!container) return;
+container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Loading...</div>';
+try {
+// Fetch recent payments + attendance + penalties
+const [paySnap, attSnap, penSnap] = await Promise.all([
+db.collection('payments').orderBy('timestamp', 'desc').limit(5).get(),
+db.collection('attendance').orderBy('timestamp', 'desc').limit(5).get(),
+db.collection('penalties').orderBy('timestamp', 'desc').limit(5).get()
+]);
+const activities = [];
+paySnap.forEach(d => {
+const p = d.data();
+activities.push({
+type: 'fee',
+icon: 'banknote',
+color: 'bg-green-100 text-green-600',
+html: `<strong>${p.name}</strong> paid <strong>৳${(p.amount || 0).toLocaleString()}</strong> (${p.feeType || 'Fee'})`,
+time: p.timestamp ? p.timestamp.toDate() : new Date()
+});
+});
+attSnap.forEach(d => {
+const a = d.data();
+if (a.status === 'Absent' || a.status === 'Late') {
+activities.push({
+type: 'attendance',
+icon: a.status === 'Late' ? 'clock' : 'x-circle',
+color: a.status === 'Late' ? 'bg-amber-100 text-amber-600' : 'bg-rose-100 text-rose-600',
+html: `<strong>${a.name}</strong> marked <strong>${a.status.toLowerCase()}</strong>`,
+time: a.timestamp ? a.timestamp.toDate() : new Date()
+});
+}
+});
+penSnap.forEach(d => {
+const p = d.data();
+activities.push({
+type: 'penalty',
+icon: 'alert-triangle',
+color: 'bg-orange-100 text-orange-600',
+html: `<strong>${p.name}</strong> — ৳${p.amount} penalty`,
+time: p.timestamp ? p.timestamp.toDate() : new Date()
+});
+});
+activities.sort((a, b) => b.time - a.time);
+const top = activities.slice(0, 8);
+if (!top.length) {
+container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">No recent activity</div>';
+return;
+}
+container.innerHTML = top.map(a => `
+<div class="recent-activity-item">
+<div class="ra-icon ${a.color}"><i data-lucide="${a.icon}" class="w-4 h-4"></i></div>
+<div style="flex-grow:1">
+<div class="ra-text">${a.html}</div>
+<div class="ra-time">${timeAgo(a.time)}</div>
+</div>
+</div>
+`).join('');
+lucide.createIcons();
+} catch(e) {
+console.error('Recent activity error:', e);
+container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Unable to load</div>';
+}
+}
+
+function updateDashUpcomingExams() {
+const container = document.getElementById('dashUpcomingExams');
+if (!container) return;
+if (!resExamsCache || !resExamsCache.length) {
+container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">No upcoming exams</div>';
+return;
+}
+const today = new Date().toISOString().split('T')[0];
+const upcoming = resExamsCache.filter(e => e.date >= today).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 5);
+if (!upcoming.length) {
+container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">No upcoming exams</div>';
+return;
+}
+container.innerHTML = upcoming.map(e => `
+<div class="flex items-center gap-3 p-3 border-b border-slate-100 last:border-0">
+<div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+<i data-lucide="graduation-cap" class="w-5 h-5"></i>
+</div>
+<div style="flex-grow:1;min-width:0">
+<div class="font-semibold text-sm text-slate-800 truncate">${e.name}</div>
+<div class="text-xs text-slate-500">${e.date} • ${e.fullMarks} marks</div>
+</div>
+<span class="text-[10px] font-bold px-2 py-1 rounded-full ${e.published ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}">${e.published ? 'Published' : 'Draft'}</span>
+</div>
+`).join('');
+lucide.createIcons();
+}
+
+function timeAgo(date) {
+const seconds = Math.floor((new Date() - date) / 1000);
+if (seconds < 60) return 'Just now';
+if (seconds < 3600) return Math.floor(seconds/60) + 'm ago';
+if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago';
+if (seconds < 604800) return Math.floor(seconds/86400) + 'd ago';
+return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+}
+
+// ================================================================
+// NEW: NOTIFICATION SYSTEM
+// ================================================================
+function startNotificationsListener() {
+if (!currentUser) return;
+if (notifListener) return;
+notifListener = db.collection('notifications')
+.orderBy('createdAt', 'desc')
+.limit(50)
+.onSnapshot(snap => {
+notificationsCache = [];
+snap.forEach(d => {
+const data = d.data();
+data.id = d.id;
+notificationsCache.push(data);
+});
+renderNotifications();
+updateNotifBadge();
+}, err => console.error('Notification listener error:', err));
+}
+
+function stopNotificationsListener() {
+if (notifListener) { try { notifListener(); } catch(e) {} notifListener = null; }
+notificationsCache = [];
+}
+
+async function createNotification(type, title, message, data = {}) {
+if (!currentUser) return;
+try {
+// Avoid duplicate: check if same type+title+roll exists within last 5 minutes
+const recentThreshold = new Date(Date.now() - 5 * 60 * 1000);
+const key = `${type}_${title}_${data.roll || ''}_${data.date || ''}`.substring(0, 100);
+// Simple duplicate prevention using a timestamp-based ID
+const notifId = `${currentUser.uid}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+await db.collection('notifications').doc(notifId).set({
+type, title, message,
+roll: data.roll || null,
+session: data.session || null,
+date: data.date || null,
+amount: data.amount || null,
+invoiceNo: data.invoiceNo || null,
+examId: data.examId || null,
+uid: currentUser.uid,
+read: false,
+dedupKey: key,
+createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+} catch(e) { console.error('Notification create error:', e); }
+}
+
+function renderNotifications() {
+const list = document.getElementById('notifList');
+if (!list) return;
+if (!notificationsCache.length) {
+list.innerHTML = '<div class="notif-empty"><i data-lucide="bell-off" class="w-10 h-10"></i><p>No notifications yet</p></div>';
+lucide.createIcons();
+return;
+}
+list.innerHTML = notificationsCache.map(n => {
+const iconMap = {
+fee: { icon: 'banknote', cls: 'fee' },
+penalty: { icon: 'alert-triangle', cls: 'penalty' },
+attendance: { icon: 'calendar-check', cls: 'attendance' },
+student: { icon: 'user-plus', cls: 'student' },
+result: { icon: 'graduation-cap', cls: 'result' },
+info: { icon: 'info', cls: 'info' }
+};
+const ic = iconMap[n.type] || iconMap.info;
+const unread = n.read ? '' : 'unread';
+const time = n.createdAt ? timeAgo(n.createdAt.toDate()) : '';
+return `
+<div class="notif-item ${unread}" data-id="${n.id}" onclick="handleNotifClick(event, '${n.id}')">
+<div class="notif-icon ${ic.cls}"><i data-lucide="${ic.icon}" class="w-4 h-4"></i></div>
+<div class="notif-content">
+<p class="notif-title">${escapeHtml(n.title)}</p>
+<p class="notif-msg">${escapeHtml(n.message)}</p>
+<div class="notif-meta">
+<span>${time}</span>
+${n.session ? `<span>• ${escapeHtml(n.session)}</span>` : ''}
+</div>
+</div>
+<button class="notif-delete" onclick="deleteNotification(event, '${n.id}')" title="Delete">
+<i data-lucide="x" class="w-3.5 h-3.5"></i>
+</button>
+</div>
+`;
+}).join('');
+lucide.createIcons();
+}
+
+function escapeHtml(str) {
+if (!str) return '';
+return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+function updateNotifBadge() {
+const badge = document.getElementById('notifBadge');
+if (!badge) return;
+const unread = notificationsCache.filter(n => !n.read).length;
+if (unread > 0) {
+badge.textContent = unread > 99 ? '99+' : unread;
+badge.classList.remove('hidden-badge');
+} else {
+badge.classList.add('hidden-badge');
+}
+}
+
+function toggleNotifications(event) {
+if (event) event.stopPropagation();
+const dd = document.getElementById('notifDropdown');
+dd.classList.toggle('open');
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+const dd = document.getElementById('notifDropdown');
+const btn = document.getElementById('notifBtn');
+if (!dd.contains(e.target) && !btn.contains(e.target)) {
+dd.classList.remove('open');
+}
+});
+
+async function handleNotifClick(event, id) {
+event.stopPropagation();
+const n = notificationsCache.find(x => x.id === id);
+if (!n) return;
+// Mark as read
+if (!n.read) {
+try {
+await db.collection('notifications').doc(id).update({ read: true });
+n.read = true;
+renderNotifications();
+updateNotifBadge();
+} catch(e) {}
+}
+// Navigate to relevant section
+const dd = document.getElementById('notifDropdown');
+dd.classList.remove('open');
+if (n.type === 'fee' && n.roll) {
+switchTab('feesTab');
+setTimeout(() => {
+const input = document.getElementById('feeRollInput');
+if (input) { input.value = n.roll; input.dispatchEvent(new Event('input')); input.focus(); }
+}, 200);
+} else if (n.type === 'penalty' && n.roll) {
+switchTab('penaltyTab');
+setTimeout(() => {
+const input = document.getElementById('penaltySearchRoll');
+if (input) { input.value = n.roll; input.focus(); }
+}, 200);
+} else if (n.type === 'attendance' && n.roll) {
+switchTab('recordsTab');
+setTimeout(() => {
+const input = document.getElementById('indivRollSearch');
+if (input) { input.value = n.roll; input.dispatchEvent(new Event('input')); }
+}, 200);
+} else if (n.type === 'student' && n.roll) {
+switchTab('studentsTab');
+setTimeout(() => {
+const input = document.getElementById('studentSearch');
+if (input) { input.value = n.roll; input.dispatchEvent(new Event('input')); }
+}, 200);
+} else if (n.type === 'result') {
+switchTab('resultTab');
+}
+}
+
+async function deleteNotification(event, id) {
+event.stopPropagation();
+try {
+await db.collection('notifications').doc(id).delete();
+} catch(e) { console.error('Delete notif error:', e); }
+}
+
+async function markAllNotificationsRead() {
+try {
+const batch = db.batch();
+notificationsCache.filter(n => !n.read).forEach(n => {
+batch.update(db.collection('notifications').doc(n.id), { read: true });
+});
+await batch.commit();
+} catch(e) { console.error('Mark all read error:', e); }
+}
+
+async function clearAllNotifications() {
+if (!notificationsCache.length) return;
+if (!confirm('Clear all notifications? This cannot be undone.')) return;
+try {
+const batch = db.batch();
+notificationsCache.forEach(n => batch.delete(db.collection('notifications').doc(n.id)));
+await batch.commit();
+} catch(e) { console.error('Clear all error:', e); }
+}
 </script>
 </body>
 </html>
