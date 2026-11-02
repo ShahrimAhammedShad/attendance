@@ -59,7 +59,6 @@ aside, .no-print, #dashboardSection > main > section:not(#attendanceReportTab), 
 .report-date-field { margin-top: 15px !important; text-align: center !important; font-size: 10px !important; }
 .no-data-message { text-align: center !important; padding: 40px !important; color: #666 !important; border: 2px dashed #999 !important; font-size: 12px !important; font-weight: 600 !important; }
 }
-
 /* --- NEW: TOP HEADER BAR --- */
 .top-header {
 background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
@@ -161,7 +160,6 @@ padding: 0 4px;
 border: 2px solid #1e293b;
 }
 .notif-btn .badge.hidden-badge { display: none; }
-
 /* --- NOTIFICATION DROPDOWN --- */
 .notif-dropdown {
 position: fixed;
@@ -291,7 +289,6 @@ color: #94a3b8;
 font-size: 13px;
 }
 .notif-empty i { margin: 0 auto 8px; display: block; opacity: 0.5; }
-
 /* --- DASHBOARD CARDS --- */
 .dash-card {
 background: white;
@@ -355,7 +352,6 @@ right: 0;
 height: 3px;
 background: linear-gradient(90deg, var(--trend-color, #6366f1), transparent);
 }
-
 .chart-container {
 background: white;
 border-radius: 14px;
@@ -381,7 +377,6 @@ position: relative;
 height: 240px;
 }
 .chart-wrap canvas { max-height: 100%; }
-
 .dash-section-title {
 font-size: 16px;
 font-weight: 800;
@@ -397,7 +392,6 @@ height: 18px;
 background: linear-gradient(180deg, #6366f1, #8b5cf6);
 border-radius: 2px;
 }
-
 .recent-activity-item {
 display: flex;
 gap: 12px;
@@ -426,15 +420,386 @@ color: #94a3b8;
 margin-top: 2px;
 }
 
-/* Mobile responsiveness */
+/* ============================================================
+   SMART SIDEBAR SYSTEM
+   ============================================================ */
+:root {
+  --sidebar-width-expanded: 260px;
+  --sidebar-width-collapsed: 72px;
+  --sidebar-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --top-header-height: 64px;
+}
+
+/* --- Sidebar Base --- */
+aside#mainSidebar {
+  width: var(--sidebar-width-expanded);
+  transition: width var(--sidebar-transition);
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* --- Collapsed State (Desktop) --- */
+aside#mainSidebar.sidebar-collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+
+aside#mainSidebar.sidebar-collapsed .sidebar-brand-text,
+aside#mainSidebar.sidebar-collapsed .nav-group-title,
+aside#mainSidebar.sidebar-collapsed .nav-label,
+aside#mainSidebar.sidebar-collapsed #userRoleBadge {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s, width 0.2s;
+}
+
+aside#mainSidebar.sidebar-collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 16px 8px;
+}
+
+aside#mainSidebar.sidebar-collapsed nav button {
+  justify-content: center;
+  padding: 12px 0;
+  position: relative;
+}
+
+aside#mainSidebar.sidebar-collapsed nav button i {
+  margin-right: 0 !important;
+}
+
+/* --- Tooltip on Collapsed Nav Items --- */
+aside#mainSidebar.sidebar-collapsed nav button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0f172a;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+aside#mainSidebar.sidebar-collapsed nav button[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* --- Main Content Wrapper --- */
+.main-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  transition: all var(--sidebar-transition);
+}
+
+.main-content-wrapper > main {
+  min-width: 0;
+  flex-grow: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* --- Mobile Overlay --- */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 35;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--sidebar-transition);
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* --- Sidebar Toggle Button --- */
+.sidebar-toggle-btn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.05);
+}
+
+.sidebar-toggle-btn .toggle-icon {
+  transition: transform 0.3s;
+}
+
+/* --- Sidebar Brand --- */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all var(--sidebar-transition);
+}
+
+.sidebar-brand-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sidebar-brand-text {
+  transition: opacity 0.2s, width 0.2s;
+  min-width: 0;
+}
+
+/* --- Close Button (Mobile Only) --- */
+.sidebar-close-btn {
+  display: none;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* --- Nav Groups --- */
+.nav-group {
+  margin-bottom: 4px;
+}
+
+.nav-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 10px 12px 4px;
+  margin-top: 6px;
+  transition: opacity 0.2s;
+}
+
+/* --- Active Nav Item Indicator --- */
+aside#mainSidebar nav button.active-nav {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
+  color: #a5b4fc;
+  border-left: 3px solid #6366f1;
+  padding-left: calc(12px - 3px);
+}
+
+aside#mainSidebar.sidebar-collapsed nav button.active-nav {
+  padding-left: 0;
+  border-left: 3px solid #6366f1;
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE SIDEBAR
+   ============================================================ */
 @media (max-width: 768px) {
-.top-header { padding: 10px 12px; }
-.top-header .brand-text h1 { font-size: 13px; }
-.top-header .brand-text p { font-size: 10px; }
-.top-header .brand-icon { width: 34px; height: 34px; font-size: 15px; }
-.user-chip { display: none; }
-.notif-dropdown { right: 10px; width: calc(100vw - 20px); top: 58px; }
-.dash-card .card-value { font-size: 20px; }
+  aside#mainSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    transform: translateX(-100%);
+    transition: transform var(--sidebar-transition);
+    z-index: 40;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+    padding-top: 12px;
+  }
+
+  aside#mainSidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  /* Always show labels on mobile */
+  aside#mainSidebar .sidebar-brand-text,
+  aside#mainSidebar .nav-group-title,
+  aside#mainSidebar .nav-label,
+  aside#mainSidebar #userRoleBadge {
+    opacity: 1 !important;
+    width: auto !important;
+  }
+
+  aside#mainSidebar nav button {
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  .main-content-wrapper {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  body.sidebar-open-mobile {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+
+  .top-header {
+    padding: 10px 12px;
+  }
+
+  .top-header .brand-text h1 { font-size: 13px; }
+  .top-header .brand-text p { font-size: 10px; }
+  .top-header .brand-icon { width: 34px; height: 34px; font-size: 15px; }
+  .user-chip { display: none; }
+}
+
+/* ============================================================
+   FULLY RESPONSIVE DASHBOARD
+   ============================================================ */
+@media (max-width: 1280px) {
+  .chart-wrap { height: 220px; }
+}
+
+@media (max-width: 1024px) {
+  .dash-card .card-value { font-size: 20px; }
+  .dash-card { padding: 14px; }
+  .chart-wrap { height: 200px; }
+}
+
+@media (max-width: 768px) {
+  .dash-card .card-value { font-size: 18px; }
+  .dash-card .card-label { font-size: 10px; }
+  .dash-card .card-sub { font-size: 10px; }
+  .dash-card .card-icon { width: 36px; height: 36px; }
+  .dash-card .card-icon i { width: 18px; height: 18px; }
+  .chart-wrap { height: 220px; }
+  .chart-container h3 { font-size: 13px; }
+  .dash-section-title { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  .dash-card { padding: 12px; }
+  .dash-card .card-value { font-size: 17px; }
+  .chart-wrap { height: 200px; }
+  main { padding: 12px !important; }
+}
+
+/* ============================================================
+   RESPONSIVE TABLES
+   ============================================================ */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+@media (max-width: 640px) {
+  table { font-size: 11px; }
+  table th, table td { padding: 8px 6px; }
+  table th { font-size: 9px; }
+}
+
+/* ============================================================
+   RESPONSIVE FORMS
+   ============================================================ */
+@media (max-width: 640px) {
+  form input, form select, form textarea {
+    font-size: 14px; /* Prevents iOS zoom */
+  }
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    gap: 8px;
+  }
+}
+
+/* ============================================================
+   NOTIFICATION DROPDOWN RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+  .notif-dropdown {
+    width: calc(100vw - 20px);
+    right: 10px;
+    max-height: 70vh;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION PREFERENCE
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   FIX: Prevent horizontal overflow globally
+   ============================================================ */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.tab-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.invoice-box {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Chart canvas fix */
+.chart-wrap canvas {
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 /* --- SCREEN STYLES --- */
@@ -457,7 +822,6 @@ margin-top: 2px;
 <p id="loginError" class="text-red-500 text-center text-sm mt-4 hidden"></p>
 </div>
 </div>
-
 <!-- NOTIFICATION DROPDOWN (outside dashboard so it's always accessible) -->
 <div id="notifDropdown" class="notif-dropdown">
 <div class="notif-header">
@@ -474,7 +838,6 @@ margin-top: 2px;
 </div>
 </div>
 </div>
-
 <!-- DASHBOARD -->
 <div id="dashboardSection" class="hidden flex-grow flex flex-col">
 <!-- NEW: TOP HEADER BAR -->
@@ -487,6 +850,9 @@ margin-top: 2px;
 </div>
 </div>
 <div class="top-header-actions">
+<button id="sidebarToggleBtn" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+<i data-lucide="menu" class="w-5 h-5 toggle-icon"></i>
+</button>
 <div class="user-chip">
 <div class="avatar" id="userAvatar">A</div>
 <div>
@@ -503,34 +869,115 @@ margin-top: 2px;
 </button>
 </div>
 </div>
+<!-- Mobile Sidebar Overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <div class="flex flex-grow overflow-hidden">
-<aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col p-4 space-y-2 overflow-y-auto flex-shrink-0">
-<div class="py-4 px-2 border-b border-slate-800 mb-4 hidden md:block">
-<h3 class="text-lg font-bold tracking-wider text-indigo-400">Navigation</h3>
-<p id="userRoleBadge" class="text-xs bg-slate-800 text-slate-300 inline-block px-2 py-0.5 rounded-full mt-1 font-semibold uppercase"></p>
+<aside id="mainSidebar" class="bg-slate-900 text-white flex flex-col p-4 space-y-2 flex-shrink-0">
+<div class="sidebar-brand py-4 px-2 border-b border-slate-800 mb-4">
+  <div class="sidebar-brand-content">
+    <div class="brand-icon">IC</div>
+    <div class="sidebar-brand-text">
+      <h3 class="text-sm font-bold tracking-wider text-indigo-400">Navigation</h3>
+      <p id="userRoleBadge" class="text-xs bg-slate-800 text-slate-300 inline-block px-2 py-0.5 rounded-full mt-1 font-semibold uppercase"></p>
+    </div>
+  </div>
+  <button class="sidebar-close-btn" onclick="closeMobileSidebar()" title="Close">
+    <i data-lucide="x" class="w-5 h-5"></i>
+  </button>
 </div>
 <nav class="space-y-1 flex-grow">
-<!-- NEW: Dashboard Button (first) -->
-<button onclick="switchTab('dashboardTab')" id="btn-dashboardTab" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium bg-slate-800"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span>Dashboard</span></button>
-<button onclick="switchTab('markTab')" id="btn-markTab" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium"><i data-lucide="check-square" class="w-5 h-5"></i> <span>Mark Attendance</span></button>
-<button onclick="switchTab('studentsTab')" id="btn-studentsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="users" class="w-5 h-5"></i> <span>Student Database</span></button>
-<button onclick="switchTab('recordsTab')" id="btn-recordsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="calendar" class="w-5 h-5"></i> <span>Attendance History</span></button>
-<button onclick="switchTab('attendanceReportTab')" id="btn-attendanceReportTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="file-search" class="w-5 h-5"></i> <span>Attendance Reports</span></button>
-<button onclick="switchTab('statsTab')" id="btn-statsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="bar-chart-3" class="w-5 h-5"></i> <span>Statistics & Reports</span></button>
-<button onclick="switchTab('feesTab')" id="btn-feesTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="dollar-sign" class="w-5 h-5"></i> <span>Fee Management</span></button>
-<button onclick="switchTab('penaltyTab')" id="btn-penaltyTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="alert-circle" class="w-5 h-5"></i> <span>Penalty Management</span></button>
-<button onclick="switchTab('expenseTab')" id="btn-expenseTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="trending-up" class="w-5 h-5"></i> <span>Expense Management</span></button>
-<button onclick="switchTab('invoiceHistoryTab')" id="btn-invoiceHistoryTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="file-text" class="w-5 h-5"></i> <span>Invoice History</span></button>
-<button onclick="switchTab('collectionReportTab')" id="btn-collectionReportTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="receipt" class="w-5 h-5"></i> <span>Fee Collection Report</span></button>
-<button onclick="switchTab('resultTab')" id="btn-resultTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="graduation-cap" class="w-5 h-5"></i> <span>Result Management</span></button>
-<button onclick="switchTab('logsTab')" id="btn-logsTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="clipboard-list" class="w-5 h-5"></i> <span>Activity Logs</span></button>
-<button onclick="switchTab('usersTab')" id="btn-usersTab" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden"><i data-lucide="user-plus" class="w-5 h-5"></i> <span>Add Inputter</span></button>
+
+  <!-- MAIN -->
+  <div class="nav-group">
+    <div class="nav-group-title">Main</div>
+    <button onclick="switchTab('dashboardTab')" id="btn-dashboardTab" data-tooltip="Dashboard" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium active-nav">
+      <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Dashboard</span>
+    </button>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="nav-group">
+    <div class="nav-group-title">Attendance</div>
+    <button onclick="switchTab('markTab')" id="btn-markTab" data-tooltip="Mark Attendance" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium">
+      <i data-lucide="check-square" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Mark Attendance</span>
+    </button>
+    <button onclick="switchTab('recordsTab')" id="btn-recordsTab" data-tooltip="Attendance History" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="calendar" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Attendance History</span>
+    </button>
+    <button onclick="switchTab('attendanceReportTab')" id="btn-attendanceReportTab" data-tooltip="Attendance Reports" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="file-search" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Attendance Reports</span>
+    </button>
+    <button onclick="switchTab('statsTab')" id="btn-statsTab" data-tooltip="Statistics" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Statistics</span>
+    </button>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="nav-group">
+    <div class="nav-group-title">Students</div>
+    <button onclick="switchTab('studentsTab')" id="btn-studentsTab" data-tooltip="Student Database" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Student Database</span>
+    </button>
+  </div>
+
+  <!-- FINANCE -->
+  <div class="nav-group">
+    <div class="nav-group-title">Finance</div>
+    <button onclick="switchTab('feesTab')" id="btn-feesTab" data-tooltip="Fee Management" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="dollar-sign" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Fee Management</span>
+    </button>
+    <button onclick="switchTab('penaltyTab')" id="btn-penaltyTab" data-tooltip="Penalty Management" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Penalty Management</span>
+    </button>
+    <button onclick="switchTab('expenseTab')" id="btn-expenseTab" data-tooltip="Expense Management" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="trending-up" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Expense Management</span>
+    </button>
+    <button onclick="switchTab('invoiceHistoryTab')" id="btn-invoiceHistoryTab" data-tooltip="Invoice History" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="file-text" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Invoice History</span>
+    </button>
+    <button onclick="switchTab('collectionReportTab')" id="btn-collectionReportTab" data-tooltip="Collection Report" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="receipt" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Collection Report</span>
+    </button>
+  </div>
+
+  <!-- ACADEMIC -->
+  <div class="nav-group">
+    <div class="nav-group-title">Academic</div>
+    <button onclick="switchTab('resultTab')" id="btn-resultTab" data-tooltip="Result Management" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="graduation-cap" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Result Management</span>
+    </button>
+  </div>
+
+  <!-- ADMINISTRATION -->
+  <div class="nav-group">
+    <div class="nav-group-title">Administration</div>
+    <button onclick="switchTab('logsTab')" id="btn-logsTab" data-tooltip="Activity Logs" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="clipboard-list" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Activity Logs</span>
+    </button>
+    <button onclick="switchTab('usersTab')" id="btn-usersTab" data-tooltip="Add Inputter" class="admin-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left hover:bg-slate-800 transition font-medium hidden">
+      <i data-lucide="user-plus" class="w-5 h-5 flex-shrink-0"></i>
+      <span class="nav-label">Add Inputter</span>
+    </button>
+  </div>
+
 </nav>
 </aside>
-
-<main class="flex-grow p-4 md:p-6 overflow-y-auto max-w-7xl mx-auto w-full">
-
+<div class="main-content-wrapper">
+<main class="p-4 md:p-6 max-w-7xl mx-auto w-full">
 <!-- ============ NEW: DASHBOARD TAB ============ -->
 <section id="dashboardTab" class="tab-content space-y-6">
 <!-- Welcome Banner -->
@@ -542,7 +989,6 @@ margin-top: 2px;
 <p class="text-indigo-100 text-sm md:text-base">Here's what's happening at Ideal Coaching Center today — <span id="dashTodayDate"></span></p>
 </div>
 </div>
-
 <!-- Primary Stats Row -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
 <div class="dash-card trend" style="--trend-color:#6366f1">
@@ -578,7 +1024,6 @@ margin-top: 2px;
 <p class="card-sub">Active sessions</p>
 </div>
 </div>
-
 <!-- Financial Stats Row -->
 <h3 class="dash-section-title"><span class="bar"></span> Financial Overview</h3>
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -615,7 +1060,6 @@ margin-top: 2px;
 <p class="card-sub"><span id="dashPendingPenalties">৳0</span> pending</p>
 </div>
 </div>
-
 <!-- Charts Row 1 -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 <div class="chart-container lg:col-span-2">
@@ -629,7 +1073,6 @@ margin-top: 2px;
 <div class="chart-wrap"><canvas id="chartAttendancePie"></canvas></div>
 </div>
 </div>
-
 <!-- Charts Row 2 -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 <div class="chart-container">
@@ -643,7 +1086,6 @@ margin-top: 2px;
 <div class="chart-wrap"><canvas id="chartMonthlyCollection"></canvas></div>
 </div>
 </div>
-
 <!-- Recent Activity & Upcoming -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 <div class="chart-container lg:col-span-2">
@@ -662,7 +1104,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- MARK ATTENDANCE -->
 <section id="markTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -701,7 +1142,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- STUDENT DATABASE -->
 <section id="studentsTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -800,7 +1240,6 @@ margin-top: 2px;
 </tr></thead><tbody id="studentTableBody" class="divide-y divide-slate-100"></tbody></table></div>
 </div>
 </section>
-
 <!-- ATTENDANCE HISTORY -->
 <section id="recordsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -840,7 +1279,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- ATTENDANCE REPORTS TAB -->
 <section id="attendanceReportTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 no-print">
@@ -903,7 +1341,6 @@ margin-top: 2px;
 </div>
 <div id="attendanceReportPreview" class="hidden"></div>
 </section>
-
 <!-- STATISTICS -->
 <section id="statsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -937,7 +1374,6 @@ margin-top: 2px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Roll</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Name</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Present</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Late</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Absent</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Leave</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Rate</th></tr></thead><tbody id="statsTableBody" class="divide-y divide-slate-100"><tr><td colspan="7" class="text-center py-6 text-slate-400">Generate analysis first.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- FEE MANAGEMENT -->
 <section id="feesTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1008,7 +1444,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- PENALTY MANAGEMENT -->
 <section id="penaltyTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1093,7 +1528,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- EXPENSE MANAGEMENT -->
 <section id="expenseTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1156,7 +1590,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- INVOICE HISTORY -->
 <section id="invoiceHistoryTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1181,7 +1614,6 @@ margin-top: 2px;
 </table></div>
 </div>
 </section>
-
 <!-- FEE COLLECTION REPORT -->
 <section id="collectionReportTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1260,7 +1692,6 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 <!-- RESULT MANAGEMENT -->
 <section id="resultTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1296,7 +1727,6 @@ margin-top: 2px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Exam</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Full Marks</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Action</th></tr></thead><tbody id="resExamsBody" class="divide-y divide-slate-100"><tr><td colspan="5" class="text-center py-4 text-slate-400">No exams.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- ACTIVITY LOGS -->
 <section id="logsTab" class="tab-content space-y-6 hidden">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -1310,7 +1740,6 @@ margin-top: 2px;
 <div class="overflow-x-auto"><table class="min-w-full bg-white divide-y divide-slate-100 text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Time</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Inputter</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Date</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Student</th><th class="px-4 py-3 text-left font-semibold text-slate-500 uppercase text-xs">Batch</th><th class="px-4 py-3 text-center font-semibold text-slate-500 uppercase text-xs">Status</th></tr></thead><tbody id="logsTableBody" class="divide-y divide-slate-100"><tr><td colspan="6" class="text-center py-6 text-slate-400">Apply filters.</td></tr></tbody></table></div>
 </div>
 </section>
-
 <!-- USER MANAGEMENT -->
 <section id="usersTab" class="tab-content space-y-6 hidden">
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1330,11 +1759,10 @@ margin-top: 2px;
 </div>
 </div>
 </section>
-
 </main>
 </div>
 </div>
-
+</div>
 <!-- MODALS (unchanged) -->
 <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4">
@@ -1604,6 +2032,7 @@ margin-top: 2px;
 </div>
 </div>
 </div>
+</div>
 <div class="border-t p-4 flex justify-end gap-3 no-print bg-slate-50 rounded-b-xl">
 <button onclick="closeInvoiceModal()" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold hover:bg-slate-100 transition">Close</button>
 <button onclick="downloadInvoicePDF()" class="px-4 py-2 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition flex items-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Download PDF</button>
@@ -1614,7 +2043,6 @@ margin-top: 2px;
 <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-4 text-center text-sm mt-auto">
 <p>Developed by: <a href="https://shahrimahammedshad.github.io/attendance-with-button/" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">Shahrim Ahammed Shad</a></p>
 </footer>
-
 <script>
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -1673,13 +2101,127 @@ let collectedFeesData = [];
 let collectedFeesMeta = { fromDate: '', toDate: '', batch: '', method: '' };
 let arReportData = [];
 let arReportMeta = {};
-
 // ===== NEW: DASHBOARD & NOTIFICATION STATE =====
 let dashboardListeners = [];
 let dashboardCharts = {};
 let notificationsCache = [];
 let notifListener = null;
 const DASHBOARD_TODAY = new Date().toISOString().split('T')[0];
+
+// ================================================================
+// SMART SIDEBAR SYSTEM
+// ================================================================
+let sidebarCollapsed = localStorage.getItem('icc_sidebar_collapsed') === 'true';
+let isMobileView = window.innerWidth <= 768;
+
+function toggleSidebar() {
+  if (isMobileView) {
+    const sidebar = document.getElementById('mainSidebar');
+    if (sidebar.classList.contains('sidebar-open')) {
+      closeMobileSidebar();
+    } else {
+      openMobileSidebar();
+    }
+  } else {
+    toggleDesktopSidebar();
+  }
+}
+
+function toggleDesktopSidebar() {
+  const sidebar = document.getElementById('mainSidebar');
+  sidebarCollapsed = !sidebarCollapsed;
+  sidebar.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+  localStorage.setItem('icc_sidebar_collapsed', sidebarCollapsed);
+  
+  // Resize charts after transition
+  setTimeout(() => {
+    resizeAllCharts();
+  }, 350);
+}
+
+function openMobileSidebar() {
+  const sidebar = document.getElementById('mainSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.add('sidebar-open');
+  overlay.classList.add('active');
+  document.body.classList.add('sidebar-open-mobile');
+  lucide.createIcons();
+}
+
+function closeMobileSidebar() {
+  const sidebar = document.getElementById('mainSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.remove('sidebar-open');
+  overlay.classList.remove('active');
+  document.body.classList.remove('sidebar-open-mobile');
+}
+
+function resizeAllCharts() {
+  if (typeof dashboardCharts !== 'undefined' && dashboardCharts) {
+    Object.values(dashboardCharts).forEach(c => {
+      try { 
+        if (c && typeof c.resize === 'function') c.resize(); 
+      } catch(e) { console.warn('Chart resize error:', e); }
+    });
+  }
+}
+
+function initSidebarState() {
+  const sidebar = document.getElementById('mainSidebar');
+  if (!sidebar) return;
+  
+  isMobileView = window.innerWidth <= 768;
+  
+  if (!isMobileView && sidebarCollapsed) {
+    sidebar.classList.add('sidebar-collapsed');
+  } else {
+    sidebar.classList.remove('sidebar-collapsed');
+  }
+  
+  // Resize charts after initial load
+  setTimeout(resizeAllCharts, 500);
+}
+
+// Handle window resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const wasMobile = isMobileView;
+    isMobileView = window.innerWidth <= 768;
+    
+    const sidebar = document.getElementById('mainSidebar');
+    
+    // If crossing mobile breakpoint
+    if (wasMobile !== isMobileView) {
+      closeMobileSidebar();
+      
+      if (!isMobileView) {
+        // Switched to desktop - apply saved collapsed state
+        sidebar.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+      } else {
+        // Switched to mobile - remove desktop collapsed class
+        sidebar.classList.remove('sidebar-collapsed');
+      }
+    }
+    
+    resizeAllCharts();
+  }, 150);
+});
+
+// Close mobile sidebar on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeMobileSidebar();
+    const dd = document.getElementById('notifDropdown');
+    if (dd) dd.classList.remove('open');
+  }
+});
+
+// Initialize sidebar on DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+  initSidebarState();
+});
 
 // ===== HOLD STATUS HELPERS =====
 function isStudentOnHold(student, checkDate = null) {
@@ -1745,7 +2287,6 @@ const container = document.getElementById('editHoldFieldsContainer');
 if (status === 'Hold') container.classList.remove('hidden');
 else container.classList.add('hidden');
 }
-
 window.addEventListener('DOMContentLoaded', () => {
 initIcons(); setDefaultDates(); initResultFirebase();
 auth.onAuthStateChanged(async (user) => {
@@ -1767,7 +2308,6 @@ stopNotificationsListener();
 }
 });
 });
-
 function updateUserHeader() {
 if (!currentUser) return;
 const email = currentUser.email || '';
@@ -1783,7 +2323,6 @@ if (welcome) welcome.textContent = email.split('@')[0];
 const todayDate = document.getElementById('dashTodayDate');
 if (todayDate) todayDate.textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
-
 function initIcons() { lucide.createIcons(); }
 function setDefaultDates() {
 const today = new Date().toISOString().split('T')[0];
@@ -1891,15 +2430,41 @@ function setupDashboardForRole(role) {
 document.getElementById('loginSection').classList.add('hidden'); document.getElementById('dashboardSection').classList.remove('hidden');
 document.getElementById('userRoleBadge').textContent = role;
 document.querySelectorAll('.admin-only').forEach(el => role === 'admin' ? el.classList.remove('hidden') : el.classList.add('hidden'));
-switchTab('dashboardTab'); // CHANGED: Dashboard is default
+switchTab('dashboardTab');
+// NEW: Initialize sidebar state after login
+initSidebarState();
 }
 function switchTab(tabId) {
-document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-document.getElementById(tabId).classList.remove('hidden');
-document.querySelectorAll('aside nav button').forEach(btn => btn.classList.remove('bg-slate-800'));
-const activeBtn = document.getElementById(`btn-${tabId}`); if (activeBtn) activeBtn.classList.add('bg-slate-800');
-if (tabId === 'resultTab' && resultReady) loadResultData();
-if (tabId === 'dashboardTab') refreshDashboard();
+  // Hide all tabs, show selected
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(tabId).classList.remove('hidden');
+  
+  // Update active nav state
+  document.querySelectorAll('aside#mainSidebar nav button').forEach(btn => {
+    btn.classList.remove('bg-slate-800', 'active-nav');
+  });
+  const activeBtn = document.getElementById(`btn-${tabId}`);
+  if (activeBtn) {
+    activeBtn.classList.add('bg-slate-800', 'active-nav');
+  }
+  
+  // Module-specific loading
+  if (tabId === 'resultTab' && resultReady) loadResultData();
+  if (tabId === 'dashboardTab') refreshDashboard();
+  
+  // Close mobile sidebar after navigation
+  if (isMobileView) {
+    closeMobileSidebar();
+  }
+  
+  // Resize charts after tab switch
+  setTimeout(() => {
+    resizeAllCharts();
+  }, 100);
+  
+  // Scroll main content to top
+  const mainEl = document.querySelector('.main-content-wrapper > main');
+  if (mainEl) mainEl.scrollTop = 0;
 }
 async function syncCache() {
 db.collection('students').onSnapshot(snapshot => {
@@ -1961,14 +2526,15 @@ if (!date || roll.length !== 6) { alert("Provide valid date and roll."); return;
 const m = studentsCache.find(s => s.roll.toString() === roll.toString()); if (!m) { alert("Roll not found."); return; }
 if (currentUserRole === 'inputter' && currentUserAssignedSession && m.session !== currentUserAssignedSession) { alert("Access Blocked."); return; }
 if (isStudentOnHold(m, date)) {
-if (!confirm(`⚠️ Student "${m.name}" is currently ON HOLD on ${date}.\nAttendance for held students is normally not recorded.\nDo you still want to mark attendance?`)) return;
+if (!confirm(`⚠️ Student "${m.name}" is currently ON HOLD on ${date}.
+Attendance for held students is normally not recorded.
+Do you still want to mark attendance?`)) return;
 }
 try {
 await db.collection('attendance').doc(`${date}_${roll}`).set({ date, roll, name: m.name, session: m.session, status, markedBy: currentUser.uid, markedByEmail: currentUser.email, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
 if ((status === "Absent" || status === "Late") && status !== "Leave") await addAutomaticPenalty(m, date, status);
 const sent = await sendAttendanceEmail(m, date, status);
 alert(sent ? "Saved & email sent!" : "Saved!");
-// Notification for attendance (only for notable statuses to avoid spam)
 if (status === 'Absent' || status === 'Late') {
 createNotification('attendance', `${m.name} marked ${status}`, `${m.name} (${m.session}) was marked ${status.toLowerCase()} on ${date}.`, { roll: m.roll, date, status });
 }
@@ -2042,7 +2608,6 @@ await batch.commit();
 let sent = 0;
 for (const item of emailQueue) { if (await sendAttendanceEmail(item.student, date, item.status)) sent++; await new Promise(r => setTimeout(r, 400)); }
 alert(`Saved! Emails: ${sent}/${emailQueue.length}`);
-// Single summarized notification for bulk attendance
 createNotification('attendance', `Batch Attendance: ${session}`, `Date: ${date} — Present: ${presentCount}, Late: ${lateCount}, Absent: ${absentCount}, Leave: ${leaveCount}`, { session, date, present: presentCount, late: lateCount, absent: absentCount, leave: leaveCount });
 document.getElementById('bulkSessionFilter').value = ""; loadStudentsForBulkMarking();
 } catch(e) { alert("Error: " + e.message); }
@@ -2341,7 +2906,9 @@ const transactionId = document.getElementById('feeTransactionId').value.trim();
 const collectedBy = document.getElementById('feeCollectedBy').value;
 if (!feeSelectedStudent) { alert("Match a student first."); return; }
 if (feeType === 'Tuition Fee' && isMonthInHoldPeriod(feeSelectedStudent, month)) {
-if (!confirm(`⚠️ Student "${feeSelectedStudent.name}" is ON HOLD for ${month}.\nNormally no tuition fee applies during hold period.\nDo you still want to record this payment?`)) return;
+if (!confirm(`⚠️ Student "${feeSelectedStudent.name}" is ON HOLD for ${month}.
+Normally no tuition fee applies during hold period.
+Do you still want to record this payment?`)) return;
 }
 let status = "Paid";
 if (feeType === "Tuition Fee") { const fee = feeSelectedStudent.monthlyFee ?? 1500; status = amount >= fee ? "Paid" : amount > 0 ? "Partial" : "Unpaid"; }
@@ -2370,7 +2937,6 @@ session: feeSelectedStudent.session, month, amount, status, feeType, paymentDate
 receivedByEmail: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
 alert("Payment Saved & Invoice Generated!");
-// Fee collection notification
 createNotification('fee', `Fee Received: ৳${amount.toLocaleString()}`, `${feeSelectedStudent.name} (${feeSelectedStudent.session}) paid ${feeType} for ${month} via ${paymentMethod}.`, { roll: feeSelectedStudent.roll, amount, feeType, month, invoiceNo });
 document.getElementById('collectFeeForm').reset(); setDefaultDates();
 document.getElementById('feePaymentMethod').value = 'Cash';
@@ -4042,21 +4608,15 @@ window.print();
 window.addEventListener('DOMContentLoaded', () => {
 toggleARFilters();
 });
-
 // ================================================================
 // NEW: DASHBOARD FUNCTIONS
 // ================================================================
 function initDashboard() {
-// Setup listeners for dashboard data
 const listeners = [];
-
-// Students listener (already exists in syncCache, but we need separate for dashboard)
 listeners.push(db.collection('students').onSnapshot(() => {
 updateDashStudentStats();
 updateDashBatchChart();
 }));
-
-// Today's attendance listener
 const today = new Date().toISOString().split('T')[0];
 listeners.push(db.collection('attendance').where('date', '==', today).onSnapshot(snap => {
 let p=0, l=0, a=0, lv=0;
@@ -4074,8 +4634,6 @@ const el4 = document.getElementById('dashLateToday'); if (el4) el4.textContent =
 const el5 = document.getElementById('dashLeaveToday'); if (el5) el5.textContent = lv;
 updateDashAttendanceChart(p, l, a, lv);
 }));
-
-// Payments listener for today's collection + month collection
 listeners.push(db.collection('payments').onSnapshot(snap => {
 const today = new Date().toISOString().split('T')[0];
 const currentMonth = new Date().toISOString().substring(0, 7);
@@ -4092,8 +4650,6 @@ const el3 = document.getElementById('dashMonthCollection'); if (el3) el3.textCon
 updateDashFeeTrendChart();
 updateDashMonthlyCollectionChart();
 }));
-
-// Penalties listener
 listeners.push(db.collection('penalties').onSnapshot(snap => {
 let total = 0, pending = 0;
 snap.forEach(d => {
@@ -4106,26 +4662,16 @@ pending += Math.max(0, due);
 const el1 = document.getElementById('dashPenalties'); if (el1) el1.textContent = '৳' + total.toLocaleString();
 const el2 = document.getElementById('dashPendingPenalties'); if (el2) el2.textContent = '৳' + pending.toLocaleString();
 }));
-
 dashboardListeners = listeners;
-
-// Initial load of outstanding fees (computed)
 computeOutstandingFees();
-
-// Recent activity
 loadRecentActivity();
-
-// Initialize charts
 initDashboardCharts();
 }
-
 async function computeOutstandingFees() {
-// Compute outstanding fees for current month
 try {
 const currentMonth = new Date().toISOString().substring(0, 7);
 let totalOutstanding = 0;
 let dueStudents = 0;
-// Simple approximation: for each student, compute net dues for current month
 for (const s of studentsCache) {
 if ((s.status || 'Active') === 'Hold' && isMonthInHoldPeriod(s, currentMonth)) continue;
 try {
@@ -4140,7 +4686,6 @@ const el1 = document.getElementById('dashOutstanding'); if (el1) el1.textContent
 const el2 = document.getElementById('dashDueStudents'); if (el2) el2.textContent = dueStudents;
 } catch(e) { console.error('Outstanding compute error:', e); }
 }
-
 function updateDashStudentStats() {
 const total = studentsCache.length;
 const active = studentsCache.filter(s => (s.status || 'Active') === 'Active').length;
@@ -4150,29 +4695,25 @@ const el2 = document.getElementById('dashActiveStudents'); if (el2) el2.textCont
 const el3 = document.getElementById('dashTotalBatches'); if (el3) el3.textContent = batches;
 const el4 = document.getElementById('dashBatchCount'); if (el4) el4.textContent = batches;
 }
-
 function cleanupDashboard() {
 dashboardListeners.forEach(unsub => { try { unsub(); } catch(e) {} });
 dashboardListeners = [];
 Object.values(dashboardCharts).forEach(c => { try { c.destroy(); } catch(e) {} });
 dashboardCharts = {};
 }
-
 function refreshDashboard() {
 updateDashStudentStats();
 computeOutstandingFees();
 loadRecentActivity();
 updateDashUpcomingExams();
-// Trigger chart refresh
 setTimeout(() => {
 updateDashFeeTrendChart();
 updateDashMonthlyCollectionChart();
 updateDashBatchChart();
+resizeAllCharts();
 }, 100);
 }
-
 function initDashboardCharts() {
-// Fee Trend (last 7 days) - bar chart
 const ctx1 = document.getElementById('chartFeeTrend');
 if (ctx1) {
 dashboardCharts.feeTrend = new Chart(ctx1, {
@@ -4185,7 +4726,6 @@ scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { dis
 }
 });
 }
-// Attendance Pie
 const ctx2 = document.getElementById('chartAttendancePie');
 if (ctx2) {
 dashboardCharts.attendancePie = new Chart(ctx2, {
@@ -4197,7 +4737,6 @@ plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 1
 }
 });
 }
-// Batch Distribution
 const ctx3 = document.getElementById('chartBatchDist');
 if (ctx3) {
 dashboardCharts.batchDist = new Chart(ctx3, {
@@ -4210,7 +4749,6 @@ scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' } }, y: { grid: { dis
 }
 });
 }
-// Monthly Collection
 const ctx4 = document.getElementById('chartMonthlyCollection');
 if (ctx4) {
 dashboardCharts.monthlyCollection = new Chart(ctx4, {
@@ -4224,7 +4762,6 @@ scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { dis
 });
 }
 }
-
 async function updateDashFeeTrendChart() {
 if (!dashboardCharts.feeTrend) return;
 try {
@@ -4235,7 +4772,6 @@ const d = new Date(today);
 d.setDate(d.getDate() - i);
 const dateStr = d.toISOString().split('T')[0];
 labels.push(d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
-// Query payments for this date
 const snap = await db.collection('payments').where('paymentDate', '==', dateStr).get();
 let total = 0;
 snap.forEach(doc => { total += Number(doc.data().amount) || 0; });
@@ -4246,13 +4782,11 @@ dashboardCharts.feeTrend.data.datasets[0].data = data;
 dashboardCharts.feeTrend.update();
 } catch(e) { console.error('Fee trend chart error:', e); }
 }
-
 function updateDashAttendanceChart(p, l, a, lv) {
 if (!dashboardCharts.attendancePie) return;
 dashboardCharts.attendancePie.data.datasets[0].data = [p, l, a, lv];
 dashboardCharts.attendancePie.update();
 }
-
 function updateDashBatchChart() {
 if (!dashboardCharts.batchDist) return;
 const batchCount = {};
@@ -4265,7 +4799,6 @@ dashboardCharts.batchDist.data.labels = sorted.map(x => x[0]);
 dashboardCharts.batchDist.data.datasets[0].data = sorted.map(x => x[1]);
 dashboardCharts.batchDist.update();
 }
-
 async function updateDashMonthlyCollectionChart() {
 if (!dashboardCharts.monthlyCollection) return;
 try {
@@ -4285,13 +4818,11 @@ dashboardCharts.monthlyCollection.data.datasets[0].data = data;
 dashboardCharts.monthlyCollection.update();
 } catch(e) { console.error('Monthly chart error:', e); }
 }
-
 async function loadRecentActivity() {
 const container = document.getElementById('dashRecentActivity');
 if (!container) return;
 container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Loading...</div>';
 try {
-// Fetch recent payments + attendance + penalties
 const [paySnap, attSnap, penSnap] = await Promise.all([
 db.collection('payments').orderBy('timestamp', 'desc').limit(5).get(),
 db.collection('attendance').orderBy('timestamp', 'desc').limit(5).get(),
@@ -4351,7 +4882,6 @@ console.error('Recent activity error:', e);
 container.innerHTML = '<div class="text-center py-8 text-slate-400 text-sm">Unable to load</div>';
 }
 }
-
 function updateDashUpcomingExams() {
 const container = document.getElementById('dashUpcomingExams');
 if (!container) return;
@@ -4379,7 +4909,6 @@ container.innerHTML = upcoming.map(e => `
 `).join('');
 lucide.createIcons();
 }
-
 function timeAgo(date) {
 const seconds = Math.floor((new Date() - date) / 1000);
 if (seconds < 60) return 'Just now';
@@ -4388,7 +4917,6 @@ if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago';
 if (seconds < 604800) return Math.floor(seconds/86400) + 'd ago';
 return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
-
 // ================================================================
 // NEW: NOTIFICATION SYSTEM
 // ================================================================
@@ -4409,19 +4937,15 @@ renderNotifications();
 updateNotifBadge();
 }, err => console.error('Notification listener error:', err));
 }
-
 function stopNotificationsListener() {
 if (notifListener) { try { notifListener(); } catch(e) {} notifListener = null; }
 notificationsCache = [];
 }
-
 async function createNotification(type, title, message, data = {}) {
 if (!currentUser) return;
 try {
-// Avoid duplicate: check if same type+title+roll exists within last 5 minutes
 const recentThreshold = new Date(Date.now() - 5 * 60 * 1000);
 const key = `${type}_${title}_${data.roll || ''}_${data.date || ''}`.substring(0, 100);
-// Simple duplicate prevention using a timestamp-based ID
 const notifId = `${currentUser.uid}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 await db.collection('notifications').doc(notifId).set({
 type, title, message,
@@ -4438,7 +4962,6 @@ createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
 } catch(e) { console.error('Notification create error:', e); }
 }
-
 function renderNotifications() {
 const list = document.getElementById('notifList');
 if (!list) return;
@@ -4478,12 +5001,10 @@ ${n.session ? `<span>• ${escapeHtml(n.session)}</span>` : ''}
 }).join('');
 lucide.createIcons();
 }
-
 function escapeHtml(str) {
 if (!str) return '';
 return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
-
 function updateNotifBadge() {
 const badge = document.getElementById('notifBadge');
 if (!badge) return;
@@ -4495,14 +5016,11 @@ badge.classList.remove('hidden-badge');
 badge.classList.add('hidden-badge');
 }
 }
-
 function toggleNotifications(event) {
 if (event) event.stopPropagation();
 const dd = document.getElementById('notifDropdown');
 dd.classList.toggle('open');
 }
-
-// Close dropdown on outside click
 document.addEventListener('click', (e) => {
 const dd = document.getElementById('notifDropdown');
 const btn = document.getElementById('notifBtn');
@@ -4510,12 +5028,10 @@ if (!dd.contains(e.target) && !btn.contains(e.target)) {
 dd.classList.remove('open');
 }
 });
-
 async function handleNotifClick(event, id) {
 event.stopPropagation();
 const n = notificationsCache.find(x => x.id === id);
 if (!n) return;
-// Mark as read
 if (!n.read) {
 try {
 await db.collection('notifications').doc(id).update({ read: true });
@@ -4524,7 +5040,6 @@ renderNotifications();
 updateNotifBadge();
 } catch(e) {}
 }
-// Navigate to relevant section
 const dd = document.getElementById('notifDropdown');
 dd.classList.remove('open');
 if (n.type === 'fee' && n.roll) {
@@ -4555,14 +5070,12 @@ if (input) { input.value = n.roll; input.dispatchEvent(new Event('input')); }
 switchTab('resultTab');
 }
 }
-
 async function deleteNotification(event, id) {
 event.stopPropagation();
 try {
 await db.collection('notifications').doc(id).delete();
 } catch(e) { console.error('Delete notif error:', e); }
 }
-
 async function markAllNotificationsRead() {
 try {
 const batch = db.batch();
@@ -4572,7 +5085,6 @@ batch.update(db.collection('notifications').doc(n.id), { read: true });
 await batch.commit();
 } catch(e) { console.error('Mark all read error:', e); }
 }
-
 async function clearAllNotifications() {
 if (!notificationsCache.length) return;
 if (!confirm('Clear all notifications? This cannot be undone.')) return;
